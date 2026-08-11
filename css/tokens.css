@@ -1,0 +1,201 @@
+/* ==========================================================================
+   divot.css — tokens
+   --------------------------------------------------------------------------
+   The default theme: a warm paper-gray in the light, bister brown once the
+   lights are off, with a single brass highlighter for an accent. It comes
+   from The Library, where the divot was cut.
+
+   The primitive itself has no colours of its own — it derives every wall it
+   draws from whatever ground it is sitting on (see core.css). So this file
+   is entirely replaceable: define the same token names against your own
+   palette and the divot follows you, theme flips and all.
+
+   The tokens the primitive actually reads are the surfaces (--bg and
+   friends), the two bezel sources (--edge-hi, --edge-lo), the ink ramp, and
+   --hl-wash for .accent. The type, space and dither tokens below are used
+   only by the build-out in system.css.
+   ========================================================================== */
+
+/* --- §1 shape, type, space -------------------------------------------------
+   Theme-independent: these do not change between light and dark, so they
+   live on :root alone and the palette blocks below never mention them.
+
+   No @font-face here on purpose — this package ships no binary assets. The
+   two families stay at the head of their stacks so a project that already
+   loads Instrument Sans or IBM Plex Mono gets them; everyone else lands on
+   the system UI and mono faces, which is a fine place to land. */
+
+:root {
+  /* type */
+  --font-ui: "Instrument Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --fs-micro: 10px;
+  --fs-meta: 11px;
+  --fs-mono: 12px;
+  --fs-ui: 13px;
+  --fs-body: 14px;
+  --fs-title: 15px;
+  --track-label: 0.12em;
+
+  /* space & shape. --r is 0px because the system is square; system.css §N3
+     adds opt-in per-component radii on top of it. */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --r: 0px;
+
+  /* dither tiles: black-on-transparent Bayer thresholds. Black works over
+     both themes, so these are theme-independent too. system.css uses the
+     50% tile for the popover scrim. */
+  --dither-12: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1'/%3E%3Crect x='2' y='2' width='1' height='1'/%3E%3C/svg%3E");
+  --dither-25: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1'/%3E%3C/svg%3E");
+  --dither-50: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1'/%3E%3Crect x='1' y='1' width='1' height='1'/%3E%3C/svg%3E");
+}
+
+/* --- §2 the light palette --------------------------------------------------
+   Two tokens deliberately do NOT follow the theme, and they are declared
+   here only: --paper, because a page scan is white whatever the hour, and
+   --hl-ink, the mark drawn on top of it. --hl-line brightens for dark
+   chrome and that brightened value all but disappears on a white page, so
+   anything sitting on paper takes --hl-ink and keeps the light value in
+   both themes. The dark block below omits both on purpose — they inherit.
+
+   [data-theme="light"] rides along on the same rule so a light panel can be
+   forced open inside a dark document (the specimen sheet shows both themes
+   side by side that way). */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* surfaces */
+  --bg: #e8e4d9;
+  --surface: #f1eee5;
+  --well: #dcd6c7;
+  --paper: #fffdf8;
+
+  /* lines & bezels — the two --edge tokens are the divot's light and
+     shadow sources, and the only reason it can draw a cut at all */
+  --line: #c9c3b1;
+  --line-strong: #8e8977;
+  --edge-hi: #fbf9f2;
+  --edge-lo: #a29c89;
+
+  /* ink */
+  --ink: #1e1c16;
+  --ink-dim: #605c4b; /* ≥4.5:1 on --bg, for 11px mono metadata */
+  --ink-faint: #97917c;
+
+  /* the one accent — a highlighter, never a fill. --hl is the wash colour
+     and is lighter than the grounds it sits on, so unringed solid fills
+     take --hl-line instead: it is the only one of the two that clears 3:1
+     in the light theme. */
+  --hl: #c39649;
+  --hl-wash: rgba(195, 150, 73, 0.3);
+  --hl-line: #996917;
+  --hl-ink: #996917; /* theme-constant: the pen on a white scan */
+}
+
+/* --- §3 the dark palette ---------------------------------------------------
+   The same ramp walked in Lab at fixed lightness and tinted toward bister,
+   so contrast against --bg is identical to the neutral it replaces (ink
+   15.0:1, ink-dim 5.6:1).
+
+   Declared twice, and the two copies must stay identical: once for
+   documents that simply follow the OS, and once for [data-theme="dark"] so
+   a theme can be forced — on the root to beat the OS preference, or on any
+   container to show the two themes on one page. The :not() guard is what
+   lets an explicit light choice win under a dark OS. They are adjacent so
+   the pair can be checked at a glance; there is no way to say this once in
+   plain CSS. */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg: #110e0a;
+    --surface: #191613;
+    --well: #0c0906;
+
+    --line: #2a2521;
+    --line-strong: #4c443d;
+    --edge-hi: #322c28;
+    --edge-lo: #000000;
+
+    --ink: #e7e2de;
+    --ink-dim: #8d8a87;
+    --ink-faint: #5a5856;
+
+    --hl: #daaf6b;
+    --hl-line: #ebc385;
+    --hl-wash: rgba(218, 175, 107, 0.24);
+  }
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #110e0a;
+  --surface: #191613;
+  --well: #0c0906;
+
+  --line: #2a2521;
+  --line-strong: #4c443d;
+  --edge-hi: #322c28;
+  --edge-lo: #000000;
+
+  --ink: #e7e2de;
+  --ink-dim: #8d8a87;
+  --ink-faint: #5a5856;
+
+  --hl: #daaf6b;
+  --hl-line: #ebc385;
+  --hl-wash: rgba(218, 175, 107, 0.24);
+}
+
+/* --- §4 grounds ------------------------------------------------------------
+   House rule number one: declare the ground on the CONTAINER. A button that
+   has to know where it is has already lost, and a divot cut for --bg and
+   then dropped onto --well stops being flush and starts being a rectangle.
+
+   Each helper writes its background and its --divot-ground from the same
+   variable, so the two cannot drift apart. Use them, or set --divot-ground
+   yourself on whatever surface you already have — they are a convenience,
+   not a requirement. */
+
+.ground-bg {
+  background: var(--bg);
+  --divot-ground: var(--bg);
+}
+
+.ground-surface {
+  background: var(--surface);
+  --divot-ground: var(--surface);
+}
+
+.ground-well {
+  background: var(--well);
+  --divot-ground: var(--well);
+}
+
+/* Paper is the instructive one. Nothing is lighter than a white scan, so
+   the light source collapses to the paper itself and the cut becomes
+   shadow-only — which is what a groove in white paper actually looks like.
+   Its shadow source and ink are pinned to the light values rather than
+   taken from the theme, for the same reason --paper is: the sheet is white
+   whatever the hour, and the dark ramp would be invisible on it. */
+.ground-paper {
+  background: var(--paper);
+  --divot-ground: var(--paper);
+  --divot-src-hi: var(--paper);
+  --divot-src-lo: #8e8977;
+  --ink: #1e1c16;
+  --ink-dim: #605c4b;
+  --ink-faint: #97917c;
+  --hl-wash: rgba(153, 105, 23, 0.22);
+  --well: #f0ece0; /* a field cut into paper is still paper, just lower */
+  color: var(--ink);
+}
