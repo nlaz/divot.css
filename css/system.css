@@ -1,0 +1,1124 @@
+/* ==========================================================================
+   divot.css — the build-out
+   --------------------------------------------------------------------------
+   OPT-IN, and a layer rather than a replacement. This sheet loads after
+   core.css and overrides it; link it (or import css/divot.system.css) when
+   you want the whole system, and leave it out when you want the button and
+   nothing else. system.html shows it running, with live controls for each
+   axis it adds.
+
+   It is the younger half of this library. The core primitive has years of
+   use behind it; this has the specimen sheet. Everything here obeys the
+   core's rules — no wall colour is hardcoded, every one is mixed from
+   --divot-ground, and the ground is still declared on the container — but
+   if you want only the proven part, use core.css alone.
+
+   It changes one thing in the primitive and builds six components on top:
+
+     the change   the two walls stop being a `border` and become inset
+                  box-shadow bands. That buys two axes the border could not
+                  give — WIDTH (a border that thickens reflows the row) and
+                  RADIUS (a four-colour border miters into visible seams on
+                  a curve) — and it makes `.quiet` honest, since there is now
+                  no border to hold space in the first place.
+
+     the model    one signed number, --divot-rest, from -2 (sunk) to +2
+                  (proud). Everything else derives. At -2, 0 and +2 it
+                  reproduces the core's .on, .divot and .raise exactly; the
+                  fractional stops in between are new.
+
+     the parts    wells (inputs, textareas, checks, switches, ranges),
+                  folder tabs, cards, popovers, menus, forms.
+   ========================================================================== */
+
+:root {
+  /* --- the two new axes --------------------------------------------------
+
+     WIDTH is not strength. --divot-n says how far the walls travel from the
+     ground in value; --divot-w says how many pixels of the face they eat.
+     The core profile is w:1 — one band down, one band back up, 2px total
+     — and that stays the default, because the house rule "don't scale the
+     profile" is about buttons. The wider settings are for the things a
+     button is cut into: a card is a bigger object and can afford a bigger
+     cut. */
+  --divot-w: 1;
+
+  /* ELEVATION, in bands. -2 is a face on the floor of its own groove, 0 is
+     flush, +2 is a face standing one full band proud. Fractions are legal
+     and are the point of the axis: -1 and +1 are the "slightly" stops. */
+  --divot-rest: 0;
+
+  /* how much face value one band of elevation is worth. 11% × 2 = the 22%
+     the core's --_sunk uses, which is how -2 lands on the core's pressed
+     state and +2 within a hair of its --raise-n: 20. */
+  --lift-step: 11;
+
+  /* --- radius ------------------------------------------------------------
+     --r stays 0px. The system is square and should stay square; these are
+     opt-in per component. --r-pill switches the wall renderer, see §N3. */
+  --r-sm: 3px;
+  --r-md: 6px;
+  --r-lg: 10px;
+  --r-pill: 999px;
+
+  /* wells are cut deeper than buttons on purpose: a field is a hole, and it
+     has to out-read a button sitting next to it in the same toolbar */
+  --well-n: 55;
+}
+
+/* ==========================================================================
+   §N1 · the profile, re-cut
+   --------------------------------------------------------------------------
+   An inset box-shadow with an offset and no blur paints an L: `inset X Y`
+   covers a band Y tall along the top and X wide along the left — the part
+   of the box the shadow's own copy has been shifted off of. Two of those,
+   at w and 2w, with the near one listed first so it paints over the far
+   one, give band 0–w as the outer wall and band w–2w as the return. The
+   bottom-right pair is the same thing with the offsets negated.
+
+   Corners butt rather than miter — a real border joins its four colours on
+   the diagonal, and this joins them square. At w:1 that is one pixel and
+   invisible; at w:3 you can find it if you look. The trade is worth it:
+   nothing here reflows when the width changes, and all of it survives a
+   border-radius.
+   ========================================================================== */
+
+.divot,
+.well {
+  --_str: calc((var(--divot-n) + var(--divot-bump)) * 1%);
+  --_hi: color-mix(in oklab, var(--divot-src-hi) var(--_str), var(--divot-ground));
+  --_lo: color-mix(in oklab, var(--divot-src-lo) var(--_str), var(--divot-ground));
+
+  /* --_lift is the *current* elevation; --divot-rest is the authored one.
+     The press moves the first and leaves the second alone, which is what
+     lets one rule serve every role: see §N2. Clamped because a color-mix
+     percentage outside 0–100 is not an error, it is an invalid declaration
+     — the whole button would silently lose its walls. */
+  --_lift: clamp(-2, var(--divot-rest), 2);
+  --_up: max(0, var(--_lift));
+  --_dn: max(0, calc(-1 * var(--_lift)));
+
+  /* how much of the return wall survives. Full at flush, gone at either
+     extreme — a face on the floor has no wall climbing back up to meet it
+     (the core's :active note), and a face standing proud has no groove at
+     all. One expression now covers both ends. */
+  --_k: max(0, calc(1 - (var(--_up) + var(--_dn)) / 2));
+
+  --_face: color-mix(
+    in oklab,
+    var(--divot-src-hi) calc(var(--_up) * var(--lift-step) * 1%),
+    color-mix(
+      in oklab,
+      var(--divot-src-lo) calc(var(--_dn) * var(--lift-step) * 1%),
+      var(--divot-ground)
+    )
+  );
+
+  /* The chisel does not flip at a threshold, it rotates. Top-left is the
+     shadow wall while the face is at or below the plane and becomes the
+     highlight wall as it rises — passing through a dead flat mid-grey at
+     +1, which is exactly what a 1px lip looks like in raking light. */
+  --_o-tl: color-mix(in oklab, var(--_hi) calc(var(--_up) * 50%), var(--_lo));
+  --_o-br: color-mix(in oklab, var(--_lo) calc(var(--_up) * 50%), var(--_hi));
+  --_i-tl: color-mix(in oklab, var(--_hi) calc(var(--_k) * 100%), var(--_face));
+  --_i-br: color-mix(in oklab, var(--_lo) calc(var(--_k) * 100%), var(--_face));
+
+  --_w: calc(var(--divot-w) * 1px);
+  --_w2: calc(var(--divot-w) * 2px);
+
+  background-color: var(--_face);
+  color: var(--ink);
+  border: 0;
+  border-radius: var(--r);
+  box-shadow:
+    inset var(--_w) var(--_w) 0 0 var(--_o-tl),
+    inset calc(-1 * var(--_w)) calc(-1 * var(--_w)) 0 0 var(--_o-br),
+    inset var(--_w2) var(--_w2) 0 0 var(--_i-tl),
+    inset calc(-1 * var(--_w2)) calc(-1 * var(--_w2)) 0 0 var(--_i-br);
+}
+
+.divot {
+  cursor: pointer;
+}
+
+.divot:hover {
+  --divot-bump: 25;
+}
+
+/* ==========================================================================
+   §N2 · the elevation ladder
+   --------------------------------------------------------------------------
+   Every button travels exactly two bands down on press, from wherever it
+   was authored. A default goes 0 → -2 (flush → floor). A raise goes
+   +2 → 0 (proud → flush). A slightly-raised .lift goes +1 → -1. The
+   distance is the constant; the rest position is the variable. That is the
+   same promise the core's .raise makes, expressed as arithmetic instead of
+   as four hand-written state rules.
+   ========================================================================== */
+
+.divot.sink {
+  --divot-rest: -2;
+}
+
+.divot.press {
+  --divot-rest: -1;
+}
+
+.divot.lift {
+  --divot-rest: 1;
+}
+
+.divot.raise {
+  --divot-rest: 2;
+}
+
+.divot:active,
+.divot.on,
+.divot.active,
+.divot.sel,
+.divot[aria-pressed="true"],
+.divot[aria-expanded="true"] {
+  --_lift: clamp(-2, calc(var(--divot-rest) - 2), 2);
+  --divot-bump: 0;
+}
+
+/* --- roles, unchanged in meaning ---------------------------------------- */
+
+.divot.ghost {
+  --divot-n: 25;
+}
+
+.divot.firm {
+  --divot-n: 70;
+}
+
+.divot.quiet {
+  --divot-n: 0;
+}
+
+.divot.quiet:hover {
+  --divot-bump: 45;
+}
+
+.divot.quiet.on,
+.divot.quiet.active,
+.divot.quiet.sel,
+.divot.quiet[aria-pressed="true"] {
+  --divot-n: 45;
+}
+
+.divot.bare {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.divot.accent {
+  background-image: linear-gradient(var(--hl-wash), var(--hl-wash));
+}
+
+.divot.danger:hover {
+  --divot-ground: var(--ink);
+  --divot-src-hi: var(--ink-dim);
+  color: var(--bg);
+}
+
+.divot:disabled {
+  --divot-n: 0;
+  --divot-rest: 0;
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+.divot:disabled:hover {
+  --divot-bump: 0;
+}
+
+/* ==========================================================================
+   §N3 · radius
+   --------------------------------------------------------------------------
+   Why the square system can take a radius at all now: the four wall colours
+   are no longer a border, so there is no miter to go wrong. The bands
+   follow the curve because inset shadows are clipped by border-radius.
+
+   Up to --r-md this is exact. Past it the offset-band renderer starts to
+   lie, because it only knows four directions: on a real curve the wall's
+   angle to the light changes continuously, so the colour should too. At
+   pill radius the whole box IS curve and the lie is the only thing you
+   see — the top band runs flat across an arc that should be shading off.
+   .pill therefore swaps renderers and draws the wall as a conic gradient,
+   which is the honest version of the same lighting model. Everything below
+   --r-lg keeps the cheap one.
+   ========================================================================== */
+
+.divot.r-sm,
+.well.r-sm {
+  border-radius: var(--r-sm);
+}
+
+.divot.r-md,
+.well.r-md {
+  border-radius: var(--r-md);
+}
+
+.divot.r-lg,
+.well.r-lg {
+  border-radius: var(--r-lg);
+}
+
+/* the conic renderer. Two rings, masked to their own thickness: ::before is
+   the outer wall at the border edge, ::after the return wall one band in.
+   `from 135deg` puts gradient position 0 at the bottom-right — the lit side
+   when the face is flush — and the midpoint 180deg round at the top-left.
+   Both are negative-z children so they paint over the button's background
+   and under its label; `isolation` keeps them from escaping to the page. */
+.divot.pill,
+.well.pill {
+  border-radius: var(--r-pill);
+  box-shadow: none;
+  position: relative;
+  isolation: isolate;
+}
+
+.divot.pill::before,
+.divot.pill::after,
+.well.pill::before,
+.well.pill::after {
+  content: "";
+  position: absolute;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  padding: var(--_w);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.divot.pill::before,
+.well.pill::before {
+  inset: 0;
+  background: conic-gradient(
+    from 135deg,
+    var(--_o-br),
+    var(--_o-tl) 180deg,
+    var(--_o-br) 360deg
+  );
+}
+
+.divot.pill::after,
+.well.pill::after {
+  inset: var(--_w);
+  background: conic-gradient(
+    from 135deg,
+    var(--_i-br),
+    var(--_i-tl) 180deg,
+    var(--_i-br) 360deg
+  );
+}
+
+/* ==========================================================================
+   §N4 · the well — fields
+   --------------------------------------------------------------------------
+   The house rule states the pair: a groove around a face is a button, a
+   well you can see into is a field. Never let a button and an input share
+   a treatment. The well is not a new recipe, it is the same one at
+   --divot-rest: -2 — outer wall descending, no return wall, face below the
+   plane — and pinned to the --well token so it reads as a hole with a
+   bottom rather than a button someone is holding down.
+
+   The distinction that keeps the two apart under the shared profile: a
+   pressed button is momentary and a field is permanent, so the field is cut
+   deeper (--well-n) and never travels. Focus deepens the cut; it does not
+   move the face.
+   ========================================================================== */
+
+.well {
+  --divot-n: var(--well-n);
+  --divot-rest: -2;
+  background-color: var(--well);
+  color: var(--ink);
+  font: inherit;
+  padding: 6px 10px;
+  outline: none;
+}
+
+.well::placeholder {
+  color: var(--ink-faint);
+}
+
+/* Deepen, don't lift. The focus ring from core.css is still the thing that
+   says "here"; this only says "and it is live". */
+.well:focus,
+.well:focus-visible,
+.well:focus-within {
+  --divot-bump: 22;
+  outline: 1px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.well:disabled {
+  --divot-n: 18;
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+.well[aria-invalid="true"] {
+  --divot-src-lo: var(--ink);
+  --divot-n: 80;
+}
+
+textarea.well {
+  display: block;
+  width: 100%;
+  min-height: 5.5rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+select.well {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 26px;
+  cursor: pointer;
+  /* the chevron is drawn, not a glyph: a font-dependent ▾ would sit at a
+     different optical height in the UI face than in the mono one */
+  background-image: linear-gradient(
+      45deg,
+      transparent 50%,
+      currentcolor 50% calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(
+      -45deg,
+      transparent 50%,
+      currentcolor 50% calc(50% + 1px),
+      transparent calc(50% + 1px)
+    );
+  background-position:
+    right 14px center,
+    right 9px center;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* a field with something in its gutter — a leading glyph, a trailing key
+   hint, a unit. The wrapper carries the well so the affordances sit inside
+   the hole with the text, not in a second box beside it. */
+.wellrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 10px;
+}
+
+.wellrow > input,
+.wellrow > textarea {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+.wellrow > .mark {
+  color: var(--ink-faint);
+  display: flex;
+  flex: none;
+}
+
+/* --- checks, radios, switches, ranges -------------------------------------
+   All four are the same idea: a well holding something. Nothing is filled
+   with a colour to mean "on" — the accent is a highlighter, not a state,
+   and greyscale would lose it anyway. On is ink in a hole, or a knob that
+   has moved. */
+
+.check {
+  --divot-n: var(--well-n);
+  --divot-rest: -2;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  flex: none;
+  margin: 0;
+  background-color: var(--well);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+}
+
+.check.radio {
+  border-radius: var(--r-pill);
+}
+
+.check::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  transform: scale(0);
+  transition: transform 90ms ease-out;
+  background: var(--ink);
+}
+
+.check.radio::after {
+  border-radius: var(--r-pill);
+}
+
+/* the checkmark is a rotated corner rather than a square — the same two
+   strokes the mono face draws, at a size where a glyph would blur */
+.check:not(.radio)::after {
+  width: 9px;
+  height: 5px;
+  background: none;
+  border-left: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  transform: rotate(-45deg) scale(0);
+  margin-top: -2px;
+}
+
+.check:checked::after {
+  transform: scale(1);
+}
+
+.check:not(.radio):checked::after {
+  transform: rotate(-45deg) scale(1);
+}
+
+.check:disabled {
+  --divot-n: 18;
+  cursor: default;
+}
+
+.check:disabled::after {
+  border-color: var(--ink-faint);
+  background: var(--ink-faint);
+}
+
+/* the switch: a groove with a raised knob in it, which is the one place in
+   the system where a thing genuinely translates. It is allowed to, because
+   the position IS the state — reading it any other way would need a colour. */
+.switch {
+  --divot-n: var(--well-n);
+  --divot-rest: -2;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 38px;
+  height: 20px;
+  flex: none;
+  margin: 0;
+  padding: 2px;
+  border-radius: var(--r-pill);
+  background-color: var(--well);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* the knob is the only thing in the system that is genuinely raised off a
+   surface it is not flush with, so it gets a face and a chisel of its own —
+   both mixed from --divot-ground and the two sources, never from --surface
+   or --edge-lo directly, or it stops following the paper override */
+.switch::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: var(--r-pill);
+  background: color-mix(in oklab, var(--divot-src-hi) 34%, var(--divot-ground));
+  box-shadow:
+    inset 1px 1px 0 0
+      color-mix(in oklab, var(--divot-src-hi) 62%, var(--divot-ground)),
+    inset -1px -1px 0 0
+      color-mix(in oklab, var(--divot-src-lo) 55%, var(--divot-ground));
+  transform: translateX(0);
+  transition: transform 120ms ease-out;
+}
+
+.switch:checked::after {
+  transform: translateX(18px);
+}
+
+.switch:checked {
+  --divot-n: 30;
+}
+
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: none;
+  margin: 0;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.range::-webkit-slider-runnable-track {
+  --divot-n: var(--well-n);
+  --divot-rest: -2;
+  height: 8px;
+  background-color: var(--well);
+  border-radius: var(--r-pill);
+  box-shadow:
+    inset 1px 1px 0 0 var(--_lo),
+    inset -1px -1px 0 0 var(--_hi);
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -4px;
+  border-radius: var(--r-pill);
+  background: color-mix(in oklab, var(--divot-src-hi) 34%, var(--divot-ground));
+  box-shadow:
+    inset 1px 1px 0 0
+      color-mix(in oklab, var(--divot-src-hi) 62%, var(--divot-ground)),
+    inset -1px -1px 0 0
+      color-mix(in oklab, var(--divot-src-lo) 55%, var(--divot-ground));
+}
+
+/* ==========================================================================
+   §N5 · tabs — the file cabinet
+   --------------------------------------------------------------------------
+   The elevation ladder is what makes a folder tab possible without a fill:
+   the tabs that are not open sit back in the drawer at -1, the open one
+   stands at +1, and its face is the panel's face because they are the same
+   piece of card. The panel's top wall is what the open tab interrupts —
+   that overlap is the entire read. Selection here is elevation, which is
+   the same argument .docitem makes for weight and ink.
+
+   Two cuts. .tabs--folder rounds the top corners, which is what a
+   manila folder actually does and what the offset-band renderer draws
+   correctly. .tabs--cut takes the trapezoid literally with a clip-path,
+   which kills box-shadow — so its wall is a 1px underlay showing past an
+   inset copy of the same shape. Use the first; the second is here because
+   "file cabinet" was the brief and the shoulders are the picture people
+   have in their head.
+   ========================================================================== */
+
+.tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding-left: var(--sp-3);
+  position: relative;
+  z-index: 1;
+}
+
+.tab {
+  --divot-rest: -1;
+  padding: 5px 14px;
+  font-size: var(--fs-ui);
+  color: var(--ink-dim);
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+/* the open folder: pulled up out of the drawer (the extra padding-top, not
+   a transform — the tab gets taller, it does not move), standing proud, and
+   lapped one band over the panel below so the panel's top wall stops at it */
+.tab[aria-selected="true"] {
+  --divot-rest: 1;
+  --divot-bump: 0;
+  color: var(--ink);
+  padding-top: 8px;
+  margin-bottom: calc(-1 * var(--_w2));
+  padding-bottom: calc(5px + var(--_w2));
+  z-index: 2;
+}
+
+/* a tab does not travel on press — it is already the thing that moved */
+.tab:active {
+  --_lift: var(--divot-rest);
+}
+
+.tabs--folder .tab {
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+
+.tabs--folder .tab[aria-selected="true"] {
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+
+/* the trapezoid. --shoulder is the horizontal run of the angled sides; the
+   ::before is the face inset by one band, so what shows around it is the
+   wall, following the angle. One colour rather than four — a shoulder that
+   runs from the lit side to the shadowed side has no single answer, and
+   averaging them is more honest than picking. */
+.tabs--cut {
+  gap: 0;
+}
+
+.tabs--cut .tab {
+  --shoulder: 13px;
+  box-shadow: none;
+  background-color: color-mix(in oklab, var(--_o-tl) 50%, var(--_o-br));
+  clip-path: polygon(
+    0 100%,
+    var(--shoulder) 0,
+    calc(100% - var(--shoulder)) 0,
+    100% 100%
+  );
+  padding: 5px 20px;
+  margin: 0 calc(-1 * var(--shoulder) + 4px);
+  isolation: isolate;
+}
+
+.tabs--cut .tab::before {
+  content: "";
+  position: absolute;
+  inset: var(--_w) var(--_w) 0;
+  z-index: -1;
+  background-color: var(--_face);
+  clip-path: polygon(
+    0 100%,
+    var(--shoulder) 0,
+    calc(100% - var(--shoulder)) 0,
+    100% 100%
+  );
+}
+
+.tabs--cut .tab[aria-selected="true"] {
+  z-index: 3;
+}
+
+.tabs--cut .tab:nth-child(1) {
+  margin-left: 0;
+}
+
+/* the drawer the tabs are filed in */
+.tabpanel {
+  --divot-rest: 1;
+  padding: var(--sp-4);
+  min-height: 90px;
+}
+
+.tabpanel[hidden] {
+  display: none;
+}
+
+/* ==========================================================================
+   §N6 · cards
+   --------------------------------------------------------------------------
+   Four, and the choice between them is a claim about what the thing is:
+
+     .card          flush. A region of this surface with an edge. The
+                    default, and the only one that scales to a grid of
+                    twenty without the page turning into gravel.
+     .card.lift     +1. Something on the surface. For the one card that is
+                    being acted on.
+     .card.tray     -2, ground re-pointed to --well. A container things go
+                    into — drop targets, queues, the empty state.
+     .card.pick     a .divot at card scale. Presses, latches, is a button.
+
+   Cards are the one place --divot-w earns its keep. A 2px cut around a
+   280px card is the same *proportion* of edge that a 1px cut is around a
+   28px button, and "don't scale the profile" is a rule about buttons in a
+   row with each other, not about a card in a grid.
+   ========================================================================== */
+
+/* The card inherits its ground and does not declare one. This is the rule
+   that is easiest to get wrong here: a card that sets --divot-ground:
+   var(--surface) and then sits on --bg is not flush, it is a pale
+   rectangle, and the groove around it becomes decoration. If a card needs
+   to be a lighter plane than the page, that is what .lift is for — it
+   raises the face *derived from the ground it is actually on*, which is a
+   different colour on --bg than on --paper and correct on both. */
+.card {
+  --divot-w: 2;
+  --divot-rest: 0;
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  text-align: left;
+}
+
+.card.lift {
+  --divot-rest: 1;
+}
+
+/* the one card that pins its face: a tray is the same hole a field is, and
+   it has to match the fields elsewhere on the page rather than being one
+   band down from whatever it happens to be sitting on */
+.card.tray {
+  --divot-rest: -2;
+  --divot-n: var(--well-n);
+  background-color: var(--well);
+}
+
+.card.pick {
+  cursor: pointer;
+}
+
+.card.pick:hover {
+  --divot-bump: 25;
+}
+
+.card.pick:active,
+.card.pick[aria-pressed="true"] {
+  --_lift: clamp(-2, calc(var(--divot-rest) - 2), 2);
+  --divot-bump: 0;
+}
+
+.card__label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.card__title {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.card__body {
+  color: var(--ink-dim);
+  font-size: var(--fs-ui);
+  line-height: 1.55;
+}
+
+/* the divider is a hairline, not a groove. A card that is cut into three
+   grooved sections stops reading as one object. */
+.card__foot {
+  margin-top: auto;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.card__foot .push {
+  margin-left: auto;
+}
+
+.cardgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: var(--sp-3);
+}
+
+/* ==========================================================================
+   §N7 · popovers and menus
+   --------------------------------------------------------------------------
+   A popover is a --surface ground, a --line-strong border and a hard
+   dithered shadow offset down-right. That shadow is the house idiom and it
+   stays: it is the one thing in the system that says "this is over the page,
+   not in it", and a soft shadow would be the wrong material.
+
+   What is added is the elevation — .pop sits at +1, so its own edge is a
+   lip rather than a rule — and an arrow that carries the same two walls
+   round to point at its anchor.
+   ========================================================================== */
+
+.pop {
+  --divot-ground: var(--surface);
+  --divot-rest: 1;
+  --divot-w: 1;
+  position: relative;
+  padding: var(--sp-2);
+  min-width: 180px;
+}
+
+/* the dithered drop. Two rectangles rather than a box-shadow, because the
+   dither has to stay a 2px grid aligned to the device pixel — a blurred
+   copy of the box would be a different material. */
+.pop::before,
+.pop::after {
+  content: "";
+  position: absolute;
+  background: var(--dither-50) 0 0 / 2px 2px;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.pop::before {
+  top: 4px;
+  bottom: -5px;
+  right: -5px;
+  width: 4px;
+}
+
+.pop::after {
+  left: 4px;
+  right: -5px;
+  bottom: -5px;
+  height: 4px;
+}
+
+.pop.flat {
+  --divot-rest: 0;
+}
+
+.pop.plain::before,
+.pop.plain::after {
+  display: none;
+}
+
+/* the arrow: a square rotated 45°, carrying the two walls on the two sides
+   that are still exposed once the popover's own face covers the rest */
+.pop__arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: var(--_face);
+  transform: rotate(45deg);
+}
+
+.pop__arrow.top {
+  top: -6px;
+  left: 18px;
+  box-shadow:
+    inset var(--_w) var(--_w) 0 0 var(--_o-tl),
+    inset calc(-1 * var(--_w)) calc(-1 * var(--_w)) 0 0 var(--_face);
+}
+
+.pop__arrow.bottom {
+  bottom: -6px;
+  left: 18px;
+  box-shadow:
+    inset calc(-1 * var(--_w)) calc(-1 * var(--_w)) 0 0 var(--_o-br),
+    inset var(--_w) var(--_w) 0 0 var(--_face);
+}
+
+.pop__title {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 2px var(--sp-2) var(--sp-2);
+}
+
+/* --- menus ----------------------------------------------------------------
+   Rows are .bare, per the house rules: a groove around every line in a list
+   fights the surface. The hovered row gets the groove, one row at a time,
+   which is also the only cue that says which one the keyboard is on. */
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 190px;
+}
+
+.menuitem {
+  --divot-n: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: 5px var(--sp-2);
+  text-align: left;
+  font-size: var(--fs-ui);
+  background-color: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.menuitem:hover,
+.menuitem:focus-visible,
+.menuitem[aria-current="true"] {
+  --divot-n: 45;
+  --divot-rest: -2;
+  background-color: var(--_face);
+  box-shadow:
+    inset var(--_w) var(--_w) 0 0 var(--_o-tl),
+    inset calc(-1 * var(--_w)) calc(-1 * var(--_w)) 0 0 var(--_o-br);
+}
+
+.menuitem__key {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  color: var(--ink-faint);
+}
+
+.menuitem:disabled {
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+.menuitem:disabled:hover {
+  --divot-n: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.menu__sep {
+  height: 1px;
+  background: var(--line);
+  margin: var(--sp-1) 0;
+}
+
+/* ==========================================================================
+   §N8 · forms
+   --------------------------------------------------------------------------
+   No new material — the layout only. The rule it encodes: the label is
+   above the field and the hint is below it, both in the flow, so that
+   turning a hint into an error message does not move the field. An error
+   that reflows the form is how you lose the field you were typing in.
+   ========================================================================== */
+
+.form {
+  display: grid;
+  gap: var(--sp-4);
+  max-width: 30rem;
+}
+
+.field {
+  display: grid;
+  gap: 5px;
+}
+
+.field > label {
+  font-size: var(--fs-ui);
+  font-weight: 500;
+}
+
+.field__hint {
+  font-size: var(--fs-meta);
+  color: var(--ink-dim);
+  min-height: 1.2em;
+}
+
+/* severity by rule, not by colour — the same argument .swarn makes in
+   settings.css, and the same one that keeps this legible in greyscale */
+.field.bad .field__hint {
+  color: var(--ink);
+  border-left: 2px solid var(--ink);
+  padding-left: 6px;
+}
+
+.field__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.fieldset {
+  display: grid;
+  gap: var(--sp-2);
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.fieldset > legend {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 0 0 var(--sp-1);
+}
+
+.optrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-ui);
+  cursor: pointer;
+}
+
+/* a setting and its control on one line, borrowed verbatim from .srow —
+   this is the shape settings already uses and a second one would only be a
+   slightly different one */
+.switchrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--line);
+}
+
+.switchrow:last-of-type {
+  border-bottom: 1px solid var(--line);
+}
+
+.formactions {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: flex-end;
+  padding-top: var(--sp-2);
+}
+
+.formactions .push {
+  margin-right: auto;
+}
+
+/* ==========================================================================
+   §N9 · accessibility
+   --------------------------------------------------------------------------
+   Same posture as core.css. High contrast pushes every wall to full
+   travel globally rather than asking call sites to opt in; forced-colors
+   throws the whole derived system away and takes the system colours, and
+   has to put a real border back because there is no border left to keep.
+   ========================================================================== */
+
+@media (prefers-contrast: more) {
+  :root {
+    --divot-n: 100;
+    --well-n: 100;
+  }
+
+  .divot.quiet,
+  .divot.ghost,
+  .menuitem {
+    --divot-n: 100;
+  }
+}
+
+@media (forced-colors: active) {
+  .divot,
+  .well,
+  .check,
+  .switch,
+  .card,
+  .pop,
+  .tab {
+    border: 1px solid ButtonBorder;
+    background-color: ButtonFace;
+    color: ButtonText;
+    box-shadow: none;
+  }
+
+  .divot.pill::before,
+  .divot.pill::after,
+  .well.pill::before,
+  .well.pill::after {
+    display: none;
+  }
+
+  .tab[aria-selected="true"],
+  .check:checked,
+  .switch:checked {
+    background-color: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .check::after,
+  .switch::after {
+    transition: none;
+  }
+}

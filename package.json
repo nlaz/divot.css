@@ -1,0 +1,40 @@
+{
+  "name": "divot.css",
+  "version": "0.1.0",
+  "description": "A button whose face is the plane it sits in, made legible by a groove cut around it. The walls are mixed from the ground, never hardcoded.",
+  "license": "Apache-2.0",
+  "author": "Niko Lazaris",
+  "homepage": "https://github.com/nlaz/divot.css",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nlaz/divot.css.git"
+  },
+  "keywords": [
+    "css",
+    "button",
+    "design-system",
+    "color-mix",
+    "skeuomorphism",
+    "bezel",
+    "dark-mode"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "css/divot.css",
+  "style": "css/divot.css",
+  "exports": {
+    ".": "./css/divot.css",
+    "./system": "./css/divot.system.css",
+    "./tokens.css": "./css/tokens.css",
+    "./core.css": "./css/core.css",
+    "./system.css": "./css/system.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "css",
+    "README.md",
+    "LICENSE"
+  ]
+}

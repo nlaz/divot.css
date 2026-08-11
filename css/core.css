@@ -1,0 +1,252 @@
+/* ==========================================================================
+   divot.css — the core primitive
+   --------------------------------------------------------------------------
+   A button whose face IS the plane it sits in. Nothing raised, nothing
+   filled differently, nothing translating on press. It is made legible by a
+   groove cut around it: one wall down, one wall back up.
+
+   The whole system is two derived colours. The walls are MIXED FROM THE
+   GROUND the button is cut into, never hardcoded — which is what lets one
+   recipe survive a surface change, a theme flip and the --paper special
+   case without a single override. Set --divot-ground on the *container*;
+   a button that has to know where it is has already lost.
+
+   Lighting, worked from the section: light comes from the top-left.
+   Descending into the channel that wall turns away from it — shadow;
+   climbing back out to the face it turns toward it — highlight. On the
+   bottom-right you meet the same two walls in the opposite order, so the
+   pair flips. A symmetric ring would read as a printed outline rather than
+   a cut; the asymmetry is the whole illusion.
+   ========================================================================== */
+
+/* --- the base it needs -----------------------------------------------------
+   Buttons do not inherit type by default and the UA's own border-radius has
+   an opinion, so both are reset here rather than left to the host page.
+
+   The focus ring is not optional and is not decoration. A flush button
+   carries no value contrast against its ground — the cut is doing all the
+   work of saying "target" — so the outline is the one element in this
+   system permitted to break the plane. If you already have a focus style
+   you like, override it; if you delete it, the primitive stops being
+   usable by anyone navigating with a keyboard. */
+
+button {
+  font: inherit;
+  color: inherit;
+  border-radius: var(--r);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 1px;
+}
+
+:root {
+  --divot-n: 45; /* strength 0–100 — the only knob you should touch */
+  --divot-bump: 0; /* :hover deepens without a cyclic ref to --divot-n */
+  --divot-ground: var(--bg); /* the plane being cut */
+  --divot-src-hi: var(--edge-hi); /* light source, the up-slope */
+  --divot-src-lo: var(--edge-lo); /* shadow source, the down-slope */
+  --raise-n: 20; /* how far the accent lifts off the plane */
+}
+
+.divot {
+  --_str: calc((var(--divot-n) + var(--divot-bump)) * 1%);
+  --_hi: color-mix(in oklab, var(--divot-src-hi) var(--_str), var(--divot-ground));
+  --_lo: color-mix(in oklab, var(--divot-src-lo) var(--_str), var(--divot-ground));
+  /* the floor of the groove — where the face lands when pressed. Derived
+     from the ground too, so it survives the same surface changes. */
+  --_sunk: color-mix(in oklab, var(--divot-src-lo) 22%, var(--divot-ground));
+
+  /* background-color, never the shorthand: .accent layers the highlighter
+     into background-image and the shorthand would wipe it on every state */
+  background-color: var(--divot-ground);
+  color: var(--ink);
+  border: 1px solid;
+  border-color: var(--_lo) var(--_hi) var(--_hi) var(--_lo);
+  box-shadow: inset 1px 1px 0 var(--_hi), inset -1px -1px 0 var(--_lo);
+  cursor: pointer;
+
+  /* A starting box, so a bare <button class="divot"> is not left at the
+     UA's default padding. It is the only measurement in this file, and it
+     is the one thing here you should feel free to overwrite per call site —
+     the cut is a physical profile and never scales, but the box around it
+     is yours. */
+  padding: 4px 10px;
+}
+
+/* icon-only: square the box back up around a glyph, and make it a flex
+   container so the glyph centres instead of sitting on the text baseline */
+.divot.icon {
+  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.divot:hover {
+  --divot-bump: 25;
+}
+
+/* Press: keep the outer wall exactly where it is and DELETE the inner one.
+   A face that has sunk to the floor of the groove has no wall climbing back
+   up to meet it. Rolling both walls over instead throws a lip up around the
+   button — it reads as the surround rising, not the face falling. Nothing
+   translates: at zero height there is nothing to fall from, so the
+   tactility is value, not displacement.
+
+   The selector is compound on purpose — every one of these is .divot AND
+   the state, never the state alone. A loose [aria-pressed="true"] reaches
+   every pressed thing on the page, including list rows and rail items that
+   want to show selection as weight and ink rather than as a fill. */
+.divot:active,
+.divot.on,
+.divot.active,
+.divot.sel,
+.divot[aria-pressed="true"],
+.divot[aria-expanded="true"] {
+  --divot-bump: 0;
+  box-shadow: none;
+  background-color: var(--_sunk);
+}
+
+/* --- strengths ------------------------------------------------------------
+   Contrast, not size. Depth is fixed at one band per wall, so a ghost and a
+   firm button are the same 2px profile and the same box — only the walls
+   travel further from the ground. */
+
+.divot.ghost {
+  --divot-n: 25;
+}
+
+.divot.firm {
+  --divot-n: 70;
+}
+
+/* quiet: silent at rest, cut on hover. --divot-n:0 mixes the walls to
+   *exactly* the ground rather than removing them, so the 1px border is
+   still there holding its space — the groove appears without reflowing the
+   row it sits in. Never swap this for `border: none`. */
+.divot.quiet {
+  --divot-n: 0;
+}
+
+.divot.quiet:hover {
+  --divot-bump: 45;
+}
+
+/* a quiet button that has latched is no longer quiet — it has to hold its
+   state while the pointer is elsewhere, and a sunk face with no walls is
+   not enough to read as "this one is on" */
+.divot.quiet.on,
+.divot.quiet.active,
+.divot.quiet.sel,
+.divot.quiet[aria-pressed="true"] {
+  --divot-n: 45;
+}
+
+/* bare: the shared class with a null role. For full-width ledger and rail
+   rows, where a groove around every line would fight a surface that means
+   to separate things with whitespace instead of boxes. Keeps the cursor and
+   the focus ring, and nothing else. */
+.divot.bare {
+  border: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* --- the raise ------------------------------------------------------------
+   The inverse of the divot, at one band instead of two: the face lifts
+   slightly off the plane and the chisel flips to highlight-top-left.
+   Deliberately no drop shadow — a hard shadow is what made the old buttons
+   read as floating.
+
+   The press is the point. Every button in this system travels exactly one
+   step down: a default goes flush → sunk, a raise goes raised → flush,
+   landing on the divot's own rest state. */
+
+.divot.raise {
+  --_lift: color-mix(
+    in oklab,
+    var(--divot-src-hi) calc(var(--raise-n) * 1%),
+    var(--divot-ground)
+  );
+  background-color: var(--_lift);
+  border-color: var(--_hi) var(--_lo) var(--_lo) var(--_hi);
+  box-shadow: none;
+}
+
+.divot.raise:active,
+.divot.raise.on,
+.divot.raise[aria-pressed="true"] {
+  background-color: var(--divot-ground); /* sinks to flush */
+  border-color: var(--_lo) var(--_hi) var(--_hi) var(--_lo);
+  box-shadow: inset 1px 1px 0 var(--_hi), inset -1px -1px 0 var(--_lo);
+}
+
+/* accent: the raise plus the one accent, which is a highlighter and not a
+   fill. The wash rides in background-image so it survives the press
+   unchanged and simply sits over the lower face — a highlighter mark does
+   not change colour when you push the paper down. */
+.divot.accent {
+  background-image: linear-gradient(var(--hl-wash), var(--hl-wash));
+}
+
+/* danger: severity by inversion, the house idiom. Re-pointing the ground
+   rather than setting a background is what keeps the walls correct — they
+   re-derive against ink automatically. */
+.divot.danger:hover {
+  --divot-ground: var(--ink);
+  --divot-src-hi: var(--ink-dim);
+  color: var(--bg);
+}
+
+/* --- disabled -------------------------------------------------------------
+   Last, so it wins over every strength above it without a specificity
+   fight. The groove goes flat and the ink fades, but the box keeps its
+   size and its label: a control you can see and cannot use is often how an
+   interface explains a capability this machine doesn't have, so it has to
+   stay readable.
+
+   --divot-n: 0 mixes the walls to exactly the ground rather than removing
+   them (the .quiet trick), which is why nothing reflows. The hover bump
+   goes with it — a groove that deepens under a pointer that can't do
+   anything is a promise the button won't keep. */
+
+.divot:disabled {
+  --divot-n: 0;
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+.divot:disabled:hover {
+  --divot-bump: 0;
+}
+
+/* --- accessibility --------------------------------------------------------
+   A flush button carries no value contrast against its ground — the cut is
+   doing all the work of saying "target". Where the platform says the user
+   wants more, give it to them globally rather than asking every call site
+   to opt in. The focus ring is the one at the top of this file: it is the
+   one element in the system permitted to break the plane. */
+
+@media (prefers-contrast: more) {
+  :root {
+    --divot-n: 100;
+  }
+
+  .divot.quiet,
+  .divot.ghost {
+    --divot-n: 100;
+  }
+}
+
+@media (forced-colors: active) {
+  .divot {
+    border-color: ButtonBorder;
+    background-color: ButtonFace;
+    color: ButtonText;
+    box-shadow: none;
+  }
+}
