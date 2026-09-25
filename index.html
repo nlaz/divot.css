@@ -11,11 +11,14 @@
      the library is wrong. -->
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/core.css">
+<!-- page-only mock of the proposed --divot-light token; after core.css -->
+<link rel="stylesheet" href="site/light.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 
 <!-- the hero render: three.js, then the page-only scene in site/ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="site/ascii-button.js"></script>
+<script src="site/light.js"></script>
 
 <style>
 /* --- page-only -----------------------------------------------------------
@@ -56,7 +59,11 @@ a.divot { text-decoration: none; display: inline-block; }
 .hero h1 { font-size: clamp(48px, 8.5vw, 120px); line-height: 0.92; letter-spacing: -0.035em; }
 .hero .sub { font-size: clamp(15px, 1.6vw, 19px); color: var(--ink-dim); max-width: 30ch; }
 .hero .art { border: 1px solid var(--line-strong); background: var(--surface); position: relative; }
-.hero .hint { position: absolute; right: 10px; bottom: 8px; font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); pointer-events: none; }
+/* press counter: appears above the render after the third press */
+.hero .badge { position: absolute; top: -12px; right: 14px; font: 500 var(--fs-meta)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink); background: var(--bg); border: 1px solid var(--line-strong); padding: 6px 10px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .3s ease, transform .3s ease; }
+.hero .badge.on { opacity: 1; transform: none; }
+.hero .badge b { font-variant-numeric: tabular-nums; font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .hero .badge { transition: none; } }
 canvas.ascii { width: 100%; height: auto; display: block; max-width: 100%; }
 canvas.ascii:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
 @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
@@ -75,8 +82,35 @@ svg.fig { width: 100%; height: auto; display: block; }
 @media (max-width: 760px) { .install { grid-template-columns: 1fr; } }
 .foot { padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font: var(--fs-mono)/1.5 var(--font-mono); color: var(--ink-dim); }
 .foot nav { display: flex; gap: 16px; }
-/* while the theme flips, colours ease rather than cut; the class is on for the duration only */
-html.theming, html.theming * { transition: background-color .6s ease, color .6s ease, border-color .6s ease, box-shadow .6s ease, outline-color .6s ease; }
+/* customize: drag the lamp. The frame is square so the lamp can orbit it;
+   the button in the middle is a real .divot with 12px walls, so it shows
+   the same cut the page uses, twelve times over. */
+.cust { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+@media (max-width: 760px) { .cust { grid-template-columns: 1fr; } }
+.lframe { position: relative; width: 100%; max-width: 580px; aspect-ratio: 1; container-type: inline-size; justify-self: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.lframe.grab { cursor: grabbing; }
+.lframe .ring { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed var(--line-strong); }
+.lframe .brg { position: absolute; font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); color: var(--ink-faint); background: var(--bg); padding: 2px 4px; }
+.lframe .brg.n { top: 0; left: 50%; transform: translate(-50%, -4px); }
+.lframe .brg.e { right: 0; top: 50%; transform: translate(4px, -50%); }
+.lframe .brg.s { bottom: 0; left: 50%; transform: translate(-50%, 4px); }
+.lframe .brg.w { left: 0; top: 50%; transform: translate(-4px, -50%); }
+.lframe .ray { position: absolute; left: 50%; top: 50%; width: 0; height: 46cqw; border-left: 1px dashed var(--ink-dim); transform-origin: 0 0; transform: rotate(calc(var(--divot-light) + 180deg)); }
+.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; font: 500 clamp(40px, 11cqw, 68px)/1 var(--font-ui); letter-spacing: -0.02em; border-width: 12px; --divot-reach: 12px; --divot-nudge: 3px; --divot-pad-y: clamp(14px, 4cqw, 26px); --divot-pad-x: clamp(28px, 8cqw, 48px); }
+.lframe .zoom { position: absolute; left: 50%; top: calc(50% + clamp(56px, 13cqw, 84px)); transform: translateX(-50%); font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
+.lframe .lamp { position: absolute; left: 50%; top: 50%; z-index: 2; width: 22px; height: 22px; margin: -11px; border-radius: 50%; border: 1px solid var(--ink); background: var(--bg); display: grid; place-items: center;
+  transform: rotate(var(--divot-light)) translateY(-46cqw) rotate(calc(-1 * var(--divot-light))); }
+.lframe .lamp::before { content: ""; position: absolute; inset: -14px; border-radius: 50%; }
+.lframe .lamp::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
+.lframe .lamp:hover, .lframe.grab .lamp { box-shadow: 0 0 0 5px var(--line); }
+.lframe .lamp:focus-visible { outline: 1px solid var(--ink); outline-offset: 5px; }
+.cust-side { display: grid; gap: 18px; align-content: center; }
+.lread { display: flex; gap: 12px; align-items: baseline; }
+.lread b { font: 500 clamp(32px, 4vw, 44px)/1 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.sides { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.sides > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 8px 10px; display: grid; gap: 6px; }
+.sides dd { margin: 0; font: 500 var(--fs-mono)/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.snippet { background: var(--surface); border: 1px solid var(--line); padding: 10px 12px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -85,7 +119,7 @@ html.theming, html.theming * { transition: background-color .6s ease, color .6s 
   <header class="mast">
     <span class="word">divot.css</span>
     <nav>
-      <a href="#concept">concept</a><a href="#reference">reference</a><a href="#install">install</a><a href="https://github.com/nlaz/divot.css">github</a>
+      <a href="#concept">concept</a><a href="#reference">reference</a><a href="#customize">customize</a><a href="#install">install</a><a href="https://github.com/nlaz/divot.css">github</a>
       <span class="row theme">
         <button class="divot quiet" data-set-theme="light">light</button>
         <button class="divot quiet" data-set-theme="system">auto</button>
@@ -102,7 +136,7 @@ html.theming, html.theming * { transition: background-color .6s ease, color .6s 
     <p class="sub">A simple skeuomorphic button style system. One class, cut into the page.</p>
     <div class="row"><a class="divot raise" href="#install" role="button">Get started</a><a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a></div>
   </div>
-  <div class="art"><canvas class="ascii" data-press='{"cols":104,"rows":54,"cell":7}'></canvas><p class="hint">press it &#183; switches the lights</p></div>
+  <div class="art"><canvas class="ascii" data-press='{"cols":104,"rows":54,"cell":7}'></canvas><span class="badge" id="presses" aria-live="polite"><b>0</b> presses</span></div>
 </div></div></div>
 
 <div class="wrap">
@@ -145,8 +179,36 @@ html.theming, html.theming * { transition: background-color .6s ease, color .6s 
 </div></div>
 
 <div class="wrap">
+  <section id="customize">
+    <div class="sec-head"><p class="eyebrow">03 &#183; customize</p><h2>Move the lamp.</h2></div>
+    <div class="cust">
+      <div class="lframe" id="lframe">
+        <i class="ring" aria-hidden="true"></i>
+        <span aria-hidden="true"><span class="brg n">0&#176;</span><span class="brg e">90&#176;</span><span class="brg s">180&#176;</span><span class="brg w">270&#176;</span></span>
+        <i class="ray" aria-hidden="true"></i>
+        <button class="divot mag" tabindex="-1" aria-hidden="true">Read</button>
+        <span class="zoom" aria-hidden="true">walls at 12&#215; &#183; press it</span>
+        <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
+      </div>
+      <div class="cust-side">
+        <p>The groove assumes a lamp at the top-left. Drag the lamp around the ring and every wall on this page re-mixes from one value: a wall facing the lamp drops into shadow, and a wall turned away catches the light. The button in the middle is a real <code>.divot</code> with its walls drawn twelve times wider. Press it.</p>
+        <div class="lread"><b id="lDeg">315&#176;</b><span class="dim" id="lDir">top-left</span></div>
+        <dl class="sides" aria-label="Shade on each outer wall">
+          <div><dt class="lab">top</dt><dd id="lSt">100%</dd></div>
+          <div><dt class="lab">right</dt><dd id="lSr">0%</dd></div>
+          <div><dt class="lab">bottom</dt><dd id="lSb">0%</dd></div>
+          <div><dt class="lab">left</dt><dd id="lSl">100%</dd></div>
+        </dl>
+        <pre class="snippet" id="lCss">:root { --divot-light: 315deg; }</pre>
+        <div class="row"><button class="divot" id="lReset" disabled>Reset</button><button class="divot quiet" id="lCopy">Copy CSS</button></div>
+        <div class="row"><span class="lab">at 1&#215;</span><button class="divot">Read</button><button class="divot" aria-pressed="true">held</button><button class="divot raise">Add to collection</button></div>
+        <p class="lab">drag anywhere in the ring &#183; shift snaps to 15&#176; &#183; arrow keys when the lamp is focused</p>
+      </div>
+    </div>
+  </section>
+
   <section id="install">
-    <div class="sec-head"><p class="eyebrow">03 &#183; install</p><h2>Link it, or install it.</h2></div>
+    <div class="sec-head"><p class="eyebrow">04 &#183; install</p><h2>Link it, or install it.</h2></div>
     <div class="install">
       <div><span class="eyebrow">link it</span><pre>&lt;link rel="stylesheet" href="divot.css"&gt;
 &lt;button class="divot"&gt;Read&lt;/button&gt;</pre></div>
@@ -164,19 +226,20 @@ html.theming, html.theming * { transition: background-color .6s ease, color .6s 
 <script>
 (function(){
   var root = document.documentElement;
-  var themingTimer = null;
-  function set(t){ root.classList.add('theming'); clearTimeout(themingTimer); themingTimer = setTimeout(function(){ root.classList.remove('theming'); }, 700);
-    if (t === 'system') root.removeAttribute('data-theme'); else root.dataset.theme = t;
+  function set(t){ if (t === 'system') root.removeAttribute('data-theme'); else root.dataset.theme = t;
     document.querySelectorAll('[data-set-theme]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.setTheme === t ? 'true' : 'false'); });
     try { localStorage.setItem('divot-theme', t); } catch(e){} }
-  function current(){ return root.dataset.theme || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
   document.querySelectorAll('[data-set-theme]').forEach(function(b){ b.addEventListener('click', function(){ set(b.dataset.setTheme); }); });
   var saved = null; try { saved = localStorage.getItem('divot-theme'); } catch(e){}
   set(saved || root.dataset.theme || 'system');
-  // the hero button is the power switch: a completed press flips the theme
+  // the hero button counts its presses; the badge shows up from the third one
+  var badge = document.getElementById('presses'), presses = 0;
+  try { presses = parseInt(localStorage.getItem('divot-presses') || '0', 10) || 0; } catch(e){}
+  function showCount(){ if (!badge) return; badge.querySelector('b').textContent = presses; badge.classList.toggle('on', presses >= 3); }
+  showCount();
   document.querySelectorAll('canvas.ascii').forEach(function(c){
     var o = JSON.parse(c.dataset.press || '{}');
-    o.onPress = function(){ set(current() === 'dark' ? 'light' : 'dark'); };
+    o.onPress = function(){ presses += 1; try { localStorage.setItem('divot-presses', String(presses)); } catch(e){} showCount(); };
     try { window.asciiPress(c, o); } catch(e) {}
   });
 })();
