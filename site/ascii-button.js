@@ -95,8 +95,11 @@ window.asciiPress = function(canvas, o){
   canvas.addEventListener('keydown', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (!down) { down = true; retarget(); } ev.preventDefault(); } });
   canvas.addEventListener('keyup', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (down) { down = false; retarget(); fire(); } ev.preventDefault(); } });
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ dirty = true; }); } catch(e){}
-  try { new MutationObserver(function(){ dirty = true; }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']}); } catch(e){}
+  // a theme change crossfades the last frame into the new one instead of cutting
+  var fade = null, FADE_MS = o.fadeMs != null ? o.fadeMs : 600;
+  function themeChanged(){ if (reduce) { dirty = true; return; } var snap = document.createElement('canvas'); snap.width = canvas.width; snap.height = canvas.height; snap.getContext('2d').drawImage(canvas, 0, 0); fade = { img: snap, t0: performance.now() }; dirty = true; }
+  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeChanged); } catch(e){}
+  try { new MutationObserver(themeChanged).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']}); } catch(e){}
 
   function draw(){
     button.position.y = -SINK*pr;
@@ -118,6 +121,7 @@ window.asciiPress = function(canvas, o){
       ctx.fillStyle = o.tones ? (l>0.66 ? ink : l>0.33 ? dim : faint) : ink;
       ctx.fillText(c, x*cw, y*ch);
     }
+    if (fade) { var k = (performance.now() - fade.t0)/FADE_MS; if (k >= 1) fade = null; else { ctx.globalAlpha = 1 - k*k*(3-2*k); ctx.drawImage(fade.img, 0, 0); ctx.globalAlpha = 1; dirty = true; } }
   }
   function frame(){
     var next = reduce ? target : pr + (target - pr)*0.14;
