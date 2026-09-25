@@ -228,14 +228,8 @@ svg.fig { width: 100%; height: auto; display: block; }
   var saved = null; try { saved = localStorage.getItem('divot-theme'); } catch(e){}
   set(saved || root.dataset.theme || 'system');
   var lf = document.getElementById('lframe'); if (lf && window.divotLight) window.divotLight(lf);
-  // the hero button counts its presses; the badge shows up from the third one
-  var badge = document.getElementById('presses'), presses = 0;
-  try { presses = parseInt(localStorage.getItem('divot-presses') || '0', 10) || 0; } catch(e){}
-  function showCount(){ if (!badge) return; badge.querySelector('b').textContent = String(Math.min(presses, 999999)).padStart(6, '0'); badge.classList.toggle('on', presses >= 3); }
-  showCount();
   document.querySelectorAll('canvas.ascii').forEach(function(c){
     var o = JSON.parse(c.dataset.press || '{}');
-    o.onPress = function(){ presses += 1; try { localStorage.setItem('divot-presses', String(presses)); } catch(e){} showCount(); };
     try { window.asciiPress(c, o); } catch(e) {}
   });
 })();
