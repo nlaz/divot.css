@@ -7,7 +7,7 @@
    page's own ink on the page's own ground, so it follows the theme.
 
    It is a button: hover depresses it a little, a press pushes it fully in
-   and it LATCHES there; the next press releases it. It takes focus and
+   and it LATCHES at half depth; the next press releases it. It takes focus and
    works from Space or Enter. Every move eases. A completed press calls
    opts.onPress with the state, whose .latched says which way it went.
    It only re-renders when something changed, so it idles at no cost.
@@ -69,7 +69,7 @@ window.asciiPress = function(canvas, o){
   function css(v, dflt){ var s = getComputedStyle(document.documentElement).getPropertyValue(v).trim(); return s || dflt; }
   function clamp(x){ return x<0?0:x>1?1:x; }
 
-  var HOVER = o.hoverDepth != null ? o.hoverDepth : 0.35, SINK = 0.09, VIG = o.vignette != null ? o.vignette : 0.14;
+  var HOVER = o.hoverDepth != null ? o.hoverDepth : 0.35, LATCH = o.latchDepth != null ? o.latchDepth : 0.5, SINK = 0.09, VIG = o.vignette != null ? o.vignette : 0.14;
   var over = false, down = false, focused = false, latched = false, target = 0, pr = 0, dirty = true;
   var state = { phase: 'rest', pressure: 0, latched: false };
   var ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -80,7 +80,7 @@ window.asciiPress = function(canvas, o){
     return ray.intersectObject(face).length > 0;
   }
   function retarget(){
-    target = (down || latched) ? 1 : (over || focused) ? HOVER : 0;
+    target = down ? 1 : latched ? LATCH : (over || focused) ? HOVER : 0;
     state.phase = down ? 'pressed' : latched ? 'latched' : (over || focused) ? 'hover' : 'rest';
     canvas.setAttribute('aria-pressed', latched ? 'true' : 'false');
     canvas.style.cursor = over ? 'pointer' : '';
