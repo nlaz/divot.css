@@ -60,7 +60,7 @@ a.divot { text-decoration: none; display: inline-block; }
 .hero .sub { font-size: clamp(15px, 1.6vw, 19px); color: var(--ink-dim); max-width: 30ch; }
 .hero .art { border: 1px solid var(--line-strong); background: var(--surface); position: relative; }
 /* press counter: appears above the render after the third press */
-.hero .badge { position: absolute; top: -12px; right: 14px; font: 500 var(--fs-meta)/1 var(--font-mono); letter-spacing: var(--track-label); color: var(--ink-faint); background: var(--surface); padding: 6px 8px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .3s ease, transform .3s ease; }
+.hero .badge { position: absolute; bottom: calc(100% + 10px); right: 0; font: 500 var(--fs-ui)/1 var(--font-mono); letter-spacing: var(--track-label); color: var(--ink-faint); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .3s ease, transform .3s ease; }
 .hero .badge.on { opacity: 1; transform: none; }
 .hero .badge b { font-variant-numeric: tabular-nums; font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { .hero .badge { transition: none; } }
