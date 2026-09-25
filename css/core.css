@@ -17,6 +17,12 @@
    bottom-right you meet the same two walls in the opposite order, so the
    pair flips. A symmetric ring would read as a printed outline rather than
    a cut; the asymmetry is the whole illusion.
+
+   The tool that cut it is a chisel, not a gouge: two hard 1px bands a
+   side, the outer one the hairline border and the inner one a crisp inset
+   shadow with no blur. Nothing is anti-aliased; the cut is exactly as sharp
+   as the pixel grid. The gouge is still in here — see --divot-reach and
+   --divot-soft below.
    ========================================================================== */
 
 /* --- the base it needs -----------------------------------------------------
@@ -33,7 +39,7 @@
 button {
   font: inherit;
   color: inherit;
-  border-radius: var(--r);
+  border-radius: 0;
 }
 
 button:focus-visible,
@@ -43,12 +49,42 @@ input:focus-visible {
 }
 
 :root {
-  --divot-n: 45; /* strength 0–100 — the only knob you should touch */
+  --divot-n: 45; /* strength 0–100 — the only knob you should normally touch */
   --divot-bump: 0; /* :hover deepens without a cyclic ref to --divot-n */
   --divot-ground: var(--bg); /* the plane being cut */
   --divot-src-hi: var(--edge-hi); /* light source, the up-slope */
   --divot-src-lo: var(--edge-lo); /* shadow source, the down-slope */
-  --raise-n: 20; /* how far the accent lifts off the plane */
+
+  /* the tool. --divot-reach is how far the inner wall falls onto the face,
+     --divot-soft is how blurred its edge is. 1px/0 is the chisel: two hard
+     bands a side. Set soft to ~3px and the same recipe is the gouge, the
+     inner band blended out onto the face. Nothing else in the file knows
+     which one it is. */
+  --divot-reach: 1px;
+  --divot-soft: 0px;
+  /* how much of the wall colour the inner band carries. At 100% it is the
+     same colour as the hairline, so the wall reads as one 2px band; lower
+     it to step the inner band toward the ground without touching the
+     outer line. */
+  --divot-inner: 100%;
+
+  /* the corner. Radius is an axis, and the material's rest position on it
+     is square — a cut has corners because the tool does. .eased and .pill
+     move a single button along it; set this on a container to move a
+     whole region. */
+  --divot-r: 0px;
+
+  /* the box. Tokens rather than a padding declaration so the press can
+     nudge the label without knowing what the box was. Override these per
+     call site, not `padding`. */
+  --divot-pad-y: 5px;
+  --divot-pad-x: 12px;
+
+  /* how far the label slides toward the shadow on press. A quarter pixel is
+     felt more than seen, which is the point. */
+  --divot-nudge: 0.25px;
+
+  --raise-n: 20; /* how far .raise lifts off the plane */
 }
 
 .divot {
@@ -58,28 +94,31 @@ input:focus-visible {
   /* the floor of the groove — where the face lands when pressed. Derived
      from the ground too, so it survives the same surface changes. */
   --_sunk: color-mix(in oklab, var(--divot-src-lo) 22%, var(--divot-ground));
+  /* the shadow the top-left wall throws onto that floor */
+  --_cast: color-mix(in oklab, var(--divot-src-lo) 28%, var(--divot-ground));
+  /* negative spread keeps a blur, when there is one, from bleeding along
+     the whole edge — derived from --divot-soft so the chisel gets none */
+  --_spread: calc(var(--divot-soft) / -6);
+  /* the inner bands, optionally stepped toward the ground */
+  --_hi-in: color-mix(in oklab, var(--_hi) var(--divot-inner), var(--divot-ground));
+  --_lo-in: color-mix(in oklab, var(--_lo) var(--divot-inner), var(--divot-ground));
 
-  /* background-color, never the shorthand: .accent layers the highlighter
-     into background-image and the shorthand would wipe it on every state */
   background-color: var(--divot-ground);
   color: var(--ink);
   border: 1px solid;
   border-color: var(--_lo) var(--_hi) var(--_hi) var(--_lo);
-  box-shadow: inset 1px 1px 0 var(--_hi), inset -1px -1px 0 var(--_lo);
+  border-radius: var(--divot-r);
+  box-shadow:
+    inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_hi-in),
+    inset calc(-1 * var(--divot-reach)) calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) var(--_lo-in);
   cursor: pointer;
-
-  /* A starting box, so a bare <button class="divot"> is not left at the
-     UA's default padding. It is the only measurement in this file, and it
-     is the one thing here you should feel free to overwrite per call site —
-     the cut is a physical profile and never scales, but the box around it
-     is yours. */
-  padding: 4px 10px;
+  padding: var(--divot-pad-y) var(--divot-pad-x);
 }
 
 /* icon-only: square the box back up around a glyph, and make it a flex
    container so the glyph centres instead of sitting on the text baseline */
 .divot.icon {
-  padding: 4px 6px;
+  --divot-pad-x: 7px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -91,10 +130,15 @@ input:focus-visible {
 
 /* Press: keep the outer wall exactly where it is and DELETE the inner one.
    A face that has sunk to the floor of the groove has no wall climbing back
-   up to meet it. Rolling both walls over instead throws a lip up around the
-   button — it reads as the surround rising, not the face falling. Nothing
-   translates: at zero height there is nothing to fall from, so the
-   tactility is value, not displacement.
+   up to meet it — what it has instead is the shadow the top-left wall now
+   throws across it. Rolling both walls over would throw a lip up around the
+   button: the surround rising, not the face falling.
+
+   The face does not translate: at zero height there is nothing to fall
+   from, so the tactility is value, not displacement. The LABEL moves — half
+   a pixel toward the shadow, by shifting the padding rather than the box —
+   because a sunk face is further from the eye and the lamp is off-axis.
+   The walls stay put; only what is printed on the face slides.
 
    The selector is compound on purpose — every one of these is .divot AND
    the state, never the state alone. A loose [aria-pressed="true"] reaches
@@ -107,14 +151,19 @@ input:focus-visible {
 .divot[aria-pressed="true"],
 .divot[aria-expanded="true"] {
   --divot-bump: 0;
-  box-shadow: none;
   background-color: var(--_sunk);
+  box-shadow: inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_cast);
+  padding:
+    calc(var(--divot-pad-y) + var(--divot-nudge))
+    calc(var(--divot-pad-x) - var(--divot-nudge))
+    calc(var(--divot-pad-y) - var(--divot-nudge))
+    calc(var(--divot-pad-x) + var(--divot-nudge));
 }
 
 /* --- strengths ------------------------------------------------------------
-   Contrast, not size. Depth is fixed at one band per wall, so a ghost and a
-   firm button are the same 2px profile and the same box — only the walls
-   travel further from the ground. */
+   Contrast, not size. Depth is fixed, so a ghost and a firm button are the
+   same profile and the same box — only the walls travel further from the
+   ground. */
 
 .divot.ghost {
   --divot-n: 25;
@@ -148,19 +197,34 @@ input:focus-visible {
 
 /* bare: the shared class with a null role. For full-width ledger and rail
    rows, where a groove around every line would fight a surface that means
-   to separate things with whitespace instead of boxes. Keeps the cursor and
-   the focus ring, and nothing else. */
+   to separate things with whitespace instead of boxes. Keeps the cursor,
+   the focus ring and the press nudge, and nothing else. */
 .divot.bare {
   border: 0;
   background-color: transparent;
   box-shadow: none;
 }
 
-/* --- the raise ------------------------------------------------------------
-   The inverse of the divot, at one band instead of two: the face lifts
-   slightly off the plane and the chisel flips to highlight-top-left.
-   Deliberately no drop shadow — a hard shadow is what made the old buttons
-   read as floating.
+/* --- the corner -----------------------------------------------------------
+   Two stops on the radius axis. Neither changes the cut — the walls follow
+   the corner — so they cost nothing but the slight anti-aliasing of the
+   bands where they turn. */
+
+.divot.eased {
+  --divot-r: 3px;
+}
+
+.divot.pill {
+  --divot-r: 999px;
+  --divot-pad-x: 16px;
+}
+
+/* --- the ladder -----------------------------------------------------------
+   The plane has three storeys: sunk, flush, raised. Flush is the divot at
+   rest; sunk is where every press lands; raised is the inverse of the
+   divot at one band instead of two — the face lifts slightly off the plane
+   and the walls flip to highlight-top-left. Deliberately no drop shadow: a
+   hard shadow is what made the old buttons read as floating.
 
    The press is the point. Every button in this system travels exactly one
    step down: a default goes flush → sunk, a raise goes raised → flush,
@@ -179,18 +243,13 @@ input:focus-visible {
 
 .divot.raise:active,
 .divot.raise.on,
+.divot.raise.active,
 .divot.raise[aria-pressed="true"] {
   background-color: var(--divot-ground); /* sinks to flush */
   border-color: var(--_lo) var(--_hi) var(--_hi) var(--_lo);
-  box-shadow: inset 1px 1px 0 var(--_hi), inset -1px -1px 0 var(--_lo);
-}
-
-/* accent: the raise plus the one accent, which is a highlighter and not a
-   fill. The wash rides in background-image so it survives the press
-   unchanged and simply sits over the lower face — a highlighter mark does
-   not change colour when you push the paper down. */
-.divot.accent {
-  background-image: linear-gradient(var(--hl-wash), var(--hl-wash));
+  box-shadow:
+    inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_hi-in),
+    inset calc(-1 * var(--divot-reach)) calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) var(--_lo-in);
 }
 
 /* danger: severity by inversion, the house idiom. Re-pointing the ground

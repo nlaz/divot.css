@@ -3,339 +3,170 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>divot.css — button specimen sheet</title>
+<title>divot.css</title>
+<meta name="description" content="A simple skeuomorphic button style system. One class, cut into the page.">
 
 <!-- The real tokens and the real primitive, LINKED rather than copied, so
-     this sheet cannot drift from what the package ships. If it looks wrong,
-     the library is wrong. Open it over any static server, or straight off
-     the filesystem. -->
+     this page cannot drift from what the package ships. If it looks wrong,
+     the library is wrong. -->
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/core.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<!-- the hero render: three.js, then the page-only scene in site/ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="site/ascii-button.js"></script>
 
 <style>
-/* --- sheet-only ----------------------------------------------------------
-   Layout for this page and nothing else. Both themes and the four grounds
-   come from tokens.css — [data-theme] and .ground-* are package API, not
-   sheet-local, so there are no hex values copied into this file to go
-   stale. */
-
+/* --- page-only -----------------------------------------------------------
+   Layout for this page and nothing else. Both themes and the grounds come
+   from tokens.css; there are no hex values in here to go stale. */
 * { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: var(--fs-body)/1.55 var(--font-ui); padding-inline: 16px; padding-block: 0 72px; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2 { font-weight: 500; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: clamp(20px, 2.6vw, 26px); line-height: 1.2; }
+p { margin: 0; max-width: 56ch; }
+a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
+a:hover { text-decoration-color: var(--ink); }
+code { font-family: var(--font-mono); font-size: 0.92em; }
+pre { font: var(--fs-mono)/1.6 var(--font-mono); margin: 0; white-space: pre; overflow-x: auto; }
+.eyebrow { font: 500 var(--fs-meta)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
+.dim { color: var(--ink-dim); }
+.divot { font: var(--fs-ui)/1.3 var(--font-ui); }
+a.divot { text-decoration: none; display: inline-block; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lab { font: var(--fs-micro)/1.3 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-ui);
-  font-size: var(--fs-ui);
-  -webkit-font-smoothing: antialiased;
-}
+/* masthead */
+.mast { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 0; flex-wrap: wrap; }
+.mast .word { font: 500 var(--fs-title)/1 var(--font-ui); }
+.mast nav { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.mast nav a { text-decoration: none; font: var(--fs-ui)/1 var(--font-ui); color: var(--ink-dim); padding: 6px 8px; }
+.mast nav a:hover { color: var(--ink); }
+.mast .theme { margin-left: 8px; }
 
-/* button normalization and the focus ring are core.css's job, not this
-   sheet's — see the top of that file for why the outline is not optional */
+/* full-bleed band: escapes the body gutter, then re-applies it inside */
+.bleed { margin-inline: calc(50% - 50vw); padding-inline: max(16px, calc(50vw - 540px)); }
 
-.page { max-width: 1000px; margin: 0 auto; padding: 32px 24px 96px; }
-h1 { font-size: var(--fs-title); font-weight: 600; margin: 0 0 6px; }
-h2 { font-size: var(--fs-ui); font-weight: 600; margin: 0 0 4px; }
-.lede { color: var(--ink-dim); line-height: 1.55; max-width: 66ch; margin: 0 0 20px; }
-.rule { height: 1px; background: var(--line); margin: 28px 0 18px; border: 0; }
-.eyebrow {
-  font-family: var(--font-mono); font-size: var(--fs-micro);
-  letter-spacing: var(--track-label); text-transform: uppercase;
-  color: var(--ink-faint); margin: 0 0 12px;
-}
-.sec > header { margin-bottom: 14px; }
-.sec > header p { color: var(--ink-dim); font-size: var(--fs-mono); line-height: 1.5; margin: 4px 0 0; max-width: 72ch; }
+/* hero: text left, render right */
+.hero-band { background: var(--surface); --divot-ground: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center; padding-block: clamp(32px, 5vw, 64px); }
+.hero .t { display: grid; gap: 20px; align-content: center; }
+.hero h1 { font-size: clamp(48px, 8.5vw, 120px); line-height: 0.92; letter-spacing: -0.035em; }
+.hero .sub { font-size: clamp(15px, 1.6vw, 19px); color: var(--ink-dim); max-width: 30ch; }
+.hero .art { border: 1px solid var(--line-strong); background: var(--surface); }
+canvas.ascii { width: 100%; height: auto; display: block; max-width: 100%; }
+canvas.ascii:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
 
-.panel { border: 1px solid var(--line); padding: 16px; }
-.row { display: flex; gap: 22px; align-items: flex-end; flex-wrap: wrap; }
-.cell { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-.lab {
-  font-family: var(--font-mono); font-size: var(--fs-micro);
-  letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint);
-}
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.pair { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-
-/* the four grounds are .ground-* from tokens.css §4 — nothing to define here */
-
-.chrome { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
-.chrome .q {
-  flex: 1; padding: 4px 8px; color: var(--ink-dim);
-  background: var(--well); border: 1px solid;
-  border-color: var(--edge-lo) var(--edge-hi) var(--edge-hi) var(--edge-lo);
-}
-.chrome .push { margin-left: auto; }
-.scan { padding: 18px; font-size: var(--fs-body); line-height: 1.6; }
-
-.notes { color: var(--ink-dim); font-size: var(--fs-mono); line-height: 1.65; max-width: 74ch; }
-.notes strong { color: var(--ink); font-weight: 600; }
-.notes code { font-family: var(--font-mono); font-size: var(--fs-meta); }
-.notes li { margin-bottom: 7px; }
-
-table { border-collapse: collapse; width: 100%; font-size: var(--fs-mono); }
-th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-family: var(--font-mono); font-size: var(--fs-micro); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); font-weight: 400; }
-td code { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--ink); }
-td.d { color: var(--ink-dim); }
-
-.themes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.themes > div { padding: 16px; border: 1px solid var(--line); }
+/* sections */
+section { padding-block: 56px; display: grid; gap: 24px; }
+.sec-head { display: grid; gap: 10px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+svg.fig { width: 100%; height: auto; display: block; }
+.band-surface { background: var(--surface); --divot-ground: var(--surface); }
+.sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.sheet > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 18px 14px; display: grid; gap: 12px; justify-items: start; align-content: start; min-height: 80px; }
+.install { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.install > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); padding: 14px 16px; display: grid; gap: 8px; }
+@media (max-width: 760px) { .install { grid-template-columns: 1fr; } }
+.foot { padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font: var(--fs-mono)/1.5 var(--font-mono); color: var(--ink-dim); }
+.foot nav { display: flex; gap: 16px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<div class="page">
-
-  <h1>The divot — button specimen sheet</h1>
-  <p class="lede">
-    Every button here has a face at exactly its ground: same material as the
-    surface behind it, zero height, nothing to fall from. It exists because a
-    groove is cut around it. The walls of that groove are mixed from the ground
-    via <code>color-mix</code>, never hardcoded — which is what lets one recipe
-    survive a surface change, a theme flip and the paper special case without an
-    override. This page links the real <code>css/tokens.css</code> and
-    <code>css/core.css</code>; if it looks wrong, the library is wrong.
-  </p>
-  <p class="lede" style="margin-bottom:26px">
-    This is <code>css/divot.css</code> — the button and nothing else. The
-    build-out (wells, tabs, cards, popovers, menus, forms, and the width,
-    elevation and radius axes) has its own sheet:
-    <a href="system.html" style="color:var(--hl-line)">system.html&nbsp;→</a>
-  </p>
-
-  <p class="eyebrow">§1 · Strength — one number, 0–100</p>
-  <div class="sec panel ground-bg" id="strengths"></div>
-
-  <hr class="rule">
-
-  <p class="eyebrow">§2 · States</p>
-  <div class="sec">
-    <header>
-      <h2>Tactility by value, not displacement</h2>
-      <p>Nothing translates. Hover deepens the cut; press sinks the face to the
-         floor of the groove, deleting the inner wall — there is no wall climbing
-         back up to a face that has sunk. <code>:active</code> and the latched
-         classes are the same gesture: a toggle that stays on is a button still
-         being held down.</p>
-    </header>
-    <div class="panel ground-bg" id="states"></div>
-  </div>
-
-  <hr class="rule">
-
-  <p class="eyebrow">§3 · Roles</p>
-  <div class="sec">
-    <header>
-      <h2>Six, including a null one</h2>
-      <p><code>quiet</code> mixes its walls to exactly the ground rather than
-         removing them, so the border still holds its space and the groove
-         appears on hover without reflowing the row. <code>bare</code> is the
-         shared class with no walls at all — for full-width ledger and rail rows,
-         where a groove around every line would fight the surface.</p>
-    </header>
-    <div class="panel ground-bg" id="roles"></div>
-  </div>
-
-  <hr class="rule">
-
-  <p class="eyebrow">§4 · The raise</p>
-  <div class="sec">
-    <header>
-      <h2>One step down, always</h2>
-      <p>The inverse of the divot at one band instead of two: the face lifts and
-         the chisel flips to highlight-top-left. No drop shadow — a hard shadow
-         is what made the old buttons read as floating. Every button in the
-         system travels exactly one step down on press: a default goes flush →
-         sunk, a raise goes raised → flush, landing on the divot's rest state.</p>
-    </header>
-    <div class="panel ground-bg" id="raise"></div>
-  </div>
-
-  <hr class="rule">
-
-  <p class="eyebrow">§5 · Grounds</p>
-  <div class="sec">
-    <header>
-      <h2>The cut belongs to the surface, not the button</h2>
-      <p>Re-point <code>--divot-ground</code> on the container and the recipe
-         follows. This is the part that breaks if you hardcode the walls: a
-         button cut for <code>--bg</code> and then placed on <code>--well</code>
-         stops being flush and starts being a rectangle.</p>
-    </header>
-    <div class="grid4" id="grounds"></div>
-    <p class="notes" style="margin-top:14px">
-      <strong>Paper is the instructive one.</strong> Nothing is lighter than a
-      white scan, so <code>--divot-src-hi</code> collapses to the paper itself
-      and the groove becomes shadow-only — which is what a groove in white paper
-      actually looks like. Paper also pins its ink, because a scan is white
-      whatever the hour.
-    </p>
-  </div>
-
-  <hr class="rule">
-
-  <p class="eyebrow">§6 · In place</p>
-  <div class="sec" id="composites"></div>
-
-  <hr class="rule">
-
-  <p class="eyebrow">§7 · Both themes</p>
-  <div class="sec">
-    <header>
-      <h2>Same CSS, swapped tokens</h2>
-      <p>The theme follows <code>prefers-color-scheme</code> on its own; these
-         panels force the two token sets side by side with
-         <code>[data-theme]</code> so the walls can be compared. The button
-         system has no colours of its own.</p>
-    </header>
-    <div class="themes" id="themes"></div>
-  </div>
-
-  <hr class="rule">
-
-  <p class="eyebrow">§8 · Token API</p>
-  <div class="sec panel">
-    <table>
-      <tr><th>Token</th><th>Default</th><th>What it does</th></tr>
-      <tr><td><code>--divot-n</code></td><td><code>45</code></td><td class="d">Strength, 0–100. The only knob you should normally touch.</td></tr>
-      <tr><td><code>--divot-ground</code></td><td><code>var(--bg)</code></td><td class="d">The plane being cut. Must equal what is actually behind the button. Set it on the <em>container</em>, not the button.</td></tr>
-      <tr><td><code>--divot-src-hi</code></td><td><code>var(--edge-hi)</code></td><td class="d">Light source for the up-slope. Collapse it to the ground where nothing can be lighter (paper).</td></tr>
-      <tr><td><code>--divot-src-lo</code></td><td><code>var(--edge-lo)</code></td><td class="d">Shadow source for the down-slope.</td></tr>
-      <tr><td><code>--raise-n</code></td><td><code>20</code></td><td class="d">How far <code>.raise</code> lifts off the plane.</td></tr>
-      <tr><td><code>--divot-bump</code></td><td><code>0</code></td><td class="d">Internal. Lets <code>:hover</code> deepen the cut without a cyclic reference. Don't set it at call sites.</td></tr>
-    </table>
-  </div>
-
-  <hr class="rule">
-
-  <p class="eyebrow">§9 · Rules</p>
-  <ul class="notes">
-    <li><strong>Set the ground on the container.</strong> Every surface that is
-      not <code>--bg</code> declares its own <code>--divot-ground</code> once,
-      and writes its own <code>background</code> from that same variable so the
-      two cannot drift.</li>
-    <li><strong>Never hardcode the wall colours.</strong> The moment a hex goes
-      into a border, the button stops surviving theme flips — and the theme
-      follows <code>prefers-color-scheme</code>, so that failure ships silently
-      to half your sessions.</li>
-    <li><strong>Don't scale the profile.</strong> It is a physical cut, not a
-      proportion. Same 2px on a 22px icon toggle and a 44px primary.</li>
-    <li><strong>Ghost and quiet only where context implies a target</strong> —
-      inside a toolbar, a group, a row of peers.</li>
-    <li><strong>Inversion is for severity, not emphasis.</strong> Re-point
-      <code>--divot-ground</code> to <code>--ink</code> rather than setting a
-      background, so the walls re-derive.</li>
-    <li><strong>Keep the focus ring.</strong> A flush button has no value
-      contrast against its ground; the outline is the one element permitted to
-      break the plane.</li>
-  </ul>
-
+<div class="wrap">
+  <header class="mast">
+    <span class="word">divot.css</span>
+    <nav>
+      <a href="#concept">concept</a><a href="#reference">reference</a><a href="#install">install</a><a href="https://github.com/nlaz/divot.css">github</a>
+      <span class="row theme">
+        <button class="divot quiet" data-set-theme="light">light</button>
+        <button class="divot quiet" data-set-theme="system">auto</button>
+        <button class="divot quiet" data-set-theme="dark">dark</button>
+      </span>
+    </nav>
+  </header>
 </div>
 
-<script type="module">
-const I = {
-  note: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2.5 2.5h9v9h-9z"/><path d="M4.5 5.5h5M4.5 8.5h3"/></svg>',
-  chat: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 3h10v6H6l-3 2.5V9H2z"/></svg>',
-  pen:  '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9.5 2.5l2 2-6 6-2.5.5.5-2.5z"/></svg>',
-  prev: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8.5 3L5 7l3.5 4"/></svg>',
-  next: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5.5 3L9 7l-3.5 4"/></svg>',
-};
-
-/* No inline padding: core.css gives .divot a starting box and .divot.icon
-   squares it back up around a glyph. */
-const btn = (cls, label) => `<button class="divot ${cls}">${label}</button>`;
-const ico = (cls, glyph, extra = "") =>
-  `<button class="divot icon ${cls}" ${extra}>${glyph}</button>`;
-
-const cell = (lab, html) => `<div class="cell"><span class="lab">${lab}</span><div class="pair">${html}</div></div>`;
-
-document.getElementById("strengths").innerHTML = `<div class="row">` + [
-  ["quiet · 0", "quiet", "silent until hovered"],
-  ["ghost · 25", "ghost", "toolbars and groups"],
-  ["default · 45", "", "standalone actions"],
-  ["firm · 70", "firm", "over images, busy grounds"],
-].map(([l, c, note]) =>
-  `<div class="cell"><span class="lab">${l}</span>
-     <div class="pair">${btn(c, "Read")}${ico(c, I.note)}${btn(c + " on", "On")}</div>
-     <span class="lab" style="text-transform:none;letter-spacing:0">${note}</span>
-   </div>`).join("") + `</div>`;
-
-document.getElementById("states").innerHTML = `<div class="row">` + [
-  ["rest", btn("", "Read")],
-  ["hover", `<button class="divot" style="--divot-bump:25">Read</button>`],
-  ["pressed / on", btn("on", "Read")],
-  ["focus-visible", `<button class="divot" style="outline:1px solid var(--ink);outline-offset:1px">Read</button>`],
-].map(([l, h]) => cell(l, h)).join("") + `</div>`;
-
-document.getElementById("roles").innerHTML = `<div class="row">` + [
-  ["default", btn("", "Read") + btn("on", "On")],
-  ["ghost", btn("ghost", "Read") + btn("ghost on", "On")],
-  ["quiet", btn("quiet", "file away") + btn("quiet on", "On")],
-  ["danger — hover it", btn("quiet danger", "Delete")],
-  ["bare — ledger rows", btn("bare", "a document in the rail") + btn("bare sel", "selected")],
-].map(([l, h]) => cell(l, h)).join("") + `</div>`;
-
-document.getElementById("raise").innerHTML = `<div class="row">` + [
-  ["raise", btn("raise", "keep")],
-  ["raise + accent", btn("raise accent", "keep")],
-  ["pressed — sunk to flush", btn("raise accent on", "keep")],
-  ["beside a default, for scale", btn("", "Cancel") + btn("raise accent", "Add to collection")],
-].map(([l, h]) => cell(l, h)).join("") + `</div>`;
-
-const KIT = `${btn("", "Read")}${btn("raise accent", "Mark")}${ico("", I.note)}${ico("on", I.chat)}${btn("quiet", "file away")}`;
-document.getElementById("grounds").innerHTML =
-  [["--bg", "ground-bg"], ["--surface", "ground-surface"], ["--well", "ground-well"], ["--paper", "ground-paper"]]
-    .map(([l, c]) => `<div class="panel ${c}"><span class="lab">${l}</span><div class="pair" style="margin-top:10px">${KIT}</div></div>`).join("");
-
-document.getElementById("composites").innerHTML = `
-  <div class="panel ground-surface" style="padding:0;margin-bottom:8px">
-    <div class="chrome">
-      <span class="lab">the&nbsp;library</span>
-      <span class="q">deleuze fold</span>
-      ${ico("ghost push", I.note)}${ico("ghost on", I.chat)}
-    </div>
-    <div style="padding:12px 10px" class="lab">app header · ghost, because the bar already frames them</div>
+<div class="bleed hero-band"><div class="wrap"><div class="hero">
+  <div class="t">
+    <p class="eyebrow">a button primitive &#183; one class &#183; 0.2.0</p>
+    <h1>divot.css</h1>
+    <p class="sub">A simple skeuomorphic button style system. One class, cut into the page.</p>
+    <div class="row"><a class="divot raise" href="#install" role="button">Get started</a><a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a></div>
   </div>
+  <div class="art"><canvas class="ascii" data-press='{"cols":104,"rows":54,"cell":7}'></canvas></div>
+</div></div></div>
 
-  <div class="panel ground-surface" style="margin-bottom:8px">
-    <span class="lab">mark popover on --surface</span>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      ${btn("quiet", "cancel")}${btn("raise accent", "comment")}
+<div class="wrap">
+  <section id="concept">
+    <div class="sec-head"><p class="eyebrow">01 &#183; the concept</p><h2>A groove, not a box.</h2></div>
+    <div class="two">
+      <p>A divot is a button cut into the page instead of laid on top of it. The face is the same colour as whatever is behind it. A 2px groove around the edge is the only thing that says "button": one wall down, one wall back up, light from the top-left. Both wall colours are mixed from the background with <code>color-mix()</code>, so one class works on every surface and in both themes.</p>
+      <div><svg class="fig" viewBox="0 0 420 170" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side"><defs><pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/></pattern></defs><g stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="3 3"><line x1="22" y1="14" x2="64" y2="70"/><line x1="52" y1="8" x2="94" y2="64"/><line x1="82" y1="2" x2="124" y2="58"/></g>
+<circle cx="14" cy="10" r="4" fill="var(--ink)"/><text x="24" y="12" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">light</text><path d="M0 80 H60 V96 H80 V80 H340 V96 H360 V80 H420 V170 H0 Z" fill="url(#hrest)"/>
+<path d="M0 80 H60 M80 80 H340 M360 80 H420" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
+<path d="M60 80 V96 H80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
+<path d="M80 96 V80" stroke="var(--edge-hi)" stroke-width="2.5"/>
+<path d="M340 80 V96" stroke="var(--edge-hi)" stroke-width="2.5"/>
+<path d="M340 96 H360 V80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
+<g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)"><text x="0" y="122">ground</text><text x="56" y="122">lo</text><text x="80" y="122">hi</text><text x="210" y="122" text-anchor="middle">face &#183; flush</text><text x="328" y="122">hi</text><text x="356" y="122">lo</text></g>
+<g stroke="var(--ink-dim)" stroke-width="1"><line x1="60" y1="146" x2="80" y2="146"/><line x1="60" y1="142" x2="60" y2="150"/><line x1="80" y1="142" x2="80" y2="150"/></g><text x="70" y="162" text-anchor="middle" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">2px</text></svg></div>
     </div>
-  </div>
+  </section>
+</div>
 
-  <div class="panel ground-paper" style="padding:0;margin-bottom:8px">
-    <div class="scan">
-      <em>…the fold is always between two folds, and this between-two-folds seems
-      to go everywhere:</em> is it because the fold passes through inorganic
-      bodies as much as it does organic ones?
+<div class="bleed band-surface"><div class="wrap">
+  <section id="reference">
+    <div class="sec-head"><p class="eyebrow">02 &#183; reference</p><h2>One class. Every role.</h2></div>
+    <div class="sheet">
+      <div><span class="lab">.divot</span><button class="divot ">Read</button></div>
+      <div><span class="lab">held</span><button class="divot" aria-pressed="true">held</button></div>
+      <div><span class="lab">.raise</span><button class="divot raise">Add to collection</button></div>
+      <div><span class="lab">.quiet</span><button class="divot quiet">file away</button></div>
+      <div><span class="lab">.ghost</span><button class="divot ghost">Read</button></div>
+      <div><span class="lab">.firm</span><button class="divot firm">Read</button></div>
+      <div><span class="lab">.bare</span><button class="divot bare">row item</button></div>
+      <div><span class="lab">.icon</span><button class="divot icon" aria-pressed="true">&#9790;</button></div>
+      <div><span class="lab">.eased</span><button class="divot eased">Read</button></div>
+      <div><span class="lab">.pill</span><button class="divot pill">filter</button></div>
+      <div><span class="lab">.pill held</span><button class="divot pill" aria-pressed="true">filter</button></div>
+      <div><span class="lab">.danger (hover)</span><button class="divot danger">Delete</button></div>
+      <div><span class="lab">:disabled</span><button class="divot " disabled">Read</button></div>
     </div>
-    <div class="pair" style="padding:0 18px 16px">
-      ${btn("quiet", "← notes")}${btn("quiet", "file away")}${btn("raise accent", "keep")}
-    </div>
-    <div style="padding:0 18px 14px" class="lab">the sheet · shadow-only cut, pinned ink</div>
-  </div>
+  </section>
+</div></div>
 
-  <div class="panel ground-bg">
-    <span class="lab">notes rail · bare rows beside a raised "+ note"</span>
-    <div style="margin-top:10px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:320px">
-      <button class="divot bare" style="width:100%;text-align:left;padding:6px 0;color:var(--ink-faint)">Difference and Repetition</button>
-      <button class="divot bare sel" style="width:100%;text-align:left;padding:6px 0">The Fold</button>
-      <button class="divot bare" style="width:100%;text-align:left;padding:6px 0;color:var(--ink-faint)">A Thousand Plateaus</button>
+<div class="wrap">
+  <section id="install">
+    <div class="sec-head"><p class="eyebrow">03 &#183; install</p><h2>Link it, or install it.</h2></div>
+    <div class="install">
+      <div><span class="eyebrow">link it</span><pre>&lt;link rel="stylesheet" href="divot.css"&gt;
+&lt;button class="divot"&gt;Read&lt;/button&gt;</pre></div>
+      <div><span class="eyebrow">or install it</span><pre>npm install divot.css
+@import "divot.css";</pre></div>
+      <div><span class="eyebrow">put it on a surface</span><pre>&lt;div class="ground-surface"&gt;
+  &lt;button class="divot"&gt;Read&lt;/button&gt;
+&lt;/div&gt;</pre></div>
     </div>
-    <div class="pair" style="margin-top:12px">${btn("quiet", "notes")}${btn("raise accent", "+ note")}</div>
-  </div>`;
+  </section>
 
-document.getElementById("themes").innerHTML = ["light", "dark"].map(t => `
-  <div data-theme="${t}" class="ground-bg" style="background:var(--bg);color:var(--ink)">
-    <span class="lab">${t}</span>
-    <div class="pair" style="margin-top:12px">
-      ${btn("quiet", "quiet")}${btn("ghost", "ghost")}${btn("", "default")}${btn("firm", "firm")}
-    </div>
-    <div class="pair" style="margin-top:8px">
-      ${btn("raise accent", "keep")}${btn("on", "pressed")}${ico("on", I.note)}
-    </div>
-  </div>`).join("");
+  <footer class="foot"><span>divot.css &#183; Apache-2.0</span><nav><a href="https://github.com/nlaz/divot.css">GitHub</a><a href="https://www.npmjs.com/package/divot.css">npm</a><a href="https://instagram.com/">Instagram</a></nav></footer>
+</div>
+
+<script>
+(function(){
+  var root = document.documentElement;
+  function set(t){ if (t === 'system') root.removeAttribute('data-theme'); else root.dataset.theme = t;
+    document.querySelectorAll('[data-set-theme]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.setTheme === t ? 'true' : 'false'); }); }
+  document.querySelectorAll('[data-set-theme]').forEach(function(b){ b.addEventListener('click', function(){ set(b.dataset.setTheme); }); });
+  set(root.dataset.theme || 'system');
+  document.querySelectorAll('canvas.ascii').forEach(function(c){ try { window.asciiPress(c, JSON.parse(c.dataset.press || '{}')); } catch(e) {} });
+})();
 </script>
 </body>
 </html>

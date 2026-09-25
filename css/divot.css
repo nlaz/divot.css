@@ -7,12 +7,9 @@
        <link rel="stylesheet" href="css/divot.css">
        <button class="divot">Read</button>
 
-   Want the build-out too — wells, tabs, cards, popovers, menus, forms, and
-   the width/elevation/radius axes — use css/divot.system.css instead.
-
    Bringing your own palette? Skip this file, link core.css alone, and
    define the tokens it reads: --divot-ground (or --bg), --edge-hi,
-   --edge-lo, --ink, --ink-dim, --ink-faint, --hl-wash and --r.
+   --edge-lo, --ink, --ink-dim and --ink-faint.
    ========================================================================== */
 
 @import url("./tokens.css");
