@@ -6,9 +6,10 @@
    in three-quarter view, read back as pixels and drawn as text in the
    page's own ink on the page's own ground, so it follows the theme.
 
-   It is a button: hover depresses it a little, click and hold presses it
-   fully, it takes focus and presses on Space or Enter. Every move eases.
-   A completed press calls opts.onPress; the page uses it to flip the theme.
+   It is a button: hover depresses it a little, a press pushes it fully in
+   and it LATCHES there; the next press releases it. It takes focus and
+   works from Space or Enter. Every move eases. A completed press calls
+   opts.onPress with the state, whose .latched says which way it went.
    It only re-renders when something changed, so it idles at no cost.
 
    Needs window.THREE (r128) loaded first. Call asciiPress(canvas, opts);
@@ -69,8 +70,8 @@ window.asciiPress = function(canvas, o){
   function clamp(x){ return x<0?0:x>1?1:x; }
 
   var HOVER = o.hoverDepth != null ? o.hoverDepth : 0.35, SINK = 0.09, VIG = o.vignette != null ? o.vignette : 0.14;
-  var over = false, down = false, focused = false, target = 0, pr = 0, dirty = true;
-  var state = { phase: 'rest', pressure: 0 };
+  var over = false, down = false, focused = false, latched = false, target = 0, pr = 0, dirty = true;
+  var state = { phase: 'rest', pressure: 0, latched: false };
   var ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   function hit(ev){
     var r = canvas.getBoundingClientRect();
@@ -79,17 +80,18 @@ window.asciiPress = function(canvas, o){
     return ray.intersectObject(face).length > 0;
   }
   function retarget(){
-    target = down ? 1 : (over || focused) ? HOVER : 0;
-    state.phase = down ? 'pressed' : (over || focused) ? 'hover' : 'rest';
+    target = (down || latched) ? 1 : (over || focused) ? HOVER : 0;
+    state.phase = down ? 'pressed' : latched ? 'latched' : (over || focused) ? 'hover' : 'rest';
+    canvas.setAttribute('aria-pressed', latched ? 'true' : 'false');
     canvas.style.cursor = over ? 'pointer' : '';
   }
   canvas.addEventListener('pointermove', function(ev){ var h = hit(ev); if (h !== over) { over = h; retarget(); } });
   canvas.addEventListener('pointerleave', function(){ over = false; retarget(); });
   canvas.addEventListener('pointerdown', function(ev){ if (!hit(ev)) return; down = true; try { canvas.setPointerCapture(ev.pointerId); } catch(e){} retarget(); ev.preventDefault(); });
-  function fire(){ if (o.onPress) { try { o.onPress(state); } catch(e){} } }
+  function fire(){ latched = !latched; state.latched = latched; retarget(); if (o.onPress) { try { o.onPress(state); } catch(e){} } }
   function up(ev){ if (!down) return; down = false; if (ev && ev.clientX != null) over = hit(ev); retarget(); if (over || ev.clientX == null) fire(); }
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
-  canvas.tabIndex = 0; canvas.setAttribute('role', 'button'); canvas.setAttribute('aria-label', o.label || 'Power button. Hover to depress, press to push it in.');
+  canvas.tabIndex = 0; canvas.setAttribute('role', 'button'); canvas.setAttribute('aria-label', o.label || 'Power button. Press to latch it in, press again to release.');
   canvas.addEventListener('focus', function(){ focused = true; retarget(); });
   canvas.addEventListener('blur', function(){ focused = false; down = false; retarget(); });
   canvas.addEventListener('keydown', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (!down) { down = true; retarget(); } ev.preventDefault(); } });
