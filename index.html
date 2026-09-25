@@ -60,7 +60,7 @@ a.divot { text-decoration: none; display: inline-block; }
 .hero .sub { font-size: clamp(15px, 1.6vw, 19px); color: var(--ink-dim); max-width: 30ch; }
 .hero .art { border: 1px solid var(--line-strong); background: var(--surface); position: relative; }
 /* press counter: appears above the render after the third press */
-.hero .badge { position: absolute; top: -12px; right: 14px; font: 500 var(--fs-meta)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink); background: var(--bg); border: 1px solid var(--line-strong); padding: 6px 10px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .3s ease, transform .3s ease; }
+.hero .badge { position: absolute; top: -12px; right: 14px; font: 500 var(--fs-meta)/1 var(--font-mono); letter-spacing: var(--track-label); color: var(--ink-faint); background: var(--surface); padding: 6px 8px; pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .3s ease, transform .3s ease; }
 .hero .badge.on { opacity: 1; transform: none; }
 .hero .badge b { font-variant-numeric: tabular-nums; font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { .hero .badge { transition: none; } }
@@ -136,7 +136,7 @@ svg.fig { width: 100%; height: auto; display: block; }
     <p class="sub">A simple skeuomorphic button style system. One class, cut into the page.</p>
     <div class="row"><a class="divot raise" href="#install" role="button">Get started</a><a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a></div>
   </div>
-  <div class="art"><canvas class="ascii" data-press='{"cols":104,"rows":54,"cell":7}'></canvas><span class="badge" id="presses" aria-live="polite"><b>0</b> presses</span></div>
+  <div class="art"><canvas class="ascii" data-press='{"cols":104,"rows":54,"cell":7}'></canvas><span class="badge" id="presses" aria-live="polite"><b>000000</b></span></div>
 </div></div></div>
 
 <div class="wrap">
@@ -236,7 +236,7 @@ svg.fig { width: 100%; height: auto; display: block; }
   // the hero button counts its presses; the badge shows up from the third one
   var badge = document.getElementById('presses'), presses = 0;
   try { presses = parseInt(localStorage.getItem('divot-presses') || '0', 10) || 0; } catch(e){}
-  function showCount(){ if (!badge) return; badge.querySelector('b').textContent = presses; badge.classList.toggle('on', presses >= 3); }
+  function showCount(){ if (!badge) return; badge.querySelector('b').textContent = String(Math.min(presses, 999999)).padStart(6, '0'); badge.classList.toggle('on', presses >= 3); }
   showCount();
   document.querySelectorAll('canvas.ascii').forEach(function(c){
     var o = JSON.parse(c.dataset.press || '{}');
