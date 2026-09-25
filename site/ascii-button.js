@@ -8,6 +8,7 @@
 
    It is a button: hover depresses it a little, click and hold presses it
    fully, it takes focus and presses on Space or Enter. Every move eases.
+   A completed press calls opts.onPress; the page uses it to flip the theme.
    It only re-renders when something changed, so it idles at no cost.
 
    Needs window.THREE (r128) loaded first. Call asciiPress(canvas, opts);
@@ -85,13 +86,14 @@ window.asciiPress = function(canvas, o){
   canvas.addEventListener('pointermove', function(ev){ var h = hit(ev); if (h !== over) { over = h; retarget(); } });
   canvas.addEventListener('pointerleave', function(){ over = false; retarget(); });
   canvas.addEventListener('pointerdown', function(ev){ if (!hit(ev)) return; down = true; try { canvas.setPointerCapture(ev.pointerId); } catch(e){} retarget(); ev.preventDefault(); });
-  function up(ev){ if (!down) return; down = false; if (ev && ev.clientX != null) over = hit(ev); retarget(); }
+  function fire(){ if (o.onPress) { try { o.onPress(state); } catch(e){} } }
+  function up(ev){ if (!down) return; down = false; if (ev && ev.clientX != null) over = hit(ev); retarget(); if (over || ev.clientX == null) fire(); }
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
-  canvas.tabIndex = 0; canvas.setAttribute('role', 'button'); canvas.setAttribute('aria-label', o.label || 'Power button. Hover to depress, click to press.');
+  canvas.tabIndex = 0; canvas.setAttribute('role', 'button'); canvas.setAttribute('aria-label', o.label || 'Power button. Press to switch between light and dark.');
   canvas.addEventListener('focus', function(){ focused = true; retarget(); });
   canvas.addEventListener('blur', function(){ focused = false; down = false; retarget(); });
   canvas.addEventListener('keydown', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (!down) { down = true; retarget(); } ev.preventDefault(); } });
-  canvas.addEventListener('keyup', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { down = false; retarget(); ev.preventDefault(); } });
+  canvas.addEventListener('keyup', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (down) { down = false; retarget(); fire(); } ev.preventDefault(); } });
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ dirty = true; }); } catch(e){}
   try { new MutationObserver(function(){ dirty = true; }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']}); } catch(e){}
