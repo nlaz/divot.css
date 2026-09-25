@@ -75,6 +75,8 @@ svg.fig { width: 100%; height: auto; display: block; }
 @media (max-width: 760px) { .install { grid-template-columns: 1fr; } }
 .foot { padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font: var(--fs-mono)/1.5 var(--font-mono); color: var(--ink-dim); }
 .foot nav { display: flex; gap: 16px; }
+/* while the theme flips, colours ease rather than cut; the class is on for the duration only */
+html.theming, html.theming * { transition: background-color .6s ease, color .6s ease, border-color .6s ease, box-shadow .6s ease, outline-color .6s ease; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -162,7 +164,9 @@ svg.fig { width: 100%; height: auto; display: block; }
 <script>
 (function(){
   var root = document.documentElement;
-  function set(t){ if (t === 'system') root.removeAttribute('data-theme'); else root.dataset.theme = t;
+  var themingTimer = null;
+  function set(t){ root.classList.add('theming'); clearTimeout(themingTimer); themingTimer = setTimeout(function(){ root.classList.remove('theming'); }, 700);
+    if (t === 'system') root.removeAttribute('data-theme'); else root.dataset.theme = t;
     document.querySelectorAll('[data-set-theme]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.setTheme === t ? 'true' : 'false'); });
     try { localStorage.setItem('divot-theme', t); } catch(e){} }
   function current(){ return root.dataset.theme || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
