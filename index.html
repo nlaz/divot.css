@@ -232,6 +232,7 @@ svg.fig { width: 100%; height: auto; display: block; }
   document.querySelectorAll('[data-set-theme]').forEach(function(b){ b.addEventListener('click', function(){ set(b.dataset.setTheme); }); });
   var saved = null; try { saved = localStorage.getItem('divot-theme'); } catch(e){}
   set(saved || root.dataset.theme || 'system');
+  var lf = document.getElementById('lframe'); if (lf && window.divotLight) window.divotLight(lf);
   // the hero button counts its presses; the badge shows up from the third one
   var badge = document.getElementById('presses'), presses = 0;
   try { presses = parseInt(localStorage.getItem('divot-presses') || '0', 10) || 0; } catch(e){}
