@@ -1,125 +1,324 @@
-/* site/ascii-button.js: the hero render, page-only. A three.js power button
-   drawn as text in the page's own ink. Needs window.THREE (r128) first. */
-window.asciiPress = function(canvas, o){
-  if (!window.THREE) return null;
-  o = o || {};
-  var cols = o.cols || 96, rows = o.rows || 48, ramp = o.ramp || ' .:-=+*#%@';
-  // one shared renderer for every button on the page
-  var ren = window.__asciiRen;
-  if (!ren) { try { ren = new THREE.WebGLRenderer({antialias:false, preserveDrawingBuffer:true}); } catch(e) { return null; }
-    ren.setPixelRatio(1); ren.shadowMap.enabled = true; ren.shadowMap.type = THREE.PCFSoftShadowMap; window.__asciiRen = ren; }
-  var scene = new THREE.Scene(); scene.background = new THREE.Color(0x000000);
-  var aspect = cols/rows*0.6;
-  var cam = new THREE.PerspectiveCamera(o.fov || 28, aspect, 0.1, 50);
-  var dir = new THREE.Vector3(-2.4, 3.3, 3.3).normalize(), dist = o.dist || 5.4;
-  var la = o.look || [0, 0, 0]; cam.position.copy(dir.multiplyScalar(dist)); cam.lookAt(la[0], la[1], la[2]);
-  var cp = [cam.position.x, cam.position.y, cam.position.z];
+/* site/ascii-button.js: the hero render. Page-only.
+   A three.js power button in a recess, read back as pixels and drawn as text
+   in the page's own ink so it follows the theme. It behaves as a button:
+   hover depresses it, a press latches it in, a second press releases it.
+   Needs window.THREE (r128) loaded first. */
+(() => {
+  const DEFAULTS = {
+    cols: 96,
+    rows: 48,
+    cell: 8,               // px per column; rows are 1.7× taller
+    weight: 500,
+    ramp: ' .:-=+*#%@',    // dark to light
+    fov: 28,
+    dist: 5.4,
+    look: [0, 0, 0],
+    radius: 1.2,
+    hoverDepth: 0.35,
+    latchDepth: 0.5,
+    vignette: 0.14,        // how much the edges darken
+    vignetteStart: 0.7,    // radius (0–1.41) where the darkening begins
+    fadeMs: 600,           // theme crossfade
+    bgVar: '--bg',
+    inkVar: '--ink',
+    tones: false,          // colour glyphs by brightness with the ink ramp
+    label: 'Power button. Press to latch it in, press again to release.',
+    onPress: null,
+    onFrame: null,
+  };
 
-  // lighting
-  function keyLight(pos, intensity, radius, amb, fillI, fillPos){
-    var key = new THREE.DirectionalLight(0xffffff, intensity); key.position.set(pos[0], pos[1], pos[2]);
-    key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.radius = radius; key.shadow.bias = -0.0008;
-    var sc = key.shadow.camera; sc.left = -3; sc.right = 3; sc.top = 3; sc.bottom = -3; sc.near = 0.5; sc.far = 20;
-    scene.add(key); scene.add(new THREE.AmbientLight(0xffffff, amb));
-    if (fillI) { var f = new THREE.DirectionalLight(0xffffff, fillI); f.position.set(fillPos[0], fillPos[1], fillPos[2]); scene.add(f); }
-  }
-  keyLight([-1, 6, 1], 1.3, 1, 0.22, 0.0, null);
+  const SINK = 0.09;       // world units the button travels at full pressure
+  const EASE = 0.14;       // per-frame approach toward the target pressure
+  const CAMERA_DIR = [-2.4, 3.3, 3.3];
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 
-  var mGround = new THREE.MeshLambertMaterial({color: 0x4e4e4e});
-  var mWell = new THREE.MeshLambertMaterial({color: 0x0a0a0a});
-  var mFace = new THREE.MeshLambertMaterial({color: 0x626262}); // a step lighter than the ground: the face reads as its own surface
-  var mMark = new THREE.MeshLambertMaterial({color: 0x888888}); // a step lighter than the face: inks darker, but softly
-  var BR = o.radius || 1.2, G = 0.14*BR/1.35;
-  var slab = new THREE.Shape(); slab.moveTo(-60, -60); slab.lineTo(60, -60); slab.lineTo(60, 60); slab.lineTo(-60, 60); slab.closePath();
-  var hole = new THREE.Path(); hole.absarc(0, 0, BR+G, 0, Math.PI*2, true); slab.holes.push(hole);
-  var ground = new THREE.Mesh(new THREE.ExtrudeGeometry(slab, {depth: 0.5, bevelEnabled: false, curveSegments: 64}), mGround); ground.rotation.x = Math.PI/2; ground.receiveShadow = true; ground.castShadow = true; scene.add(ground);
-  var well = new THREE.Mesh(new THREE.CylinderGeometry(BR+G, BR+G, 0.3, 64), mWell); well.position.y = -0.35; well.receiveShadow = true; scene.add(well);
-  var button = new THREE.Group();
-  var face = new THREE.Mesh(new THREE.CylinderGeometry(BR-0.06*BR, BR, 0.6, 64), mFace); face.position.y = -0.3; face.castShadow = true; face.receiveShadow = true; button.add(face);
-  var fwd = new THREE.Vector2(la[0]-cp[0], la[2]-cp[2]).normalize();
-  var rgt = new THREE.Vector2(-fwd.y, fwd.x);
-  var d = fwd.clone().add(rgt).normalize();
-  var GR = 0.58*BR, GT = 0.074*BR, GAP = 0.55;
-  var ring = new THREE.Mesh(new THREE.TorusGeometry(GR, GT, 14, 80, Math.PI*2 - 2*GAP), mMark);
-  ring.rotation.set(Math.PI/2, 0, Math.atan2(d.y, d.x) + GAP); ring.position.y = -0.01; ring.castShadow = true; button.add(ring);
-  var bar = new THREE.Mesh(new THREE.BoxGeometry(0.15*BR, 0.06, 0.7*BR), mMark);
-  bar.rotation.y = Math.atan2(d.x, d.y); bar.position.set(d.x*0.37*BR, 0.0, d.y*0.37*BR); bar.castShadow = true; button.add(bar);
-  scene.add(button);
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const smoothstep = (x) => x * x * (3 - 2 * x);
+  const cssVar = (name, fallback) =>
+    getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
-  var px = new Uint8Array(cols*rows*4);
-  var BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(function(v){ return (v + 0.5)/16; });
-  var ctx = canvas.getContext('2d');
-  var cw = o.cell || 8, ch = Math.round(cw*1.7);
-  canvas.width = cols*cw; canvas.height = rows*ch;
-  var font = (o.weight || 500) + ' ' + Math.round(ch*0.95) + 'px "IBM Plex Mono", ui-monospace, monospace';
-  function css(v, dflt){ var s = getComputedStyle(document.documentElement).getPropertyValue(v).trim(); return s || dflt; }
-  function clamp(x){ return x<0?0:x>1?1:x; }
-
-  var HOVER = o.hoverDepth != null ? o.hoverDepth : 0.35, LATCH = o.latchDepth != null ? o.latchDepth : 0.5, SINK = 0.09, VIG = o.vignette != null ? o.vignette : 0.14; var VIG_IN = o.vignetteStart != null ? o.vignetteStart : 0.7;
-  var over = false, down = false, focused = false, latched = false, target = 0, pr = 0, dirty = true;
-  var state = { phase: 'rest', pressure: 0, latched: false };
-  var ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
-  function hit(ev){
-    var r = canvas.getBoundingClientRect();
-    ndc.set(((ev.clientX - r.left)/r.width)*2 - 1, -((ev.clientY - r.top)/r.height)*2 + 1);
-    ray.setFromCamera(ndc, cam);
-    return ray.intersectObject(face).length > 0;
-  }
-  function retarget(){
-    target = down ? 1 : latched ? LATCH : (over || focused) ? HOVER : 0;
-    state.phase = down ? 'pressed' : latched ? 'latched' : (over || focused) ? 'hover' : 'rest';
-    canvas.setAttribute('aria-pressed', latched ? 'true' : 'false');
-    canvas.style.cursor = over ? 'pointer' : '';
-  }
-  canvas.addEventListener('pointermove', function(ev){ var h = hit(ev); if (h !== over) { over = h; retarget(); } });
-  canvas.addEventListener('pointerleave', function(){ over = false; retarget(); });
-  canvas.addEventListener('pointerdown', function(ev){ if (!hit(ev)) return; down = true; try { canvas.setPointerCapture(ev.pointerId); } catch(e){} retarget(); ev.preventDefault(); });
-  function fire(){ latched = !latched; state.latched = latched; retarget(); if (o.onPress) { try { o.onPress(state); } catch(e){} } }
-  function up(ev){ if (!down) return; down = false; if (ev && ev.clientX != null) over = hit(ev); retarget(); if (over || ev.clientX == null) fire(); }
-  canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
-  canvas.tabIndex = 0; canvas.setAttribute('role', 'button'); canvas.setAttribute('aria-pressed', 'false'); canvas.setAttribute('aria-label', o.label || 'Power button. Press to latch it in, press again to release.');
-  canvas.addEventListener('focus', function(){ focused = true; retarget(); });
-  canvas.addEventListener('blur', function(){ focused = false; down = false; retarget(); });
-  canvas.addEventListener('keydown', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (!down) { down = true; retarget(); } ev.preventDefault(); } });
-  canvas.addEventListener('keyup', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (down) { down = false; retarget(); fire(); } ev.preventDefault(); } });
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // theme change: crossfade instead of cut
-  var fade = null, FADE_MS = o.fadeMs != null ? o.fadeMs : 600;
-  function themeChanged(){ if (reduce) { dirty = true; return; } var snap = document.createElement('canvas'); snap.width = canvas.width; snap.height = canvas.height; snap.getContext('2d').drawImage(canvas, 0, 0); fade = { img: snap, t0: performance.now() }; dirty = true; }
-  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeChanged); } catch(e){}
-  try { new MutationObserver(themeChanged).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']}); } catch(e){}
-
-  function draw(){
-    button.position.y = -SINK*pr;
-    ren.setSize(cols, rows, false);
-    ren.render(scene, cam);
-    var gl = ren.getContext();
-    gl.readPixels(0, 0, cols, rows, gl.RGBA, gl.UNSIGNED_BYTE, px);
-    var bg = css(o.bgVar || '--bg', '#e8e4d9'), ink = css(o.inkVar || '--ink', '#1e1c16'), dim = css('--ink-dim', '#605c4b'), faint = css('--ink-faint', '#97917c');
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = font; ctx.textBaseline = 'top';
-    var n = ramp.length;
-    for (var y=0; y<rows; y++) for (var x=0; x<cols; x++) {
-      var i = ((rows-1-y)*cols + x)*4;
-      var l = (px[i]*0.3 + px[i+1]*0.59 + px[i+2]*0.11)/255;
-      // vignette: radial falloff outside the well, dithered between ramp characters
-      var dx = (x/cols - 0.5)*2, dy = (y/rows - 0.5)*2, r = Math.sqrt(dx*dx + dy*dy);
-      var f = Math.min(1, Math.max(0, (r - VIG_IN)/(1.4142 - VIG_IN))); f = f*f*(3 - 2*f);
-      l *= 1 - VIG*f;
-      l += (BAYER[(y&3)*4 + (x&3)] - 0.5)/n*f*0.75;
-      var k = Math.max(0, Math.min(n-1, Math.floor(l*n)));
-      var c = ramp[k]; if (c === ' ') continue;
-      ctx.fillStyle = o.tones ? (l>0.66 ? ink : l>0.33 ? dim : faint) : ink;
-      ctx.fillText(c, x*cw, y*ch);
+  // --- renderer ------------------------------------------------------------
+  // One WebGL context shared by every button on the page; each draw resizes it.
+  let shared = null;
+  const sharedRenderer = () => {
+    if (shared) return shared;
+    try {
+      shared = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true });
+    } catch {
+      return null;
     }
-    if (fade) { var k = (performance.now() - fade.t0)/FADE_MS; if (k >= 1) fade = null; else { ctx.globalAlpha = 1 - k*k*(3-2*k); ctx.drawImage(fade.img, 0, 0); ctx.globalAlpha = 1; dirty = true; } }
-  }
-  function frame(){
-    var next = reduce ? target : pr + (target - pr)*0.14;
-    if (Math.abs(next - target) < 0.002) next = target;
-    if (next !== pr || dirty) { pr = clamp(next); dirty = false; state.pressure = pr; draw(); if (o.onFrame) o.onFrame(state); }
-    requestAnimationFrame(frame);
-  }
-  frame();
-  return state;
-};
+    shared.setPixelRatio(1);
+    shared.shadowMap.enabled = true;
+    shared.shadowMap.type = THREE.PCFSoftShadowMap;
+    return shared;
+  };
+
+  // --- scene ---------------------------------------------------------------
+  const buildScene = (o) => {
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    const camera = new THREE.PerspectiveCamera(o.fov, (o.cols / o.rows) * 0.6, 0.1, 50);
+    camera.position.copy(new THREE.Vector3(...CAMERA_DIR).normalize().multiplyScalar(o.dist));
+    camera.lookAt(...o.look);
+
+    // A hard overhead key that casts into the recess, plus a little ambient.
+    const key = new THREE.DirectionalLight(0xffffff, 1.3);
+    key.position.set(-1, 6, 1);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.radius = 1;
+    key.shadow.bias = -0.0008;
+    Object.assign(key.shadow.camera, { left: -3, right: 3, top: 3, bottom: -3, near: 0.5, far: 20 });
+    scene.add(key, new THREE.AmbientLight(0xffffff, 0.22));
+
+    const materials = {
+      ground: new THREE.MeshLambertMaterial({ color: 0x4e4e4e }),
+      well: new THREE.MeshLambertMaterial({ color: 0x0a0a0a }),
+      face: new THREE.MeshLambertMaterial({ color: 0x626262 }), // a step lighter than the ground
+      mark: new THREE.MeshLambertMaterial({ color: 0x888888 }), // a step lighter than the face
+    };
+
+    const R = o.radius;
+    const gap = (0.14 * R) / 1.35;
+
+    // The ground: a slab with a round hole for the well.
+    const slab = new THREE.Shape();
+    slab.moveTo(-60, -60); slab.lineTo(60, -60); slab.lineTo(60, 60); slab.lineTo(-60, 60);
+    slab.closePath();
+    const hole = new THREE.Path();
+    hole.absarc(0, 0, R + gap, 0, Math.PI * 2, true);
+    slab.holes.push(hole);
+    const ground = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(slab, { depth: 0.5, bevelEnabled: false, curveSegments: 64 }),
+      materials.ground,
+    );
+    ground.rotation.x = Math.PI / 2;
+    ground.receiveShadow = true;
+    ground.castShadow = true;
+
+    const well = new THREE.Mesh(new THREE.CylinderGeometry(R + gap, R + gap, 0.3, 64), materials.well);
+    well.position.y = -0.35;
+    well.receiveShadow = true;
+
+    // The button: a slightly tapered face carrying the power glyph.
+    const button = new THREE.Group();
+    const face = new THREE.Mesh(new THREE.CylinderGeometry(R - 0.06 * R, R, 0.6, 64), materials.face);
+    face.position.y = -0.3;
+    face.castShadow = true;
+    face.receiveShadow = true;
+
+    // The glyph's gap points toward the camera's near-right corner.
+    const forward = new THREE.Vector2(o.look[0] - camera.position.x, o.look[2] - camera.position.z).normalize();
+    const right = new THREE.Vector2(-forward.y, forward.x);
+    const toward = forward.clone().add(right).normalize();
+    const ringGap = 0.55;
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(0.58 * R, 0.074 * R, 14, 80, Math.PI * 2 - 2 * ringGap),
+      materials.mark,
+    );
+    ring.rotation.set(Math.PI / 2, 0, Math.atan2(toward.y, toward.x) + ringGap);
+    ring.position.y = -0.01;
+    ring.castShadow = true;
+
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.15 * R, 0.06, 0.7 * R), materials.mark);
+    bar.rotation.y = Math.atan2(toward.x, toward.y);
+    bar.position.set(toward.x * 0.37 * R, 0, toward.y * 0.37 * R);
+    bar.castShadow = true;
+
+    button.add(face, ring, bar);
+    scene.add(ground, well, button);
+
+    return { scene, camera, face, button };
+  };
+
+  // --- the button ----------------------------------------------------------
+  window.asciiPress = (canvas, options = {}) => {
+    if (!window.THREE) return null;
+    const renderer = sharedRenderer();
+    if (!renderer) return null;
+
+    const o = { ...DEFAULTS, ...options };
+    const { cols, rows, ramp } = o;
+    const { scene, camera, face, button } = buildScene(o);
+
+    const cellW = o.cell;
+    const cellH = Math.round(cellW * 1.7);
+    canvas.width = cols * cellW;
+    canvas.height = rows * cellH;
+    const ctx = canvas.getContext('2d');
+    const font = `${o.weight} ${Math.round(cellH * 0.95)}px "IBM Plex Mono", ui-monospace, monospace`;
+    const pixels = new Uint8Array(cols * rows * 4);
+
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Interaction state. `pressure` eases toward `target`; the rest is what
+    // the pointer and keyboard are doing right now.
+    const state = { phase: 'rest', pressure: 0, latched: false };
+    let over = false;
+    let down = false;
+    let focused = false;
+    let target = 0;
+    let dirty = true;
+    let fade = null;
+
+    const raycaster = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    const hitsFace = (event) => {
+      const box = canvas.getBoundingClientRect();
+      ndc.set(
+        ((event.clientX - box.left) / box.width) * 2 - 1,
+        -((event.clientY - box.top) / box.height) * 2 + 1,
+      );
+      raycaster.setFromCamera(ndc, camera);
+      return raycaster.intersectObject(face).length > 0;
+    };
+
+    const retarget = () => {
+      const hovering = over || focused;
+      target = down ? 1 : state.latched ? o.latchDepth : hovering ? o.hoverDepth : 0;
+      state.phase = down ? 'pressed' : state.latched ? 'latched' : hovering ? 'hover' : 'rest';
+      canvas.setAttribute('aria-pressed', String(state.latched));
+      canvas.style.cursor = over ? 'pointer' : '';
+    };
+
+    const toggle = () => {
+      state.latched = !state.latched;
+      retarget();
+      if (o.onPress) {
+        try { o.onPress(state); } catch { /* the page's problem, not the button's */ }
+      }
+    };
+
+    // Pointer.
+    canvas.addEventListener('pointermove', (event) => {
+      const hit = hitsFace(event);
+      if (hit !== over) { over = hit; retarget(); }
+    });
+    canvas.addEventListener('pointerleave', () => { over = false; retarget(); });
+    canvas.addEventListener('pointerdown', (event) => {
+      if (!hitsFace(event)) return;
+      down = true;
+      try { canvas.setPointerCapture(event.pointerId); } catch { /* unsupported */ }
+      retarget();
+      event.preventDefault();
+    });
+    const release = (event) => {
+      if (!down) return;
+      down = false;
+      over = hitsFace(event);
+      retarget();
+      if (over) toggle();
+    };
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+
+    // Keyboard and focus.
+    canvas.tabIndex = 0;
+    canvas.setAttribute('role', 'button');
+    canvas.setAttribute('aria-pressed', 'false');
+    canvas.setAttribute('aria-label', o.label);
+    canvas.addEventListener('focus', () => { focused = true; retarget(); });
+    canvas.addEventListener('blur', () => { focused = false; down = false; retarget(); });
+
+    const isActivation = (event) => event.key === ' ' || event.key === 'Enter';
+    canvas.addEventListener('keydown', (event) => {
+      if (!isActivation(event)) return;
+      if (!down) { down = true; retarget(); }
+      event.preventDefault();
+    });
+    canvas.addEventListener('keyup', (event) => {
+      if (!isActivation(event)) return;
+      if (down) { down = false; retarget(); toggle(); }
+      event.preventDefault();
+    });
+
+    // A theme change crossfades the last frame into the new one.
+    const onThemeChange = () => {
+      dirty = true;
+      if (reduceMotion) return;
+      const snapshot = document.createElement('canvas');
+      snapshot.width = canvas.width;
+      snapshot.height = canvas.height;
+      snapshot.getContext('2d').drawImage(canvas, 0, 0);
+      fade = { image: snapshot, start: performance.now() };
+    };
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', onThemeChange);
+    new MutationObserver(onThemeChange).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    // --- drawing -----------------------------------------------------------
+    const drawGlyphs = () => {
+      const ink = cssVar(o.inkVar, '#1e1c16');
+      const dim = cssVar('--ink-dim', '#605c4b');
+      const faint = cssVar('--ink-faint', '#97917c');
+      const n = ramp.length;
+      const vignetteSpan = Math.SQRT2 - o.vignetteStart;
+
+      ctx.font = font;
+      ctx.textBaseline = 'top';
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const i = ((rows - 1 - y) * cols + x) * 4;
+          let lum = (pixels[i] * 0.3 + pixels[i + 1] * 0.59 + pixels[i + 2] * 0.11) / 255;
+
+          // Vignette: a radial falloff outside the well. Where it acts, an
+          // ordered dither spreads the step between ramp characters so the
+          // fade reads as a gradient rather than a contour line.
+          const dx = (x / cols - 0.5) * 2;
+          const dy = (y / rows - 0.5) * 2;
+          const r = Math.hypot(dx, dy);
+          const f = smoothstep(clamp01((r - o.vignetteStart) / vignetteSpan));
+          lum *= 1 - o.vignette * f;
+          lum += ((BAYER[(y & 3) * 4 + (x & 3)] - 0.5) / n) * f * 0.75;
+
+          const glyph = ramp[Math.max(0, Math.min(n - 1, Math.floor(lum * n)))];
+          if (glyph === ' ') continue;
+          ctx.fillStyle = o.tones ? (lum > 0.66 ? ink : lum > 0.33 ? dim : faint) : ink;
+          ctx.fillText(glyph, x * cellW, y * cellH);
+        }
+      }
+    };
+
+    const drawFade = () => {
+      if (!fade) return;
+      const k = (performance.now() - fade.start) / o.fadeMs;
+      if (k >= 1) { fade = null; return; }
+      ctx.globalAlpha = 1 - smoothstep(k);
+      ctx.drawImage(fade.image, 0, 0);
+      ctx.globalAlpha = 1;
+      dirty = true;
+    };
+
+    const draw = () => {
+      button.position.y = -SINK * state.pressure;
+      renderer.setSize(cols, rows, false);
+      renderer.render(scene, camera);
+      const gl = renderer.getContext();
+      gl.readPixels(0, 0, cols, rows, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+      ctx.fillStyle = cssVar(o.bgVar, '#e8e4d9');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawGlyphs();
+      drawFade();
+    };
+
+    // Re-renders only when the pressure moves or something marked it dirty.
+    const tick = () => {
+      let next = reduceMotion ? target : state.pressure + (target - state.pressure) * EASE;
+      if (Math.abs(next - target) < 0.002) next = target;
+      if (next !== state.pressure || dirty) {
+        state.pressure = clamp01(next);
+        dirty = false;
+        draw();
+        if (o.onFrame) o.onFrame(state);
+      }
+      requestAnimationFrame(tick);
+    };
+    tick();
+
+    return state;
+  };
+})();
