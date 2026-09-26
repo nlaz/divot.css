@@ -72,6 +72,7 @@ a.divot { text-decoration: none; display: inline-block; }
 .hero .t { display: grid; gap: 20px; align-content: center; }
 .hero h1 { font-size: clamp(48px, 8.5vw, 120px); line-height: 0.92; letter-spacing: -0.035em; margin-left: -0.045em; /* optical: pull the d's side bearing back onto the text edge */ }
 .hero .ver { margin-bottom: -6px; text-transform: none; } /* sits closer to the title than the 20px stack gap */
+.hero .row .divot { --divot-pad-y: 8px; --divot-pad-x: 18px; } /* CTAs: roomier box, via the tokens so the press nudge still works */
 .hero .sub { font-size: clamp(15px, 1.6vw, 19px); line-height: 1.45; color: var(--ink-dim); max-width: 44ch; text-wrap: balance; }
 .hero .art { border: 1px solid var(--line-strong); background: var(--surface); position: relative; }
 canvas.ascii { width: 100%; height: auto; display: block; max-width: 100%; }
@@ -165,7 +166,7 @@ svg.fig { width: 100%; height: auto; display: block; }
     <p class="sub">A simple skeuomorphic button style, for buttons that feel as good to press as the real thing.</p>
     <div class="row"><a class="divot raise" href="#install" role="button">Download</a><a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a></div>
   </div>
-  <div class="art"><canvas class="ascii" data-press='{"cols":104,"rows":54,"cell":7}'></canvas></div>
+  <div class="art"><canvas class="ascii" data-press='{"cols":96,"rows":56,"cell":7,"dist":6.6}'></canvas></div>
 </div></div></div>
 
 <div class="wrap">
