@@ -49,7 +49,6 @@
 .divot:active,
 .divot.on,
 .divot.active,
-.divot.sel,
 .divot[aria-pressed="true"],
 .divot[aria-expanded="true"] {
   box-shadow:

@@ -147,7 +147,6 @@ input:focus-visible {
 .divot:active,
 .divot.on,
 .divot.active,
-.divot.sel,
 .divot[aria-pressed="true"],
 .divot[aria-expanded="true"] {
   --divot-bump: 0;
@@ -190,7 +189,6 @@ input:focus-visible {
    not enough to read as "this one is on" */
 .divot.quiet.on,
 .divot.quiet.active,
-.divot.quiet.sel,
 .divot.quiet[aria-pressed="true"] {
   --divot-n: 45;
 }

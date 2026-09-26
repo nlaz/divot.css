@@ -82,7 +82,7 @@ not size, so a `ghost` and a `firm` are the same box.
 | `.divot:disabled` | Groove flat, ink faded, box unchanged. |
 
 Latched state — a toggle that stays on is a button still being held down — is
-any of `.on`, `.active`, `.sel`, `[aria-pressed="true"]`, `[aria-expanded="true"]`.
+any of `.on`, `.active`, `[aria-pressed="true"]`, `[aria-expanded="true"]`.
 
 ```html
 <button class="divot">Read</button>
