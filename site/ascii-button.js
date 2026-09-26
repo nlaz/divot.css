@@ -70,7 +70,7 @@ window.asciiPress = function(canvas, o){
   function css(v, dflt){ var s = getComputedStyle(document.documentElement).getPropertyValue(v).trim(); return s || dflt; }
   function clamp(x){ return x<0?0:x>1?1:x; }
 
-  var HOVER = o.hoverDepth != null ? o.hoverDepth : 0.35, LATCH = o.latchDepth != null ? o.latchDepth : 0.5, SINK = 0.09, VIG = o.vignette != null ? o.vignette : 0.14;
+  var HOVER = o.hoverDepth != null ? o.hoverDepth : 0.35, LATCH = o.latchDepth != null ? o.latchDepth : 0.5, SINK = 0.09, VIG = o.vignette != null ? o.vignette : 0.14; var VIG_IN = o.vignetteStart != null ? o.vignetteStart : 0.7;
   var over = false, down = false, focused = false, latched = false, target = 0, pr = 0, dirty = true;
   var state = { phase: 'rest', pressure: 0, latched: false };
   var ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -117,11 +117,12 @@ window.asciiPress = function(canvas, o){
     for (var y=0; y<rows; y++) for (var x=0; x<cols; x++) {
       var i = ((rows-1-y)*cols + x)*4;
       var l = (px[i]*0.3 + px[i+1]*0.59 + px[i+2]*0.11)/255;
-      // lens vignette: a smooth radial falloff (cos^4-like) that starts near the centre and
-      // wraps all four edges, not just the corners. Where it acts, an ordered dither spreads
-      // the step between ramp characters so the fade reads as a gradient, not a contour line.
-      var dx = (x/cols - 0.5)*2, dy = (y/rows - 0.5)*2, r = Math.sqrt(dx*dx + dy*dy)/1.4142;
-      var f = Math.min(1, Math.max(0, (r - 0.2)/0.8)); f = f*f*(3 - 2*f);
+      // lens vignette: a smooth radial falloff that begins just outside the button's well
+      // and wraps all four edges, not just the corners. Where it acts, an ordered dither
+      // spreads the step between ramp characters so the fade reads as a gradient, not a
+      // contour line. Inside the well f is 0: the button and its edge render untouched.
+      var dx = (x/cols - 0.5)*2, dy = (y/rows - 0.5)*2, r = Math.sqrt(dx*dx + dy*dy);
+      var f = Math.min(1, Math.max(0, (r - VIG_IN)/(1.4142 - VIG_IN))); f = f*f*(3 - 2*f);
       l *= 1 - VIG*f;
       l += (BAYER[(y&3)*4 + (x&3)] - 0.5)/n*f*0.75;
       var k = Math.max(0, Math.min(n-1, Math.floor(l*n)));

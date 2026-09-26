@@ -101,13 +101,15 @@ svg.fig { width: 100%; height: auto; display: block; }
    frame is sized in cqw so it scales with the dial. */
 /* specimen card: one frame, two equal halves. The dial sits in a sunk well;
    copy, the 1x row and the code are pinned top, middle and bottom. */
-.cust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--line); }
-.cust .stage { background: var(--well); --divot-ground: var(--well); display: grid; place-items: center; align-content: center; gap: 20px; padding: clamp(24px, 4vw, 48px); border-right: 1px solid var(--line); }
+/* customize: the same two-column rhythm as the why section. Copy and code on the
+   left, the dial in a sunk well panel on the right. */
+.cust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+.cust .info { display: grid; gap: 20px; align-content: center; }
+.cust .info p { max-width: 62ch; font-size: var(--fs-title); line-height: 1.6; color: var(--ink-dim); }
+.cust .stage { background: var(--well); --divot-ground: var(--well); border: 1px solid var(--line); display: grid; place-items: center; align-content: center; gap: 20px; padding: clamp(24px, 4vw, 40px); }
 .cust .stage .lframe { max-width: 260px; }
-.cust .info { padding: clamp(20px, 3vw, 36px); display: grid; align-content: space-between; gap: 24px; }
-.cust .info .top { display: grid; gap: 12px; }
 .cust .stage .mid { justify-content: center; }
-@media (max-width: 760px) { .cust { grid-template-columns: 1fr; } .cust .stage { border-right: 0; border-bottom: 1px solid var(--line); } }
+@media (max-width: 760px) { .cust { grid-template-columns: 1fr; } }
 .lframe { position: relative; width: 100%; max-width: 290px; aspect-ratio: 1; container-type: inline-size; justify-self: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
 .lframe.grab { cursor: grabbing; }
 .lframe .ring { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed var(--line-strong); }
@@ -217,7 +219,7 @@ pre.hl .s { color: var(--syn-str); }
     <div class="sec-head"><p class="eyebrow">reference</p><h2>Every role.</h2><p class="dim">One class plus a role. None of them change the box; depth is contrast, not size.</p></div>
     <div class="sheet">
       <div><span class="lab">.divot</span><button class="divot">Edit</button><span class="cap">The default. Flush with the page.</span></div>
-      <div><span class="lab">held</span><button class="divot" aria-pressed="true">Held</button><span class="cap">A toggle that is on. Also <code>.on</code>.</span></div>
+      <div><span class="lab">held</span><button class="divot" aria-pressed="true">Held</button><span class="cap">A toggle that stays sunk while on. Set <code>aria-pressed="true"</code>.</span></div>
       <div><span class="lab">.raise</span><button class="divot raise">Save</button><span class="cap">One band up. The primary action.</span></div>
       <div><span class="lab">.quiet</span><button class="divot quiet">File away</button><span class="cap">No walls until hovered. Toolbars.</span></div>
       <div><span class="lab">.ghost</span><button class="divot ghost">Cancel</button><span class="cap">Lighter cut. Inside a framed group.</span></div>
@@ -242,7 +244,12 @@ pre.hl .s { color: var(--syn-str); }
 
 <div class="wrap">
   <section id="customize">
+    <div class="sec-head"><p class="eyebrow">customize</p><h2>Move the lamp.</h2></div>
     <div class="cust">
+      <div class="info">
+        <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code> at eight times scale, so you can press it.</p>
+        <div class="lcode"><pre id="lCss">:root { --divot-light: 315deg; }</pre><button class="divot" id="lCopy">Copy</button><button class="divot" id="lReset" disabled>Reset</button></div>
+      </div>
       <div class="stage">
         <div class="lframe" id="lframe">
           <i class="ring" aria-hidden="true"></i>
@@ -252,13 +259,6 @@ pre.hl .s { color: var(--syn-str); }
           <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
         </div>
         <div class="row mid"><span class="lab">at 1&#215;</span><button class="divot">Edit</button><button class="divot" aria-pressed="true">Held</button><button class="divot raise">Save</button></div>
-      </div>
-      <div class="info">
-        <div class="top">
-          <div class="sec-head"><p class="eyebrow">customize</p><h2>Move the lamp.</h2></div>
-          <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code> at eight times scale, so you can press it.</p>
-        </div>
-        <div class="lcode"><pre id="lCss">:root { --divot-light: 315deg; }</pre><button class="divot" id="lCopy">Copy</button><button class="divot" id="lReset" disabled>Reset</button></div>
       </div>
     </div>
   </section>
