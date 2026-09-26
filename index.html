@@ -134,6 +134,7 @@ svg.fig { width: 100%; height: auto; display: block; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 /* why: a short first-person note, set as running text */
 .why { max-width: 62ch; display: grid; gap: 14px; }
+#why .two { align-items: start; } /* copy starts at the top of the row, level with the diagram */
 .why p { max-width: none; font-size: var(--fs-title); line-height: 1.6; color: var(--ink-dim); }
 
 /* grounds strip: the same class on four surfaces, no overrides */
@@ -200,7 +201,7 @@ pre.hl .s { color: var(--syn-str); }
 
 <div class="wrap">
   <section id="why">
-    <div class="sec-head"><p class="eyebrow">why</p><h2>Buttons should be satisfying to press.</h2></div>
+    <div class="sec-head"><p class="eyebrow">background</p><h2>Buttons should be satisfying to press.</h2></div>
     <div class="two">
       <div class="why">
         <p>Real buttons are satisfying to press. So a divot is cut into the page instead of laid on top of it. The face sits flush with the surface, and a 2px groove around it is the only thing that says "press me".</p>
@@ -306,7 +307,7 @@ pre.hl .s { color: var(--syn-str); }
 
   <section id="install">
     <div class="inst-head">
-      <div class="sec-head"><p class="eyebrow">install</p><h2>Link it.</h2></div>
+      <div class="sec-head"><p class="eyebrow">install</p><h2>Add the stylesheet to your project.</h2></div>
       <a class="divot raise" href="divot.css" target="_blank" rel="noopener">Download</a>
     </div>
     <div class="install">
