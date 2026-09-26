@@ -1,4 +1,4 @@
-/*! divot.css v0.2.0 | Apache-2.0 | https://github.com/nlaz/divot.css
+/*! divot.css v0.2.0 | MIT | https://github.com/nlaz/divot.css
    A simple skeuomorphic button style. Tokens + the core primitive in one file:
      <link rel="stylesheet" href="divot.css">
      <button class="divot">Edit</button>
@@ -430,10 +430,16 @@ input:focus-visible {
 
 /* danger: severity by inversion, the house idiom. Re-pointing the ground
    rather than setting a background is what keeps the walls correct — they
-   re-derive against ink automatically. */
+   re-derive against ink automatically. Both light sources move with it: on
+   an ink ground the page's own --edge-lo can be LIGHTER than the ground
+   (and --ink-dim darker), which flips the lighting and makes the cut read
+   as raised. Mixing the sources from the ink itself, toward white and
+   toward black, keeps hi above the ground and lo below it in either theme,
+   so hover still reads as a cut and a press still sinks darker. */
 .divot.danger:hover {
   --divot-ground: var(--ink);
-  --divot-src-hi: var(--ink-dim);
+  --divot-src-hi: color-mix(in oklab, var(--ink) 60%, white);
+  --divot-src-lo: color-mix(in oklab, var(--ink) 55%, black);
   color: var(--bg);
 }
 
