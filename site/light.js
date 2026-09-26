@@ -21,7 +21,7 @@ window.divotLight = function (frame) {
     var dir = DIRS[Math.round(norm(v) / 45) % 8];
     lamp.setAttribute('aria-valuenow', n);
     lamp.setAttribute('aria-valuetext', n + ' degrees, light from the ' + dir);
-    $('#lCss').textContent = ':root { --divot-light: ' + n + 'deg; }';
+    $('#lCss').innerHTML = '<span class="t">:root</span> <span class="p">{</span> <span class="a">--divot-light</span><span class="p">:</span> <span class="s">' + n + 'deg</span><span class="p">; }</span>';
     $('#lReset').disabled = n === DEFAULT;
   }
   function set(x) { v = x; render(); }
