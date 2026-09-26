@@ -187,7 +187,9 @@
    case without a single override. Set --divot-ground on the *container*;
    a button that has to know where it is has already lost.
 
-   Lighting, worked from the section: light comes from the top-left.
+   Lighting, worked from the section: light comes from the top-left by
+   default (--divot-light, a bearing of 315deg; the lamp section near the
+   end re-mixes every wall for any other bearing).
    Descending into the channel that wall turns away from it — shadow;
    climbing back out to the face it turns toward it — highlight. On the
    bottom-right you meet the same two walls in the opposite order, so the
@@ -244,6 +246,12 @@ input:focus-visible {
      outer line. */
   --divot-inner: 100%;
 
+  /* the lamp. A bearing, clockwise from 12 o'clock. Every side of every
+     cut takes a "faces the lamp" share from it; 315deg is the top-left
+     that the fixed pairs below assume, so the default draws pixel for
+     pixel what they draw. Set it on :root to relight the whole page. */
+  --divot-light: 315deg;
+
   /* the corner. Radius is an axis, and the material's rest position on it
      is square — a cut has corners because the tool does. .eased and .pill
      move a single button along it; set this on a container to move a
@@ -282,6 +290,8 @@ input:focus-visible {
   background-color: var(--divot-ground);
   color: var(--ink);
   border: 1px solid;
+  /* the fixed top-left pair; the lamp section below re-mixes it per side
+     wherever CSS trig is available */
   border-color: var(--_lo) var(--_hi) var(--_hi) var(--_lo);
   border-radius: var(--divot-r);
   box-shadow:
@@ -306,8 +316,8 @@ input:focus-visible {
 
 /* Press: keep the outer wall exactly where it is and DELETE the inner one.
    A face that has sunk to the floor of the groove has no wall climbing back
-   up to meet it — what it has instead is the shadow the top-left wall now
-   throws across it. Rolling both walls over would throw a lip up around the
+   up to meet it — what it has instead is the shadow the wall on the lamp
+   side now throws across it. Rolling both walls over would throw a lip up around the
    button: the surround rising, not the face falling.
 
    The face does not translate: at zero height there is nothing to fall
@@ -397,7 +407,7 @@ input:focus-visible {
    The plane has three storeys: sunk, flush, raised. Flush is the divot at
    rest; sunk is where every press lands; raised is the inverse of the
    divot at one band instead of two — the face lifts slightly off the plane
-   and the walls flip to highlight-top-left. Deliberately no drop shadow: a
+   and the walls flip to put the highlight on the lamp side. Deliberately no drop shadow: a
    hard shadow is what made the old buttons read as floating.
 
    The press is the point. Every button in this system travels exactly one
@@ -440,6 +450,92 @@ input:focus-visible {
   --divot-src-lo: color-mix(in oklab, var(--ink) 55%, black);
   color: var(--bg);
 }
+
+/* --- the lamp -------------------------------------------------------------
+   --divot-light is the bearing the lamp sits at, clockwise from 12 o'clock.
+   Each side of every cut takes a "faces the lamp" share from it, and the
+   fixed pairs above become mixes by that share:
+
+     outer band   lo <-> hi    a wall facing the lamp falls into shadow
+     inner band   hi <-> lo    the wall climbing back out catches it
+     press cast   cast <-> sunk
+     .raise       the outer pair, flipped
+
+   The gain of 0.7072 is chosen so that at 315deg every share lands on
+   exactly 0% or 100%, which reproduces the fixed chisel pixel for pixel.
+   Anyone who never touches the token sees no change.
+
+   Browsers without CSS trig keep the fixed top-left cut from the rules
+   above, and forced-colors keeps its system colours. */
+
+@supports (width: calc(1px * cos(0deg))) {
+@media not (forced-colors: active) {
+
+.divot {
+  --_ft: clamp(0%, calc((0.5 + 0.7072 * cos(var(--divot-light))) * 100%), 100%);
+  --_fr: clamp(0%, calc((0.5 + 0.7072 * sin(var(--divot-light))) * 100%), 100%);
+  --_fb: clamp(0%, calc((0.5 - 0.7072 * cos(var(--divot-light))) * 100%), 100%);
+  --_fl: clamp(0%, calc((0.5 - 0.7072 * sin(var(--divot-light))) * 100%), 100%);
+  --_R: var(--divot-reach);
+  --_S: var(--divot-soft);
+
+  border-color:
+    color-mix(in oklab, var(--_lo) var(--_ft), var(--_hi))
+    color-mix(in oklab, var(--_lo) var(--_fr), var(--_hi))
+    color-mix(in oklab, var(--_lo) var(--_fb), var(--_hi))
+    color-mix(in oklab, var(--_lo) var(--_fl), var(--_hi));
+  box-shadow:
+    inset 0 var(--_R) var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_ft), var(--_lo-in)),
+    inset var(--_R) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fl), var(--_lo-in)),
+    inset calc(-1 * var(--_R)) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fr), var(--_lo-in)),
+    inset 0 calc(-1 * var(--_R)) var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fb), var(--_lo-in));
+}
+
+.divot:active,
+.divot.on,
+.divot.active,
+.divot[aria-pressed="true"],
+.divot[aria-expanded="true"] {
+  box-shadow:
+    inset 0 var(--_R) var(--_S) var(--_spread) color-mix(in oklab, var(--_cast) var(--_ft), var(--_sunk)),
+    inset var(--_R) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_cast) var(--_fl), var(--_sunk)),
+    inset calc(-1 * var(--_R)) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_cast) var(--_fr), var(--_sunk)),
+    inset 0 calc(-1 * var(--_R)) var(--_S) var(--_spread) color-mix(in oklab, var(--_cast) var(--_fb), var(--_sunk));
+}
+
+/* raised: a face above the plane is lit on the lamp side */
+.divot.raise {
+  border-color:
+    color-mix(in oklab, var(--_hi) var(--_ft), var(--_lo))
+    color-mix(in oklab, var(--_hi) var(--_fr), var(--_lo))
+    color-mix(in oklab, var(--_hi) var(--_fb), var(--_lo))
+    color-mix(in oklab, var(--_hi) var(--_fl), var(--_lo));
+}
+
+.divot.raise:active,
+.divot.raise.on,
+.divot.raise.active,
+.divot.raise[aria-pressed="true"] {
+  border-color:
+    color-mix(in oklab, var(--_lo) var(--_ft), var(--_hi))
+    color-mix(in oklab, var(--_lo) var(--_fr), var(--_hi))
+    color-mix(in oklab, var(--_lo) var(--_fb), var(--_hi))
+    color-mix(in oklab, var(--_lo) var(--_fl), var(--_hi));
+  box-shadow:
+    inset 0 var(--_R) var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_ft), var(--_lo-in)),
+    inset var(--_R) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fl), var(--_lo-in)),
+    inset calc(-1 * var(--_R)) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fr), var(--_lo-in)),
+    inset 0 calc(-1 * var(--_R)) var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fb), var(--_lo-in));
+}
+
+/* .bare opts out of the walls above; the pressed rule in this section is
+   later in the cascade at the same weight, so it has to opt out again */
+.divot.bare,
+.divot.bare:active {
+  box-shadow: none;
+}
+
+}}
 
 /* --- disabled -------------------------------------------------------------
    Last, so it wins over every strength above it without a specificity
