@@ -103,7 +103,7 @@ svg.fig { width: 100%; height: auto; display: block; }
 .lframe.grab { cursor: grabbing; }
 .lframe .ring { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed var(--line-strong); }
 .lframe .ray { position: absolute; left: 50%; top: 50%; width: 0; height: 46cqw; border-left: 1px dashed var(--ink-dim); transform-origin: 0 0; transform: rotate(calc(var(--divot-light) + 180deg)); }
-.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; font: 500 11cqw/1 var(--font-ui); letter-spacing: -0.02em; border-width: 8px; --divot-reach: 8px; --divot-nudge: 2px; --divot-pad-y: 4cqw; --divot-pad-x: 8cqw; }
+.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; font: 500 8cqw/1 var(--font-ui); letter-spacing: -0.01em; border-width: 8px; --divot-reach: 8px; --divot-nudge: 2px; --divot-pad-y: 4cqw; --divot-pad-x: 8cqw; }
 .lframe .zoom { position: absolute; left: 50%; top: calc(50% + 19cqw); transform: translateX(-50%); font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
 .lframe .lamp { position: absolute; left: 50%; top: 50%; z-index: 2; width: 22px; height: 22px; margin: -11px; border-radius: 50%; border: 1px solid var(--ink); background: var(--bg); display: grid; place-items: center;
   transform: rotate(var(--divot-light)) translateY(-46cqw) rotate(calc(-1 * var(--divot-light))); }
@@ -124,15 +124,15 @@ svg.fig { width: 100%; height: auto; display: block; }
 .grounds > div { padding: 24px 12px; display: grid; gap: 12px; justify-items: center; }
 @media (max-width: 560px) { .grounds { grid-template-columns: repeat(2, 1fr); } }
 
-/* levels: three storeys */
-.levels { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-.levels > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 22px 18px; display: grid; gap: 12px; align-content: start; justify-items: start; }
-.levels .n { font: 500 clamp(22px, 3vw, 30px)/1 var(--font-mono); letter-spacing: -0.02em; }
-.levels p { font-size: var(--fs-ui); color: var(--ink-dim); }
-@media (max-width: 640px) { .levels { grid-template-columns: 1fr; } }
+/* elevation: a short row under the reference sheet */
+.elev { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); align-items: center; border: 1px solid var(--line); border-top: 0; margin-top: -24px; }
+.elev > .lab { padding: 0 18px 0 14px; }
+.elev > div { display: flex; align-items: center; gap: 12px; padding: 14px; border-left: 1px solid var(--line); }
+.elev .n { font: 500 var(--fs-mono)/1 var(--font-mono); color: var(--ink-dim); min-width: 2ch; }
+@media (max-width: 640px) { .elev { grid-template-columns: 1fr; } .elev > .lab { padding: 12px 14px 0; } .elev > div { border-left: 0; padding-block: 8px; } }
 
 /* reference sheet captions */
-.sheet .cap { font-size: var(--fs-mono); color: var(--ink-dim); line-height: 1.4; }
+.sheet .cap, .elev .cap { font-size: var(--fs-mono); color: var(--ink-dim); line-height: 1.4; }
 
 /* cheatsheet */
 .cheat { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
@@ -172,19 +172,12 @@ svg.fig { width: 100%; height: auto; display: block; }
 <div class="wrap">
   <section id="why">
     <div class="sec-head"><p class="eyebrow">why</p><h2>I got tired of making the same button.</h2></div>
-    <div class="why">
-      <p>I've been building software for years, and every project ends at the same control: a rectangle, some padding, a border, a fill. Then the same rectangle again in another colour for the next state. It works, and it stopped being interesting a long time ago. This stylesheet started as a way out of that rut.</p>
-      <p>Real buttons are satisfying to press. There's travel, a face that goes down and comes back, a click you can feel. I wanted a page to have some of that: not a picture of a button, but something with a position. So a divot is cut into the page rather than laid on top of it. The face sits flush with the surface, and a soft groove around it is the only thing that says "press me".</p>
-      <p>What makes it different from other bevelled buttons is that flush is the resting state, and a button can move one step either way. There's a raised version that stands one band above the surface, and a sunk version, which is where every press lands. Three positions, one material, no accent colour. It gives a page a tangible feel that makes me want to click things, and that's the whole reason for it.</p>
-    </div>
-  </section>
-</div>
-
-<div class="bleed band-surface"><div class="wrap">
-  <section id="concept">
-    <div class="sec-head"><p class="eyebrow">the concept</p><h2>A groove, not a box.</h2></div>
     <div class="two">
-      <p>A divot is a button cut into the page instead of laid on top of it. The face is the same colour as whatever is behind it. A 2px groove around the edge is the only thing that says "button": one wall down, one wall back up, light from the top-left. Both wall colours are mixed from the background with <code>color-mix()</code>, so one class works on every surface and in both themes.</p>
+      <div class="why">
+        <p>Every project ends at the same control: a rectangle, some padding, a border, a fill. It works, and it stopped being interesting a long time ago.</p>
+        <p>Real buttons are satisfying to press. So a divot is cut into the page instead of laid on top of it. The face sits flush with the surface, and a 2px groove around it is the only thing that says "press me".</p>
+        <p>Flush at rest, one step up or down, no accent colour. It gives a page a tangible feel that makes you want to click things.</p>
+      </div>
       <div><svg class="fig" viewBox="0 0 420 170" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side"><defs><pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/></pattern></defs><g stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="3 3"><line x1="22" y1="14" x2="64" y2="70"/><line x1="52" y1="8" x2="94" y2="64"/><line x1="82" y1="2" x2="124" y2="58"/></g>
 <circle cx="14" cy="10" r="4" fill="var(--ink)"/><text x="24" y="12" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">light</text><path d="M0 80 H60 V96 H80 V80 H340 V96 H360 V80 H420 V170 H0 Z" fill="url(#hrest)"/>
 <path d="M0 80 H60 M80 80 H340 M360 80 H420" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
@@ -194,25 +187,6 @@ svg.fig { width: 100%; height: auto; display: block; }
 <path d="M340 96 H360 V80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
 <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)"><text x="0" y="122">ground</text><text x="56" y="122">lo</text><text x="80" y="122">hi</text><text x="210" y="122" text-anchor="middle">face &#183; flush</text><text x="328" y="122">hi</text><text x="356" y="122">lo</text></g>
 <g stroke="var(--ink-dim)" stroke-width="1"><line x1="60" y1="146" x2="80" y2="146"/><line x1="60" y1="142" x2="60" y2="150"/><line x1="80" y1="142" x2="80" y2="150"/></g><text x="70" y="162" text-anchor="middle" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">2px</text></svg></div>
-    </div>
-    <div class="sec-head"><p class="dim">The same class on four surfaces. Nothing is overridden; the walls re-mix from whatever is behind them.</p></div>
-    <div class="grounds">
-      <div class="ground-bg"><span class="lab">--bg</span><button class="divot">Read</button></div>
-      <div class="ground-surface"><span class="lab">--surface</span><button class="divot">Read</button></div>
-      <div class="ground-well"><span class="lab">--well</span><button class="divot">Read</button></div>
-      <div class="ground-paper"><span class="lab">--paper</span><button class="divot">Read</button></div>
-    </div>
-  </section>
-</div></div>
-
-<div class="wrap">
-  <section id="levels">
-    <div class="sec-head"><p class="eyebrow">levels</p><h2>Three positions, one step apart.</h2>
-    <p class="dim">Flush is the resting state. Every press travels exactly one step down: a raised button lands flush, a flush button lands sunk.</p></div>
-    <div class="levels">
-      <div><span class="n">+1</span><button class="divot raise">Save</button><p><b>Raised.</b> Stands one band above the surface. The one button on a screen that should be pressed first: save, send, confirm. There is no accent colour; this is how a button gets emphasis.</p><code>.divot.raise</code></div>
-      <div><span class="n">0</span><button class="divot">Read</button><p><b>Flush.</b> The default. The face is the page. Use it for everything that isn't the primary action, which is most buttons.</p><code>.divot</code></div>
-      <div><span class="n">&#8722;1</span><button class="divot" aria-pressed="true">Read</button><p><b>Sunk.</b> Where a press lands, and where a toggle stays while it's on. Filters, switches, a tab that is selected.</p><code>.divot[aria-pressed="true"]</code></div>
     </div>
   </section>
 </div>
@@ -233,6 +207,12 @@ svg.fig { width: 100%; height: auto; display: block; }
       <div><span class="lab">.pill</span><button class="divot pill">filter</button><span class="cap">Full-round. Chips and filters.</span></div>
       <div><span class="lab">.danger</span><button class="divot danger">Delete</button><span class="cap">Inverts on hover. Severity, not emphasis.</span></div>
       <div><span class="lab">:disabled</span><button class="divot" disabled>Read</button><span class="cap">Groove flat, ink faded, box unchanged.</span></div>
+    </div>
+    <div class="elev">
+      <span class="lab">elevation</span>
+      <div><span class="n">+1</span><button class="divot raise">Save</button><span class="cap">Raised. The primary action.</span></div>
+      <div><span class="n">0</span><button class="divot">Read</button><span class="cap">Flush. The resting state.</span></div>
+      <div><span class="n">&#8722;1</span><button class="divot" aria-pressed="true">Read</button><span class="cap">Sunk. Where a press lands.</span></div>
     </div>
   </section>
 </div></div>
