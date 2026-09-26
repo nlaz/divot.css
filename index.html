@@ -1,312 +1,334 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>divot.css</title>
-<meta name="description" content="A simple skeuomorphic button style for a satisfying button experience.">
-<link rel="canonical" href="https://nlaz.github.io/divot.css/">
-<link rel="icon" href="site/favicon.svg" type="image/svg+xml">
-<meta property="og:type" content="website">
-<meta property="og:title" content="divot.css">
-<meta property="og:description" content="A simple skeuomorphic button style for a satisfying button experience.">
-<meta property="og:url" content="https://nlaz.github.io/divot.css/">
-<meta property="og:image" content="https://nlaz.github.io/divot.css/site/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="divot.css">
-<meta name="twitter:description" content="A simple skeuomorphic button style for a satisfying button experience.">
-<meta name="twitter:image" content="https://nlaz.github.io/divot.css/site/og.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>divot.css</title>
+  <meta name="description" content="A simple skeuomorphic button style for a satisfying button experience.">
+  <link rel="canonical" href="https://nlaz.github.io/divot.css/">
+  <link rel="icon" href="site/favicon.svg" type="image/svg+xml">
 
-<!-- the package itself, linked rather than copied -->
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/core.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="divot.css">
+  <meta property="og:description" content="A simple skeuomorphic button style for a satisfying button experience.">
+  <meta property="og:url" content="https://nlaz.github.io/divot.css/">
+  <meta property="og:image" content="https://nlaz.github.io/divot.css/site/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="divot.css">
+  <meta name="twitter:description" content="A simple skeuomorphic button style for a satisfying button experience.">
+  <meta name="twitter:image" content="https://nlaz.github.io/divot.css/site/og.png">
 
-<!-- deferred, in this order -->
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script defer src="site/ascii-button.js"></script>
-<script defer src="site/light.js"></script>
-<script defer src="site/page.js"></script>
+  <!-- the package itself, linked rather than copied, then the page's own layout -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/core.css">
+  <link rel="stylesheet" href="site/site.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 
-<style>
-/* Page layout only. Colours come from tokens.css. */
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: var(--fs-body)/1.55 var(--font-ui); padding-inline: 16px; padding-block: 0 72px; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-.wrap { max-width: 1080px; margin: 0 auto; }
-h1, h2 { font-weight: 500; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
-h2 { font-size: clamp(20px, 2.6vw, 26px); line-height: 1.2; }
-p { margin: 0; max-width: 56ch; }
-a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
-a:hover { text-decoration-color: var(--ink); }
-code { font-family: var(--font-mono); font-size: 0.92em; }
-pre { font: var(--fs-mono)/1.6 var(--font-mono); margin: 0; white-space: pre; overflow-x: auto; }
-.eyebrow { font: 500 var(--fs-meta)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
-.dim { color: var(--ink-dim); }
-.divot { font: var(--fs-ui)/1.3 var(--font-ui); }
-a.divot { text-decoration: none; display: inline-block; }
-.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.lab { font: var(--fs-micro)/1.3 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
-
-/* masthead */
-.mast { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 0; flex-wrap: wrap; }
-.mast .word { font: 500 var(--fs-title)/1 var(--font-ui); }
-.mast nav { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.mast nav a { text-decoration: none; font: var(--fs-ui)/1 var(--font-ui); color: var(--ink-dim); padding: 6px 8px; }
-.mast nav a:hover { color: var(--ink); }
-.mast .theme { margin-left: 8px; gap: 4px; }
-.mast .theme .divot { --divot-pad-y: 6px; --divot-pad-x: 7px; }
-.mast .theme svg { display: block; }
-
-/* full-bleed band: escapes the body gutter, then re-applies it inside */
-.bleed { margin-inline: calc(50% - 50vw); padding-inline: max(16px, calc(50vw - 540px)); }
-
-/* hero: text left, render right */
-.hero-band { background: var(--surface); --divot-ground: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.hero { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center; padding-block: clamp(32px, 5vw, 64px); }
-.hero .t { display: grid; gap: 20px; align-content: center; }
-.hero h1 { font-size: clamp(48px, 8.5vw, 120px); line-height: 0.92; letter-spacing: -0.035em; margin-left: -0.045em; }
-.hero .ver { margin-bottom: -6px; text-transform: none; font-size: var(--fs-ui); }
-.hero .row .divot { --divot-pad-y: 8px; --divot-pad-x: 18px; }
-.hero .sub { font-size: clamp(15px, 1.6vw, 19px); line-height: 1.45; color: var(--ink-dim); max-width: 44ch; text-wrap: balance; }
-.hero .art { border: 1px solid var(--line-strong); background: var(--surface); position: relative; }
-canvas.ascii { width: 100%; height: auto; display: block; max-width: 100%; }
-canvas.ascii:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
-@media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
-
-/* sections */
-section { padding-block: 56px; display: grid; gap: 24px; }
-.sec-head { display: grid; gap: 10px; }
-.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
-@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
-svg.fig { width: 100%; height: auto; display: block; }
-.band-surface { background: var(--surface); --divot-ground: var(--surface); }
-.sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-.sheet > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 18px 14px; display: grid; gap: 12px; justify-items: start; align-content: start; min-height: 80px; }
-.install { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-.install > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); padding: 14px 16px; display: grid; gap: 8px; }
-@media (max-width: 760px) { .install { grid-template-columns: 1fr; } }
-.foot { padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font: var(--fs-mono)/1.5 var(--font-mono); color: var(--ink-dim); }
-.foot nav { display: flex; gap: 16px; }
-/* customize: copy and code left, the lamp dial in a sunk well right */
-.cust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); border: 1px solid var(--line); align-items: stretch; background: var(--bg); --divot-ground: var(--bg); }
-.cust .info { display: grid; gap: 24px; align-content: start; padding: clamp(24px, 3.5vw, 40px); }
-.cust .info .body { display: grid; gap: 20px; }
-.cust .info .body p { margin-bottom: 20px; max-width: 62ch; font-size: var(--fs-title); line-height: 1.6; color: var(--ink-dim); }
-.cust .stage { border-left: 1px solid var(--line); display: grid; place-items: center; align-content: center; gap: 20px; padding: clamp(40px, 5vw, 56px) clamp(24px, 3vw, 32px); }
-.cust .stage .lframe { max-width: 240px; }
-.cust .stage { position: relative; }
-.cust .tools { position: absolute; top: 10px; right: 10px; gap: 6px; }
-.cust .tool { --divot-pad-y: 3px; --divot-pad-x: 8px; font: var(--fs-mono)/1.3 var(--font-mono); }
-.cust .scale { min-width: 4ch; }
-/* 1x: the dial's button renders as a stock .divot */
-.lframe.x1 .mag { font: var(--fs-ui)/1.3 var(--font-ui); letter-spacing: normal; border-width: 1px; --divot-reach: 1px; --divot-nudge: 0.25px; --divot-pad-y: 5px; --divot-pad-x: 12px; }
-.lframe.x1 .zoom { top: calc(50% + 8cqw); }
-@media (max-width: 760px) { .cust { grid-template-columns: 1fr; } .cust .stage { border-left: 0; border-top: 1px solid var(--line); } }
-.lframe { position: relative; width: 100%; max-width: 290px; aspect-ratio: 1; container-type: inline-size; justify-self: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
-.lframe.grab { cursor: grabbing; }
-.lframe .ring { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed var(--line-strong); }
-.lframe .ray { position: absolute; left: 50%; top: 50%; width: 0; height: 46cqw; border-left: 1px dashed var(--ink-dim); transform-origin: 0 0; transform: rotate(calc(var(--divot-light) + 180deg)); }
-.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; /* every dimension of the stock button doubled */ font: calc(var(--fs-ui) * 2)/1.3 var(--font-ui); letter-spacing: normal; border-width: 2px; --divot-reach: 2px; --divot-nudge: 0.5px; --divot-pad-y: 10px; --divot-pad-x: 24px; }
-.lframe .zoom { position: absolute; left: 50%; top: calc(50% + 20cqw); transform: translateX(-50%); font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
-.lframe .lamp { position: absolute; left: 50%; top: 50%; z-index: 2; width: 22px; height: 22px; margin: -11px; border-radius: 50%; border: 1px solid var(--ink); background: var(--bg); display: grid; place-items: center;
-  transform: rotate(var(--divot-light)) translateY(-46cqw) rotate(calc(-1 * var(--divot-light))); }
-.lframe .lamp::before { content: ""; position: absolute; inset: -14px; border-radius: 50%; }
-.lframe .lamp::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
-.lframe .lamp:hover, .lframe.grab .lamp { box-shadow: 0 0 0 5px var(--line); }
-.lframe .lamp:focus-visible { outline: 1px solid var(--ink); outline-offset: 5px; }
-.lcode { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
-.lcode pre { flex: 1 1 auto; background: var(--surface); border: 1px solid var(--line); padding: 6px 12px; line-height: 1.5; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-.why { max-width: 62ch; display: grid; gap: 14px; }
-#why .two { align-items: center; gap: clamp(48px, 8vw, 112px); }
-#why .why .sec-head { margin-bottom: 10px; }
-#why .why .eyebrow { font-size: var(--fs-meta); line-height: 1; }
-.why p { max-width: none; font-size: var(--fs-title); line-height: 1.6; color: var(--ink-dim); }
-
-/* grounds strip */
-.grounds { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); }
-.grounds > div { padding: 24px 12px; display: grid; gap: 12px; justify-items: center; }
-@media (max-width: 560px) { .grounds { grid-template-columns: repeat(2, 1fr); } }
-
-/* elevation */
-.elev { display: grid; gap: 14px; margin-top: 16px; }
-.elev .sheet { border: 0; }
-.elev .sheet > div { box-shadow: -1px -1px 0 var(--line); }
-
-/* reference sheet captions */
-.sheet .cap { font-size: var(--fs-mono); color: var(--ink-dim); line-height: 1.4; }
-
-/* cheatsheet */
-.cheat { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-.cheat > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
-.cheat dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: var(--fs-ui); }
-.cheat dt { font-family: var(--font-mono); font-size: var(--fs-mono); white-space: nowrap; }
-.cheat dd { margin: 0; color: var(--ink-dim); }
-@media (max-width: 760px) { .cheat { grid-template-columns: 1fr; } }
-.install { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.install > div { align-content: start; }
-@media (max-width: 760px) { .install { grid-template-columns: 1fr; } }
-.support { font-size: var(--fs-ui); color: var(--ink-dim); }
-/* install */
-#install { padding-bottom: 96px; }
-.inst-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; }
-.inst-head .divot { --divot-pad-y: 8px; --divot-pad-x: 18px; }
-:root { --syn-str: #7a5a24; --syn-attr: #5b6a52; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --syn-str: #c8a570; --syn-attr: #9aab8e; } }
-[data-theme="dark"] { --syn-str: #c8a570; --syn-attr: #9aab8e; }
-pre.hl .p { color: var(--ink-faint); }
-pre.hl .t { color: var(--ink); font-weight: 500; }
-pre.hl .a { color: var(--syn-attr); }
-pre.hl .s { color: var(--syn-str); }
-</style>
+  <!-- deferred, in this order -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="site/ascii-button.js"></script>
+  <script defer src="site/light.js"></script>
+  <script defer src="site/page.js"></script>
 </head>
 <body>
+
 <div class="wrap">
   <header class="mast">
     <span class="word">divot.css</span>
     <nav>
       <a href="#install">Install</a><a href="https://github.com/nlaz/divot.css">GitHub</a>
       <span class="row theme">
-        <button class="divot quiet icon" data-set-theme="light" aria-label="Light theme" title="Light"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg></button>
-        <button class="divot quiet icon" data-set-theme="dark" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M13.5 9.6A5.5 5.5 0 0 1 6.4 2.5a5.5 5.5 0 1 0 7.1 7.1z"/></svg></button>
+        <button class="divot quiet icon" data-set-theme="light" aria-label="Light theme" title="Light">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+            <circle cx="8" cy="8" r="3"/>
+            <path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>
+          </svg>
+        </button>
+        <button class="divot quiet icon" data-set-theme="dark" aria-label="Dark theme" title="Dark">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round">
+            <path d="M13.5 9.6A5.5 5.5 0 0 1 6.4 2.5a5.5 5.5 0 1 0 7.1 7.1z"/>
+          </svg>
+        </button>
       </span>
     </nav>
   </header>
 </div>
 
-<div class="bleed hero-band"><div class="wrap"><div class="hero">
-  <div class="t">
-    <p class="eyebrow ver">v0.2.0</p>
-    <h1>divot.css</h1>
-    <p class="sub">A simple skeuomorphic button style for a satisfying button experience.</p>
-    <div class="row"><a class="divot raise" href="#install" role="button">Download</a><a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a></div>
+<div class="bleed hero-band">
+  <div class="wrap">
+    <div class="hero">
+      <div class="t">
+        <p class="eyebrow ver">v0.2.0</p>
+        <h1>divot.css</h1>
+        <p class="sub">A simple skeuomorphic button style for a satisfying button experience.</p>
+        <div class="row">
+          <a class="divot raise" href="#install" role="button">Download</a>
+          <a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a>
+        </div>
+      </div>
+      <div class="art">
+        <canvas class="ascii" data-press='{"cols":96,"rows":56,"cell":7,"dist":6.6,"vignette":0.12}'></canvas>
+      </div>
+    </div>
   </div>
-  <div class="art"><canvas class="ascii" data-press='{"cols":96,"rows":56,"cell":7,"dist":6.6,"vignette":0.12}'></canvas></div>
-</div></div></div>
+</div>
 
 <div class="wrap">
   <section id="why">
     <div class="two">
       <div class="why">
-        <div class="sec-head"><p class="eyebrow">background</p><h2>Buttons should be satisfying to press.</h2></div>
+        <div class="sec-head">
+          <p class="eyebrow">background</p>
+          <h2>Buttons should be satisfying to press.</h2>
+        </div>
         <p>Physical buttons are so satisfying to press, and I wanted to try to bring that feeling to the web. The key feature of this stylesheet is a soft divot around the button that keeps its face flush with the surface.</p>
         <p>It&#8217;s a simple, no-frills skeuomorphic style that mimics light catching the edges of the cut. The result is a page that feels tangible and makes you want to click things.</p>
       </div>
-      <div><svg class="fig" viewBox="0 0 420 160" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side"><defs><pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/></pattern></defs>
-<g stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="3 3"><line x1="37" y1="34" x2="64" y2="70"/><line x1="52" y1="8" x2="94" y2="64"/><line x1="82" y1="2" x2="124" y2="58"/></g>
-<circle cx="12" cy="10" r="4" fill="var(--ink)"/><text x="3" y="30" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">light</text>
-<path d="M0 80 H60 V96 H80 V80 H340 V96 H360 V80 H420 V112 H0 Z" fill="url(#hrest)"/>
-<path d="M0 80 H60 M80 80 H340 M360 80 H420" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
-<path d="M60 80 V96 H80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
-<path d="M80 96 V80" stroke="var(--edge-hi)" stroke-width="2.5"/>
-<path d="M340 80 V96" stroke="var(--edge-hi)" stroke-width="2.5"/>
-<path d="M340 96 H360 V80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
-<g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)"><text x="0" y="130">ground</text><text x="57" y="130" text-anchor="end">lo</text><text x="83" y="130">hi</text><text x="210" y="130" text-anchor="middle">face &#183; flush</text><text x="337" y="130" text-anchor="end">hi</text><text x="363" y="130">lo</text></g>
-<g stroke="var(--ink-dim)" stroke-width="1"><line x1="60" y1="142" x2="80" y2="142"/><line x1="60" y1="138" x2="60" y2="146"/><line x1="80" y1="138" x2="80" y2="146"/></g><text x="70" y="158" text-anchor="middle" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">2px</text></svg></div>
+      <div>
+        <!-- fig. 1: the divot in cross-section -->
+        <svg class="fig" viewBox="0 0 420 160" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side">
+          <defs>
+            <pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <!-- light rays -->
+          <g stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="3 3">
+            <line x1="37" y1="34" x2="64" y2="70"/>
+            <line x1="52" y1="8" x2="94" y2="64"/>
+            <line x1="82" y1="2" x2="124" y2="58"/>
+          </g>
+          <circle cx="12" cy="10" r="4" fill="var(--ink)"/>
+          <text x="3" y="30" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">light</text>
+          <!-- the ground, with the groove cut into it -->
+          <path d="M0 80 H60 V96 H80 V80 H340 V96 H360 V80 H420 V112 H0 Z" fill="url(#hrest)"/>
+          <path d="M0 80 H60 M80 80 H340 M360 80 H420" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
+          <path d="M60 80 V96 H80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
+          <path d="M80 96 V80" stroke="var(--edge-hi)" stroke-width="2.5"/>
+          <path d="M340 80 V96" stroke="var(--edge-hi)" stroke-width="2.5"/>
+          <path d="M340 96 H360 V80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
+          <!-- labels -->
+          <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">
+            <text x="0" y="130">ground</text>
+            <text x="57" y="130" text-anchor="end">lo</text>
+            <text x="83" y="130">hi</text>
+            <text x="210" y="130" text-anchor="middle">face &#183; flush</text>
+            <text x="337" y="130" text-anchor="end">hi</text>
+            <text x="363" y="130">lo</text>
+          </g>
+          <g stroke="var(--ink-dim)" stroke-width="1">
+            <line x1="60" y1="142" x2="80" y2="142"/>
+            <line x1="60" y1="138" x2="60" y2="146"/>
+            <line x1="80" y1="138" x2="80" y2="146"/>
+          </g>
+          <text x="70" y="158" text-anchor="middle" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">2px</text>
+        </svg>
+      </div>
     </div>
   </section>
 </div>
 
-<div class="bleed band-surface"><div class="wrap">
-  <section id="reference">
-    <div class="sec-head"><p class="eyebrow">gallery</p><h2>Every divot button type.</h2><p class="dim">Add one modifier to <code>.divot</code> to change its style. Every variant keeps the same size, so they line up in any layout.</p></div>
-    <div class="sheet">
-      <div><span class="lab">.divot</span><button class="divot">Edit</button><span class="cap">The default, flush with the page.</span></div>
-      <div><span class="lab">aria-pressed</span><button class="divot" aria-pressed="true">Held</button><span class="cap">A toggle held down while on.</span></div>
-      <div><span class="lab">.raise</span><button class="divot raise">Save</button><span class="cap">The primary action, raised.</span></div>
-      <div><span class="lab">.quiet</span><button class="divot quiet">File away</button><span class="cap">Borderless until hovered.</span></div>
-      <div><span class="lab">.ghost</span><button class="divot ghost">Cancel</button><span class="cap">A lighter cut, for grouped buttons.</span></div>
-      <div><span class="lab">.firm</span><button class="divot firm">Export</button><span class="cap">A deeper cut, for busy backgrounds.</span></div>
-      <div><span class="lab">.bare</span><button class="divot bare">Row item</button><span class="cap">No border, for list and menu rows.</span></div>
-      <div><span class="lab">.icon</span><button class="divot icon" aria-label="Dark mode">&#9790;</button><span class="cap">A square box for a single icon.</span></div>
-      <div><span class="lab">.eased</span><button class="divot eased">Share</button><span class="cap">Softly rounded 3px corners.</span></div>
-      <div><span class="lab">.pill</span><button class="divot pill">Filter</button><span class="cap">Fully rounded, for chips and filters.</span></div>
-      <div><span class="lab">.danger</span><button class="divot danger">Delete</button><span class="cap">Inverts on hover, for deletes.</span></div>
-      <div><span class="lab">:disabled</span><button class="divot" disabled>Undo</button><span class="cap">Faded, but keeps its size.</span></div>
-    </div>
-    <div class="elev">
-      <p class="eyebrow">elevation</p>
+<div class="bleed band-surface">
+  <div class="wrap">
+    <section id="reference">
+      <div class="sec-head">
+        <p class="eyebrow">gallery</p>
+        <h2>Every divot button type.</h2>
+        <p class="dim">Add one modifier to <code>.divot</code> to change its style. Every variant keeps the same size, so they line up in any layout.</p>
+      </div>
       <div class="sheet">
-        <div><span class="lab">+1 / .raise</span><button class="divot raise">Save</button><span class="cap">Raised, for the primary action.</span></div>
-        <div><span class="lab">0 / .divot</span><button class="divot">Edit</button><span class="cap">Flush, the default resting state.</span></div>
-        <div><span class="lab">&#8722;1 / pressed</span><button class="divot" aria-pressed="true">Bold</button><span class="cap">Pressed in, where every click lands.</span></div>
+        <div>
+          <span class="lab">.divot</span>
+          <button class="divot">Edit</button>
+          <span class="cap">The default, flush with the page.</span>
+        </div>
+        <div>
+          <span class="lab">aria-pressed</span>
+          <button class="divot" aria-pressed="true">Held</button>
+          <span class="cap">A toggle held down while on.</span>
+        </div>
+        <div>
+          <span class="lab">.raise</span>
+          <button class="divot raise">Save</button>
+          <span class="cap">The primary action, raised.</span>
+        </div>
+        <div>
+          <span class="lab">.quiet</span>
+          <button class="divot quiet">File away</button>
+          <span class="cap">Borderless until hovered.</span>
+        </div>
+        <div>
+          <span class="lab">.ghost</span>
+          <button class="divot ghost">Cancel</button>
+          <span class="cap">A lighter cut, for grouped buttons.</span>
+        </div>
+        <div>
+          <span class="lab">.firm</span>
+          <button class="divot firm">Export</button>
+          <span class="cap">A deeper cut, for busy backgrounds.</span>
+        </div>
+        <div>
+          <span class="lab">.bare</span>
+          <button class="divot bare">Row item</button>
+          <span class="cap">No border, for list and menu rows.</span>
+        </div>
+        <div>
+          <span class="lab">.icon</span>
+          <button class="divot icon" aria-label="Dark mode">&#9790;</button>
+          <span class="cap">A square box for a single icon.</span>
+        </div>
+        <div>
+          <span class="lab">.eased</span>
+          <button class="divot eased">Share</button>
+          <span class="cap">Softly rounded 3px corners.</span>
+        </div>
+        <div>
+          <span class="lab">.pill</span>
+          <button class="divot pill">Filter</button>
+          <span class="cap">Fully rounded, for chips and filters.</span>
+        </div>
+        <div>
+          <span class="lab">.danger</span>
+          <button class="divot danger">Delete</button>
+          <span class="cap">Inverts on hover, for deletes.</span>
+        </div>
+        <div>
+          <span class="lab">:disabled</span>
+          <button class="divot" disabled>Undo</button>
+          <span class="cap">Faded, but keeps its size.</span>
+        </div>
       </div>
-    </div>
-  </section>
+      <div class="elev">
+        <p class="eyebrow">elevation</p>
+        <div class="sheet">
+          <div>
+            <span class="lab">+1 / .raise</span>
+            <button class="divot raise">Save</button>
+            <span class="cap">Raised, for the primary action.</span>
+          </div>
+          <div>
+            <span class="lab">0 / .divot</span>
+            <button class="divot">Edit</button>
+            <span class="cap">Flush, the default resting state.</span>
+          </div>
+          <div>
+            <span class="lab">&#8722;1 / pressed</span>
+            <button class="divot" aria-pressed="true">Bold</button>
+            <span class="cap">Pressed in, where every click lands.</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <section id="customize">
-    <div class="cust">
-      <div class="info">
-        <div class="sec-head"><p class="eyebrow">customize</p><h2>Change your light source.</h2></div>
-        <div class="body">
-        <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code>: see the cut up close at 2&#215;, or switch to 1&#215; for actual size.</p>
-        <div class="lcode"><pre id="lCss" class="hl"><span class="t">:root</span> <span class="p">{</span> <span class="a">--divot-light</span><span class="p">:</span> <span class="s">315deg</span><span class="p">; }</span></pre><button class="divot" id="lCopy">Copy</button></div>
+    <section id="customize">
+      <div class="cust">
+        <div class="info">
+          <div class="sec-head">
+            <p class="eyebrow">customize</p>
+            <h2>Change your light source.</h2>
+          </div>
+          <div class="body">
+            <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code>: see the cut up close at 2&#215;, or switch to 1&#215; for actual size.</p>
+            <div class="lcode">
+              <pre id="lCss" class="hl"><span class="t">:root</span> <span class="p">{</span> <span class="a">--divot-light</span><span class="p">:</span> <span class="s">315deg</span><span class="p">; }</span></pre>
+              <button class="divot" id="lCopy">Copy</button>
+            </div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="tools row">
+            <button class="divot tool" id="lReset" disabled>Reset</button>
+            <button class="divot tool scale" id="lScale" aria-label="Scale 2&#215;, switch to 1&#215;">2&#215;</button>
+          </div>
+          <div class="lframe" id="lframe">
+            <i class="ring" aria-hidden="true"></i>
+            <i class="ray" aria-hidden="true"></i>
+            <button class="divot mag" tabindex="-1" aria-hidden="true">Edit</button>
+            <span class="zoom" aria-hidden="true">drag it</span>
+            <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
+          </div>
         </div>
       </div>
-      <div class="stage">
-        <div class="tools row"><button class="divot tool" id="lReset" disabled>Reset</button><button class="divot tool scale" id="lScale" aria-label="Scale 2&#215;, switch to 1&#215;">2&#215;</button></div>
-        <div class="lframe" id="lframe">
-          <i class="ring" aria-hidden="true"></i>
-          <i class="ray" aria-hidden="true"></i>
-          <button class="divot mag" tabindex="-1" aria-hidden="true">Edit</button>
-          <span class="zoom" aria-hidden="true">drag it</span>
-          <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-</div></div>
+    </section>
+  </div>
+</div>
 
 <div class="wrap">
-
   <section id="cheatsheet">
-    <div class="sec-head"><p class="eyebrow">reference</p><h2>How to use this stylesheet.</h2></div>
+    <div class="sec-head">
+      <p class="eyebrow">reference</p>
+      <h2>How to use this stylesheet.</h2>
+    </div>
     <div class="cheat">
-      <div><span class="lab">classes</span><dl>
-        <dt>.divot</dt><dd>the button</dd>
-        <dt>.raise</dt><dd>one band up, the primary</dd>
-        <dt>.quiet .ghost .firm</dt><dd>strength 0 / 25 / 70</dd>
-        <dt>.bare</dt><dd>no walls</dd>
-        <dt>.icon</dt><dd>square box for a glyph</dd>
-        <dt>.eased .pill</dt><dd>3px / full-round corners</dd>
-        <dt>.danger</dt><dd>inverts on hover</dd>
-      </dl></div>
-      <div><span class="lab">states</span><dl>
-        <dt>:hover</dt><dd>groove deepens</dd>
-        <dt>:active</dt><dd>face sinks, label nudges</dd>
-        <dt>[aria-pressed="true"]</dt><dd>stays sunk</dd>
-        <dt>.active</dt><dd>same, as a class</dd>
-        <dt>:disabled</dt><dd>flat groove, faint ink</dd>
-        <dt>:focus-visible</dt><dd>1px outline, keep it</dd>
-      </dl></div>
-      <div><span class="lab">tokens &#183; set on a container</span><dl>
-        <dt>--divot-ground</dt><dd>the surface it's cut into</dd>
-        <dt>--divot-n</dt><dd>strength, 0&#8211;100</dd>
-        <dt>--divot-r</dt><dd>corner radius, 0 by default</dd>
-        <dt>--divot-pad-y / -x</dt><dd>the box; not <code>padding</code></dd>
-        <dt>--raise-n</dt><dd>how far .raise lifts</dd>
-        <dt>--divot-light</dt><dd>lamp angle, 315deg by default</dd>
-      </dl></div>
+      <div>
+        <span class="lab">classes</span>
+        <dl>
+          <dt>.divot</dt><dd>the button</dd>
+          <dt>.raise</dt><dd>one band up, the primary</dd>
+          <dt>.quiet .ghost .firm</dt><dd>strength 0 / 25 / 70</dd>
+          <dt>.bare</dt><dd>no walls</dd>
+          <dt>.icon</dt><dd>square box for a glyph</dd>
+          <dt>.eased .pill</dt><dd>3px / full-round corners</dd>
+          <dt>.danger</dt><dd>inverts on hover</dd>
+        </dl>
+      </div>
+      <div>
+        <span class="lab">states</span>
+        <dl>
+          <dt>:hover</dt><dd>groove deepens</dd>
+          <dt>:active</dt><dd>face sinks, label nudges</dd>
+          <dt>[aria-pressed="true"]</dt><dd>stays sunk</dd>
+          <dt>.active</dt><dd>same, as a class</dd>
+          <dt>:disabled</dt><dd>flat groove, faint ink</dd>
+          <dt>:focus-visible</dt><dd>1px outline, keep it</dd>
+        </dl>
+      </div>
+      <div>
+        <span class="lab">tokens &#183; set on a container</span>
+        <dl>
+          <dt>--divot-ground</dt><dd>the surface it's cut into</dd>
+          <dt>--divot-n</dt><dd>strength, 0&#8211;100</dd>
+          <dt>--divot-r</dt><dd>corner radius, 0 by default</dd>
+          <dt>--divot-pad-y / -x</dt><dd>the box; not <code>padding</code></dd>
+          <dt>--raise-n</dt><dd>how far .raise lifts</dd>
+          <dt>--divot-light</dt><dd>lamp angle, 315deg by default</dd>
+        </dl>
+      </div>
     </div>
   </section>
 
   <section id="install">
     <div class="inst-head">
-      <div class="sec-head"><p class="eyebrow">install</p><h2>Add it to your project.</h2></div>
+      <div class="sec-head">
+        <p class="eyebrow">install</p>
+        <h2>Add it to your project.</h2>
+      </div>
       <a class="divot raise" href="divot.css" download>Download</a>
     </div>
     <div class="install">
-      <div><span class="eyebrow">one file</span><pre class="hl"><span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span><span class="p">=</span><span class="s">"stylesheet"</span> <span class="a">href</span><span class="p">=</span><span class="s">"divot.css"</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="t">button</span> <span class="a">class</span><span class="p">=</span><span class="s">"divot"</span><span class="p">&gt;</span>Edit<span class="p">&lt;/</span><span class="t">button</span><span class="p">&gt;</span></pre></div>
-      <div><span class="eyebrow">on a surface that isn't the page</span><pre class="hl"><span class="p">&lt;</span><span class="t">div</span> <span class="a">class</span><span class="p">=</span><span class="s">"ground-surface"</span><span class="p">&gt;</span>
+      <div>
+        <span class="eyebrow">one file</span>
+        <pre class="hl"><span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span><span class="p">=</span><span class="s">"stylesheet"</span> <span class="a">href</span><span class="p">=</span><span class="s">"divot.css"</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="t">button</span> <span class="a">class</span><span class="p">=</span><span class="s">"divot"</span><span class="p">&gt;</span>Edit<span class="p">&lt;/</span><span class="t">button</span><span class="p">&gt;</span></pre>
+      </div>
+      <div>
+        <span class="eyebrow">on a surface that isn't the page</span>
+        <pre class="hl"><span class="p">&lt;</span><span class="t">div</span> <span class="a">class</span><span class="p">=</span><span class="s">"ground-surface"</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="t">button</span> <span class="a">class</span><span class="p">=</span><span class="s">"divot"</span><span class="p">&gt;</span>Edit<span class="p">&lt;/</span><span class="t">button</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="t">div</span><span class="p">&gt;</span></pre></div>
+<span class="p">&lt;/</span><span class="t">div</span><span class="p">&gt;</span></pre>
+      </div>
     </div>
   </section>
 
-  <footer class="foot"><span>divot.css &#183; MIT</span><nav><a href="https://github.com/nlaz/divot.css">GitHub</a><a href="https://www.instagram.com/nikolazaris">Instagram</a></nav></footer>
+  <footer class="foot">
+    <span>divot.css &#183; MIT</span>
+    <nav>
+      <a href="https://github.com/nlaz/divot.css">GitHub</a>
+      <a href="https://www.instagram.com/nikolazaris">Instagram</a>
+    </nav>
+  </footer>
 </div>
 
 </body>
