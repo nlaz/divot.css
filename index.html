@@ -121,8 +121,8 @@ svg.fig { width: 100%; height: auto; display: block; }
 .lframe.grab { cursor: grabbing; }
 .lframe .ring { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed var(--line-strong); }
 .lframe .ray { position: absolute; left: 50%; top: 50%; width: 0; height: 46cqw; border-left: 1px dashed var(--ink-dim); transform-origin: 0 0; transform: rotate(calc(var(--divot-light) + 180deg)); }
-.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; /* a true 3x of the stock button: every dimension multiplied by the same factor, so the proportions match 1x */ font: calc(var(--fs-ui) * 3)/1.3 var(--font-ui); letter-spacing: normal; border-width: 3px; --divot-reach: 3px; --divot-nudge: 0.75px; --divot-pad-y: 15px; --divot-pad-x: 36px; }
-.lframe .zoom { position: absolute; left: 50%; top: calc(50% + 25cqw); transform: translateX(-50%); font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
+.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; /* a true 2x of the stock button: every dimension multiplied by the same factor, so the proportions match 1x */ font: calc(var(--fs-ui) * 2)/1.3 var(--font-ui); letter-spacing: normal; border-width: 2px; --divot-reach: 2px; --divot-nudge: 0.5px; --divot-pad-y: 10px; --divot-pad-x: 24px; }
+.lframe .zoom { position: absolute; left: 50%; top: calc(50% + 20cqw); transform: translateX(-50%); font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
 .lframe .lamp { position: absolute; left: 50%; top: 50%; z-index: 2; width: 22px; height: 22px; margin: -11px; border-radius: 50%; border: 1px solid var(--ink); background: var(--bg); display: grid; place-items: center;
   transform: rotate(var(--divot-light)) translateY(-46cqw) rotate(calc(-1 * var(--divot-light))); }
 .lframe .lamp::before { content: ""; position: absolute; inset: -14px; border-radius: 50%; }
@@ -224,7 +224,7 @@ pre.hl .s { color: var(--syn-str); }
 
 <div class="bleed band-surface"><div class="wrap">
   <section id="reference">
-    <div class="sec-head"><p class="eyebrow">reference</p><h2>Every role.</h2><p class="dim">One class plus a role. None of them change the box; depth is contrast, not size.</p></div>
+    <div class="sec-head"><p class="eyebrow">reference</p><h2>Every button type.</h2><p class="dim">One class plus a role. None of them change the box; depth is contrast, not size.</p></div>
     <div class="sheet">
       <div><span class="lab">.divot</span><button class="divot">Edit</button><span class="cap">The default, flush with the page.</span></div>
       <div><span class="lab">.on</span><button class="divot on">Held</button><span class="cap">A toggle held down while on.</span></div>
@@ -254,12 +254,12 @@ pre.hl .s { color: var(--syn-str); }
       <div class="info">
         <div class="sec-head"><p class="eyebrow">customize</p><h2>Change your light source.</h2></div>
         <div class="body">
-        <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code>: see the cut up close at 3&#215;, or switch to 1&#215; for actual size.</p>
+        <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code>: see the cut up close at 2&#215;, or switch to 1&#215; for actual size.</p>
         <div class="lcode"><pre id="lCss" class="hl"><span class="t">:root</span> <span class="p">{</span> <span class="a">--divot-light</span><span class="p">:</span> <span class="s">315deg</span><span class="p">; }</span></pre><button class="divot" id="lCopy">Copy</button></div>
         </div>
       </div>
       <div class="stage">
-        <div class="tools row"><button class="divot tool" id="lReset" disabled>Reset</button><button class="divot tool scale" id="lScale" aria-label="Scale 3&#215;, switch to 1&#215;">3&#215;</button></div>
+        <div class="tools row"><button class="divot tool" id="lReset" disabled>Reset</button><button class="divot tool scale" id="lScale" aria-label="Scale 2&#215;, switch to 1&#215;">2&#215;</button></div>
         <div class="lframe" id="lframe">
           <i class="ring" aria-hidden="true"></i>
           <i class="ray" aria-hidden="true"></i>
@@ -275,7 +275,7 @@ pre.hl .s { color: var(--syn-str); }
 <div class="wrap">
 
   <section id="cheatsheet">
-    <div class="sec-head"><p class="eyebrow">cheatsheet</p><h2>All the class names.</h2></div>
+    <div class="sec-head"><p class="eyebrow">reference</p><h2>All the class names.</h2></div>
     <div class="cheat">
       <div><span class="lab">classes</span><dl>
         <dt>.divot</dt><dd>the button</dd>
@@ -296,12 +296,11 @@ pre.hl .s { color: var(--syn-str); }
       </dl></div>
       <div><span class="lab">tokens &#183; set on a container</span><dl>
         <dt>--divot-ground</dt><dd>the surface it's cut into</dd>
-        <dt>.ground-bg &#8230; -paper</dt><dd>helpers that set it for you</dd>
         <dt>--divot-n</dt><dd>strength, 0&#8211;100</dd>
         <dt>--divot-r</dt><dd>corner radius, 0 by default</dd>
         <dt>--divot-pad-y / -x</dt><dd>the box; not <code>padding</code></dd>
         <dt>--raise-n</dt><dd>how far .raise lifts</dd>
-        <dt>--divot-light</dt><dd>lamp bearing (proposed)</dd>
+        <dt>--divot-light</dt><dd>lamp angle, 315deg by default</dd>
       </dl></div>
     </div>
   </section>
@@ -320,7 +319,7 @@ pre.hl .s { color: var(--syn-str); }
     </div>
   </section>
 
-  <footer class="foot"><span>divot.css &#183; Apache-2.0</span><nav><a href="https://github.com/nlaz/divot.css">GitHub</a><a href="https://www.instagram.com/nikolazaris">Instagram</a></nav></footer>
+  <footer class="foot"><span>divot.css &#183; MIT</span><nav><a href="https://github.com/nlaz/divot.css">GitHub</a><a href="https://www.instagram.com/nikolazaris">Instagram</a></nav></footer>
 </div>
 
 </body>
