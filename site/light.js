@@ -1,7 +1,5 @@
-/* site/light.js: the lamp pin in the Customize section (page-only)
-   Drag anywhere inside the frame and the lamp takes that bearing; the value
-   lands on :root as --divot-light, so every divot on the page re-lights.
-   The pin itself is the slider for keyboards and screen readers. */
+/* site/light.js: the lamp dial, page-only. Dragging sets --divot-light on
+   :root; the pin is a slider for keyboards and screen readers. */
 window.divotLight = function (frame) {
   var root = document.documentElement;
   var DEFAULT = 315;
@@ -12,7 +10,7 @@ window.divotLight = function (frame) {
   var mag = frame.querySelector('.mag');
 
   function norm(x) { return ((x % 360) + 360) % 360; }
-  /* shortest signed turn, so the value never jumps a whole revolution */
+  /* shortest signed turn */
   function wrap(x) { return ((x % 360) + 540) % 360 - 180; }
 
   function render() {
@@ -27,7 +25,7 @@ window.divotLight = function (frame) {
   function set(x) { v = x; render(); }
 
   frame.addEventListener('pointerdown', function (e) {
-    /* the magnified button is a button: let it press instead of dragging */
+    /* let the button press instead of dragging */
     if (e.button !== 0 || e.target === mag) return;
     e.preventDefault();
     lamp.focus({ preventScroll: true });
