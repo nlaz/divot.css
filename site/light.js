@@ -1,80 +1,120 @@
-/* site/light.js: the lamp dial, page-only. Dragging sets --divot-light on
-   :root; the pin is a slider for keyboards and screen readers. */
-window.divotLight = function (frame) {
-  var root = document.documentElement;
-  var DEFAULT = 315;
-  var DIRS = ['top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left', 'top-left'];
-  var v = DEFAULT;
-  var $ = function (sel) { return document.querySelector(sel); };
-  var lamp = frame.querySelector('[role="slider"]');
-  var mag = frame.querySelector('.mag');
+/* site/light.js: the lamp dial. Page-only.
+   Dragging inside the frame sets --divot-light on :root. The pin is a slider
+   for keyboards and screen readers. */
+window.divotLight = (frame) => {
+  const DEFAULT = 315;
+  const STEP = 5;
+  const FINE_STEP = 1;
+  const PAGE_STEP = 45;
+  const SNAP = 15;
+  const DIRECTIONS = ['top', 'top-right', 'right', 'bottom-right', 'bottom', 'bottom-left', 'left', 'top-left'];
 
-  function norm(x) { return ((x % 360) + 360) % 360; }
-  /* shortest signed turn */
-  function wrap(x) { return ((x % 360) + 540) % 360 - 180; }
+  const root = document.documentElement;
+  const pin = frame.querySelector('[role="slider"]');
+  const magnified = frame.querySelector('.mag');
+  const code = document.getElementById('lCss');
+  const reset = document.getElementById('lReset');
+  const copy = document.getElementById('lCopy');
 
-  function render() {
-    root.style.setProperty('--divot-light', v + 'deg');
-    var n = Math.round(norm(v)) % 360;
-    var dir = DIRS[Math.round(norm(v) / 45) % 8];
-    lamp.setAttribute('aria-valuenow', n);
-    lamp.setAttribute('aria-valuetext', n + ' degrees, light from the ' + dir);
-    $('#lCss').innerHTML = '<span class="t">:root</span> <span class="p">{</span> <span class="a">--divot-light</span><span class="p">:</span> <span class="s">' + n + 'deg</span><span class="p">; }</span>';
-    $('#lReset').disabled = n === DEFAULT;
-  }
-  function set(x) { v = x; render(); }
+  let angle = DEFAULT;
 
-  frame.addEventListener('pointerdown', function (e) {
-    /* let the button press instead of dragging */
-    if (e.button !== 0 || e.target === mag) return;
-    e.preventDefault();
-    lamp.focus({ preventScroll: true });
-    frame.setPointerCapture(e.pointerId);
+  // --- geometry ----------------------------------------------------------
+  const normalize = (deg) => ((deg % 360) + 360) % 360;
+
+  // The shortest signed turn from one bearing to another, so the dial never
+  // spins a full revolution to reach a nearby angle.
+  const shortestTurn = (deg) => ((deg % 360) + 540) % 360 - 180;
+
+  const bearingOf = (event) => {
+    const box = frame.getBoundingClientRect();
+    const dx = event.clientX - (box.left + box.width / 2);
+    const dy = (box.top + box.height / 2) - event.clientY;
+    const deg = Math.atan2(dx, dy) * 180 / Math.PI;
+    return event.shiftKey ? Math.round(deg / SNAP) * SNAP : deg;
+  };
+
+  // --- state -------------------------------------------------------------
+  const highlight = (deg) =>
+    `<span class="t">:root</span> <span class="p">{</span> ` +
+    `<span class="a">--divot-light</span><span class="p">:</span> ` +
+    `<span class="s">${deg}deg</span><span class="p">; }</span>`;
+
+  const render = () => {
+    const deg = Math.round(normalize(angle)) % 360;
+    const direction = DIRECTIONS[Math.round(normalize(angle) / 45) % 8];
+
+    root.style.setProperty('--divot-light', `${angle}deg`);
+    pin.setAttribute('aria-valuenow', deg);
+    pin.setAttribute('aria-valuetext', `${deg} degrees, light from the ${direction}`);
+    code.innerHTML = highlight(deg);
+    reset.disabled = deg === DEFAULT;
+  };
+
+  const setAngle = (deg) => { angle = deg; render(); };
+  const turnTo = (deg) => setAngle(angle + shortestTurn(deg - angle));
+  const focusPin = () => pin.focus({ preventScroll: true });
+
+  // --- pointer -----------------------------------------------------------
+  frame.addEventListener('pointerdown', (event) => {
+    // The magnified button is a real button: let it press instead of dragging.
+    if (event.button !== 0 || event.target === magnified) return;
+    event.preventDefault();
+    focusPin();
+    frame.setPointerCapture(event.pointerId);
     frame.classList.add('grab');
-    function to(p) {
-      var b = frame.getBoundingClientRect();
-      var a = Math.atan2(p.clientX - (b.left + b.width / 2), (b.top + b.height / 2) - p.clientY) * 180 / Math.PI;
-      if (p.shiftKey) a = Math.round(a / 15) * 15;
-      set(v + wrap(a - v));
-    }
-    function up() {
+
+    const move = (e) => turnTo(bearingOf(e));
+    const release = () => {
       frame.classList.remove('grab');
-      frame.removeEventListener('pointermove', to);
-      frame.removeEventListener('pointerup', up);
-      frame.removeEventListener('pointercancel', up);
-    }
-    to(e);
-    frame.addEventListener('pointermove', to);
-    frame.addEventListener('pointerup', up);
-    frame.addEventListener('pointercancel', up);
+      frame.removeEventListener('pointermove', move);
+      frame.removeEventListener('pointerup', release);
+      frame.removeEventListener('pointercancel', release);
+    };
+
+    move(event);
+    frame.addEventListener('pointermove', move);
+    frame.addEventListener('pointerup', release);
+    frame.addEventListener('pointercancel', release);
   });
 
-  lamp.addEventListener('keydown', function (e) {
-    var k = e.key, d = e.shiftKey ? 1 : 5;
-    if (k === 'ArrowRight' || k === 'ArrowUp') set(v + d);
-    else if (k === 'ArrowLeft' || k === 'ArrowDown') set(v - d);
-    else if (k === 'PageUp') set(v + 45);
-    else if (k === 'PageDown') set(v - 45);
-    else if (k === 'Home') set(v + wrap(DEFAULT - v));
+  // --- keyboard ----------------------------------------------------------
+  pin.addEventListener('keydown', (event) => {
+    const step = event.shiftKey ? FINE_STEP : STEP;
+    const moves = {
+      ArrowRight: step, ArrowUp: step,
+      ArrowLeft: -step, ArrowDown: -step,
+      PageUp: PAGE_STEP, PageDown: -PAGE_STEP,
+    };
+
+    if (event.key === 'Home') turnTo(DEFAULT);
+    else if (event.key in moves) setAngle(angle + moves[event.key]);
     else return;
-    e.preventDefault();
+    event.preventDefault();
   });
 
-  $('#lReset').addEventListener('click', function () {
-    set(v + wrap(DEFAULT - v));
-    lamp.focus({ preventScroll: true });
-  });
+  // --- buttons -----------------------------------------------------------
+  reset.addEventListener('click', () => { turnTo(DEFAULT); focusPin(); });
 
-  $('#lCopy').addEventListener('click', function () {
-    var btn = this, pre = $('#lCss');
-    function done(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy'; }, 1400); }
-    function select() {
-      var range = document.createRange(); range.selectNodeContents(pre);
-      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-      done('Selected');
+  copy.addEventListener('click', async () => {
+    const flash = (label) => {
+      copy.textContent = label;
+      setTimeout(() => { copy.textContent = 'Copy'; }, 1400);
+    };
+    const selectCode = () => {
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      flash('Selected');
+    };
+
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      flash('Copied');
+    } catch {
+      selectCode();
     }
-    if (navigator.clipboard) navigator.clipboard.writeText(pre.textContent).then(function () { done('Copied'); }, select);
-    else select();
   });
 
   render();
