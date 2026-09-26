@@ -4,34 +4,13 @@
      <button class="divot">Edit</button>
 */
 
-/* ==========================================================================
-   divot.css — tokens
-   --------------------------------------------------------------------------
-   The default theme: a warm paper-gray in the light, bister brown once the
-   lights are off. It comes from The Library, where the divot was cut.
+/* divot.css — tokens
+   The default palette: warm paper-gray in the light, bister brown in the
+   dark. core.css reads only the surfaces, the two --edge colours and the ink
+   ramp, so this file can be replaced by any palette that defines those. */
 
-   The primitive itself has no colours of its own — it derives every wall it
-   draws from whatever ground it is sitting on (see core.css). So this file
-   is entirely replaceable: define the same token names against your own
-   palette and the divot follows you, theme flips and all.
-
-   The tokens the primitive actually reads are the surfaces (--bg and
-   friends), the two bezel sources (--edge-hi, --edge-lo) and the ink ramp.
-   There is no accent. A brass wash on the one important button is the
-   kind of thing this system exists to not need: emphasis is a storey on
-   the ladder, not a colour.
-   ========================================================================== */
-
-/* --- §1 type & space -------------------------------------------------------
-   Theme-independent: these do not change between light and dark, so they
-   live on :root alone and the palette blocks below never mention them.
-   The primitive reads none of them; the specimen sheet does.
-
-   No @font-face here on purpose — this package ships no binary assets. The
-   two families stay at the head of their stacks so a project that already
-   loads Instrument Sans or IBM Plex Mono gets them; everyone else lands on
-   the system UI and mono faces, which is a fine place to land. */
-
+/* Type and spacing. Theme-independent; the button reads none of these. No
+   @font-face: projects that load these families get them, others fall back. */
 :root {
   --font-ui: "Instrument Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
@@ -51,51 +30,30 @@
   --sp-6: 32px;
 }
 
-/* --- §2 the light palette --------------------------------------------------
-   One token deliberately does NOT follow the theme, and it is declared
-   here only: --paper, because a page scan is white whatever the hour. The
-   dark block below omits it on purpose — it inherits.
-
-   [data-theme="light"] rides along on the same rule so a light panel can be
-   forced open inside a dark document (the specimen sheet shows both themes
-   side by side that way). */
-
+/* Light. Also applied by [data-theme="light"] so a light panel can sit inside
+   a dark page. --paper is declared here only: it stays white in both themes. */
 :root,
 [data-theme="light"] {
   color-scheme: light;
 
-  /* surfaces */
   --bg: #e8e4d9;
   --surface: #f1eee5;
   --well: #dcd6c7;
   --paper: #fffdf8;
 
-  /* lines & bezels — the two --edge tokens are the divot's light and
-     shadow sources, and the only reason it can draw a cut at all */
   --line: #c9c3b1;
   --line-strong: #8e8977;
-  --edge-hi: #fbf9f2;
-  --edge-lo: #a29c89;
+  --edge-hi: #fbf9f2; /* the highlight the button's lit walls mix toward */
+  --edge-lo: #a29c89; /* the shadow its unlit walls mix toward */
 
-  /* ink */
   --ink: #1e1c16;
-  --ink-dim: #605c4b; /* ≥4.5:1 on --bg, for 11px mono metadata */
+  --ink-dim: #605c4b; /* 4.5:1 on --bg, safe for small text */
   --ink-faint: #97917c;
 }
 
-/* --- §3 the dark palette ---------------------------------------------------
-   The same ramp walked in Lab at fixed lightness and tinted toward bister,
-   so contrast against --bg is identical to the neutral it replaces (ink
-   15.0:1, ink-dim 5.6:1).
-
-   Declared twice, and the two copies must stay identical: once for
-   documents that simply follow the OS, and once for [data-theme="dark"] so
-   a theme can be forced — on the root to beat the OS preference, or on any
-   container to show the two themes on one page. The :not() guard is what
-   lets an explicit light choice win under a dark OS. They are adjacent so
-   the pair can be checked at a glance; there is no way to say this once in
-   plain CSS. */
-
+/* Dark. Declared twice and the two blocks must stay identical: once for pages
+   that follow the OS, once for [data-theme="dark"] on the root or a container.
+   The :not() lets an explicit light choice win under a dark OS. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
@@ -132,16 +90,9 @@
   --ink-faint: #5a5856;
 }
 
-/* --- §4 grounds ------------------------------------------------------------
-   House rule number one: declare the ground on the CONTAINER. A button that
-   has to know where it is has already lost, and a divot cut for --bg and
-   then dropped onto --well stops being flush and starts being a rectangle.
-
-   Each helper writes its background and its --divot-ground from the same
-   variable, so the two cannot drift apart. Use them, or set --divot-ground
-   yourself on whatever surface you already have — they are a convenience,
-   not a requirement. */
-
+/* Grounds. Put one on the container and every button inside is cut into it.
+   Each sets its background and --divot-ground from the same variable so the
+   two cannot drift. Or set --divot-ground yourself on any surface. */
 .ground-bg {
   background: var(--bg);
   --divot-ground: var(--bg);
@@ -157,12 +108,8 @@
   --divot-ground: var(--well);
 }
 
-/* Paper is the instructive one. Nothing is lighter than a white scan, so
-   the light source collapses to the paper itself and the cut becomes
-   shadow-only — which is what a groove in white paper actually looks like.
-   Its shadow source and ink are pinned to the light values rather than
-   taken from the theme, for the same reason --paper is: the sheet is white
-   whatever the hour, and the dark ramp would be invisible on it. */
+/* Paper is white in both themes, so its highlight collapses to the paper
+   itself and its shadow and ink are pinned to the light values. */
 .ground-paper {
   background: var(--paper);
   --divot-ground: var(--paper);
@@ -174,46 +121,14 @@
   color: var(--ink);
 }
 
-/* ==========================================================================
-   divot.css — the core primitive
-   --------------------------------------------------------------------------
-   A button whose face IS the plane it sits in. Nothing raised, nothing
-   filled differently, nothing translating on press. It is made legible by a
-   groove cut around it: one wall down, one wall back up.
+/* divot.css — core
+   A button whose face sits flush with the surface, made visible by a groove
+   cut around it. Both wall colours are mixed from the ground the button sits
+   on, so one recipe works on any surface and in any theme. Set the ground on
+   the container, not the button. Palette tokens live in tokens.css. */
 
-   The whole system is two derived colours. The walls are MIXED FROM THE
-   GROUND the button is cut into, never hardcoded — which is what lets one
-   recipe survive a surface change, a theme flip and the --paper special
-   case without a single override. Set --divot-ground on the *container*;
-   a button that has to know where it is has already lost.
-
-   Lighting, worked from the section: light comes from the top-left by
-   default (--divot-light, a bearing of 315deg; the lamp section near the
-   end re-mixes every wall for any other bearing).
-   Descending into the channel that wall turns away from it — shadow;
-   climbing back out to the face it turns toward it — highlight. On the
-   bottom-right you meet the same two walls in the opposite order, so the
-   pair flips. A symmetric ring would read as a printed outline rather than
-   a cut; the asymmetry is the whole illusion.
-
-   The tool that cut it is a chisel, not a gouge: two hard 1px bands a
-   side, the outer one the hairline border and the inner one a crisp inset
-   shadow with no blur. Nothing is anti-aliased; the cut is exactly as sharp
-   as the pixel grid. The gouge is still in here — see --divot-reach and
-   --divot-soft below.
-   ========================================================================== */
-
-/* --- the base it needs -----------------------------------------------------
-   Buttons do not inherit type by default and the UA's own border-radius has
-   an opinion, so both are reset here rather than left to the host page.
-
-   The focus ring is not optional and is not decoration. A flush button
-   carries no value contrast against its ground — the cut is doing all the
-   work of saying "target" — so the outline is the one element in this
-   system permitted to break the plane. If you already have a focus style
-   you like, override it; if you delete it, the primitive stops being
-   usable by anyone navigating with a keyboard. */
-
+/* Base: buttons don't inherit type by default, and the focus ring is the one
+   thing allowed to break the plane. Override it; don't remove it. */
 button {
   font: inherit;
   color: inherit;
@@ -226,83 +141,53 @@ input:focus-visible {
   outline-offset: 1px;
 }
 
+/* Public tokens. Set them on :root or on any container. */
 :root {
-  --divot-n: 45; /* strength 0–100 — the only knob you should normally touch */
-  --divot-bump: 0; /* :hover deepens without a cyclic ref to --divot-n */
-  --divot-ground: var(--bg); /* the plane being cut */
-  --divot-src-hi: var(--edge-hi); /* light source, the up-slope */
-  --divot-src-lo: var(--edge-lo); /* shadow source, the down-slope */
+  --divot-n: 45;                  /* strength, 0–100: how far the walls sit from the ground */
+  --divot-bump: 0;                /* extra strength on hover; a separate token avoids a cyclic var */
+  --divot-ground: var(--bg);      /* the surface the button is cut into; must match what is behind it */
+  --divot-src-hi: var(--edge-hi); /* the highlight colour the lit walls mix toward */
+  --divot-src-lo: var(--edge-lo); /* the shadow colour the unlit walls mix toward */
+  --divot-light: 315deg;          /* lamp bearing, clockwise from 12; 315deg is top-left */
 
-  /* the tool. --divot-reach is how far the inner wall falls onto the face,
-     --divot-soft is how blurred its edge is. 1px/0 is the chisel: two hard
-     bands a side. Set soft to ~3px and the same recipe is the gouge, the
-     inner band blended out onto the face. Nothing else in the file knows
-     which one it is. */
-  --divot-reach: 1px;
-  --divot-soft: 0px;
-  /* how much of the wall colour the inner band carries. At 100% it is the
-     same colour as the hairline, so the wall reads as one 2px band; lower
-     it to step the inner band toward the ground without touching the
-     outer line. */
-  --divot-inner: 100%;
+  --divot-reach: 1px;   /* width of the inner band, on the face */
+  --divot-soft: 0px;    /* blur of the inner band; 0 is a hard chisel, ~3px a soft gouge */
+  --divot-inner: 100%;  /* how much wall colour the inner band carries; 100% matches the outer line */
 
-  /* the lamp. A bearing, clockwise from 12 o'clock. Every side of every
-     cut takes a "faces the lamp" share from it; 315deg is the top-left
-     that the fixed pairs below assume, so the default draws pixel for
-     pixel what they draw. Set it on :root to relight the whole page. */
-  --divot-light: 315deg;
+  --divot-r: 0px;       /* corner radius; .eased and .pill move it */
 
-  /* the corner. Radius is an axis, and the material's rest position on it
-     is square — a cut has corners because the tool does. .eased and .pill
-     move a single button along it; set this on a container to move a
-     whole region. */
-  --divot-r: 0px;
-
-  /* the box. Tokens rather than a padding declaration so the press can
-     nudge the label without knowing what the box was. Override these per
-     call site, not `padding`. */
-  --divot-pad-y: 5px;
+  --divot-pad-y: 5px;   /* the box, as tokens so a press can shift the label */
   --divot-pad-x: 12px;
+  --divot-nudge: 0.25px; /* how far the label slides toward the shadow when pressed */
 
-  /* how far the label slides toward the shadow on press. A quarter pixel is
-     felt more than seen, which is the point. */
-  --divot-nudge: 0.25px;
-
-  --raise-n: 20; /* how far .raise lifts off the plane */
+  --raise-n: 20;        /* how much lighter a .raise face is than the ground, in % */
 }
 
 .divot {
-  --_str: calc((var(--divot-n) + var(--divot-bump)) * 1%);
-  --_hi: color-mix(in oklab, var(--divot-src-hi) var(--_str), var(--divot-ground));
-  --_lo: color-mix(in oklab, var(--divot-src-lo) var(--_str), var(--divot-ground));
-  /* the floor of the groove — where the face lands when pressed. Derived
-     from the ground too, so it survives the same surface changes. */
-  --_sunk: color-mix(in oklab, var(--divot-src-lo) 22%, var(--divot-ground));
-  /* the shadow the top-left wall throws onto that floor */
-  --_cast: color-mix(in oklab, var(--divot-src-lo) 28%, var(--divot-ground));
-  /* negative spread keeps a blur, when there is one, from bleeding along
-     the whole edge — derived from --divot-soft so the chisel gets none */
-  --_spread: calc(var(--divot-soft) / -6);
-  /* the inner bands, optionally stepped toward the ground */
-  --_hi-in: color-mix(in oklab, var(--_hi) var(--divot-inner), var(--divot-ground));
-  --_lo-in: color-mix(in oklab, var(--_lo) var(--divot-inner), var(--divot-ground));
+  --_strength: calc((var(--divot-n) + var(--divot-bump)) * 1%);
+  --_wall-hi: color-mix(in oklab, var(--divot-src-hi) var(--_strength), var(--divot-ground));
+  --_wall-lo: color-mix(in oklab, var(--divot-src-lo) var(--_strength), var(--divot-ground));
+  --_floor: color-mix(in oklab, var(--divot-src-lo) 22%, var(--divot-ground));        /* where a pressed face lands */
+  --_floor-shadow: color-mix(in oklab, var(--divot-src-lo) 28%, var(--divot-ground)); /* cast onto that floor by the lit wall */
+  --_spread: calc(var(--divot-soft) / -6); /* keeps a blurred inner band from bleeding along the whole edge */
+  --_inner-hi: color-mix(in oklab, var(--_wall-hi) var(--divot-inner), var(--divot-ground));
+  --_inner-lo: color-mix(in oklab, var(--_wall-lo) var(--divot-inner), var(--divot-ground));
 
   background-color: var(--divot-ground);
   color: var(--ink);
   border: 1px solid;
-  /* the fixed top-left pair; the lamp section below re-mixes it per side
-     wherever CSS trig is available */
-  border-color: var(--_lo) var(--_hi) var(--_hi) var(--_lo);
+  /* outer band: shadow top-left, highlight bottom-right; inner band the reverse.
+     This is the fixed 315deg cut. The lamp block at the end re-mixes it per side. */
+  border-color: var(--_wall-lo) var(--_wall-hi) var(--_wall-hi) var(--_wall-lo);
   border-radius: var(--divot-r);
   box-shadow:
-    inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_hi-in),
-    inset calc(-1 * var(--divot-reach)) calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) var(--_lo-in);
+    inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_inner-hi),
+    inset calc(-1 * var(--divot-reach)) calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) var(--_inner-lo);
   cursor: pointer;
   padding: var(--divot-pad-y) var(--divot-pad-x);
 }
 
-/* icon-only: square the box back up around a glyph, and make it a flex
-   container so the glyph centres instead of sitting on the text baseline */
+/* A square box around a single glyph. */
 .divot.icon {
   --divot-pad-x: 7px;
   display: inline-flex;
@@ -314,30 +199,18 @@ input:focus-visible {
   --divot-bump: 25;
 }
 
-/* Press: keep the outer wall exactly where it is and DELETE the inner one.
-   A face that has sunk to the floor of the groove has no wall climbing back
-   up to meet it — what it has instead is the shadow the wall on the lamp
-   side now throws across it. Rolling both walls over would throw a lip up around the
-   button: the surround rising, not the face falling.
-
-   The face does not translate: at zero height there is nothing to fall
-   from, so the tactility is value, not displacement. The LABEL moves — half
-   a pixel toward the shadow, by shifting the padding rather than the box —
-   because a sunk face is further from the eye and the lamp is off-axis.
-   The walls stay put; only what is printed on the face slides.
-
-   The selector is compound on purpose — every one of these is .divot AND
-   the state, never the state alone. A loose [aria-pressed="true"] reaches
-   every pressed thing on the page, including list rows and rail items that
-   want to show selection as weight and ink rather than as a fill. */
+/* Pressed: the face sinks to the floor, the inner band goes, and the lit wall
+   casts a shadow across the floor. The box does not move; the label shifts one
+   nudge toward the shadow. Every selector is compound so a loose
+   [aria-pressed] elsewhere on the page is not restyled. */
 .divot:active,
 .divot.on,
 .divot.active,
 .divot[aria-pressed="true"],
 .divot[aria-expanded="true"] {
   --divot-bump: 0;
-  background-color: var(--_sunk);
-  box-shadow: inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_cast);
+  background-color: var(--_floor);
+  box-shadow: inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_floor-shadow);
   padding:
     calc(var(--divot-pad-y) + var(--divot-nudge))
     calc(var(--divot-pad-x) - var(--divot-nudge))
@@ -345,11 +218,7 @@ input:focus-visible {
     calc(var(--divot-pad-x) + var(--divot-nudge));
 }
 
-/* --- strengths ------------------------------------------------------------
-   Contrast, not size. Depth is fixed, so a ghost and a firm button are the
-   same profile and the same box — only the walls travel further from the
-   ground. */
-
+/* Strengths. The box never changes; only how far the walls sit from the ground. */
 .divot.ghost {
   --divot-n: 25;
 }
@@ -358,10 +227,8 @@ input:focus-visible {
   --divot-n: 70;
 }
 
-/* quiet: silent at rest, cut on hover. --divot-n:0 mixes the walls to
-   *exactly* the ground rather than removing them, so the 1px border is
-   still there holding its space — the groove appears without reflowing the
-   row it sits in. Never swap this for `border: none`. */
+/* Quiet: no walls at rest, cut on hover. Strength 0 keeps the 1px border in
+   place (mixed to exactly the ground), so nothing reflows. */
 .divot.quiet {
   --divot-n: 0;
 }
@@ -370,30 +237,22 @@ input:focus-visible {
   --divot-bump: 45;
 }
 
-/* a quiet button that has latched is no longer quiet — it has to hold its
-   state while the pointer is elsewhere, and a sunk face with no walls is
-   not enough to read as "this one is on" */
+/* A latched quiet button needs its walls back to read as "on". */
 .divot.quiet.on,
 .divot.quiet.active,
 .divot.quiet[aria-pressed="true"] {
   --divot-n: 45;
 }
 
-/* bare: the shared class with a null role. For full-width ledger and rail
-   rows, where a groove around every line would fight a surface that means
-   to separate things with whitespace instead of boxes. Keeps the cursor,
-   the focus ring and the press nudge, and nothing else. */
+/* Bare: no walls at all, for list and rail rows. Keeps the cursor, the focus
+   ring and the press nudge. */
 .divot.bare {
   border: 0;
   background-color: transparent;
   box-shadow: none;
 }
 
-/* --- the corner -----------------------------------------------------------
-   Two stops on the radius axis. Neither changes the cut — the walls follow
-   the corner — so they cost nothing but the slight anti-aliasing of the
-   bands where they turn. */
-
+/* Corners. The walls follow the radius. */
 .divot.eased {
   --divot-r: 3px;
 }
@@ -403,17 +262,8 @@ input:focus-visible {
   --divot-pad-x: 16px;
 }
 
-/* --- the ladder -----------------------------------------------------------
-   The plane has three storeys: sunk, flush, raised. Flush is the divot at
-   rest; sunk is where every press lands; raised is the inverse of the
-   divot at one band instead of two — the face lifts slightly off the plane
-   and the walls flip to put the highlight on the lamp side. Deliberately no drop shadow: a
-   hard shadow is what made the old buttons read as floating.
-
-   The press is the point. Every button in this system travels exactly one
-   step down: a default goes flush → sunk, a raise goes raised → flush,
-   landing on the divot's own rest state. */
-
+/* Raised: the face lifts one step above the ground and the walls flip, so the
+   lit side is on the outside. No drop shadow. A press lands it flush. */
 .divot.raise {
   --_lift: color-mix(
     in oklab,
@@ -421,7 +271,7 @@ input:focus-visible {
     var(--divot-ground)
   );
   background-color: var(--_lift);
-  border-color: var(--_hi) var(--_lo) var(--_lo) var(--_hi);
+  border-color: var(--_wall-hi) var(--_wall-lo) var(--_wall-lo) var(--_wall-hi);
   box-shadow: none;
 }
 
@@ -429,21 +279,16 @@ input:focus-visible {
 .divot.raise.on,
 .divot.raise.active,
 .divot.raise[aria-pressed="true"] {
-  background-color: var(--divot-ground); /* sinks to flush */
-  border-color: var(--_lo) var(--_hi) var(--_hi) var(--_lo);
+  background-color: var(--divot-ground);
+  border-color: var(--_wall-lo) var(--_wall-hi) var(--_wall-hi) var(--_wall-lo);
   box-shadow:
-    inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_hi-in),
-    inset calc(-1 * var(--divot-reach)) calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) var(--_lo-in);
+    inset var(--divot-reach) var(--divot-reach) var(--divot-soft) var(--_spread) var(--_inner-hi),
+    inset calc(-1 * var(--divot-reach)) calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) var(--_inner-lo);
 }
 
-/* danger: severity by inversion, the house idiom. Re-pointing the ground
-   rather than setting a background is what keeps the walls correct — they
-   re-derive against ink automatically. Both light sources move with it: on
-   an ink ground the page's own --edge-lo can be LIGHTER than the ground
-   (and --ink-dim darker), which flips the lighting and makes the cut read
-   as raised. Mixing the sources from the ink itself, toward white and
-   toward black, keeps hi above the ground and lo below it in either theme,
-   so hover still reads as a cut and a press still sinks darker. */
+/* Danger: inverts to ink on hover. The ground is re-pointed rather than a
+   background set, so the walls re-derive. Both sources are mixed from the ink
+   itself so they land on the right side of it in either theme. */
 .divot.danger:hover {
   --divot-ground: var(--ink);
   --divot-src-hi: color-mix(in oklab, var(--ink) 60%, white);
@@ -451,44 +296,30 @@ input:focus-visible {
   color: var(--bg);
 }
 
-/* --- the lamp -------------------------------------------------------------
-   --divot-light is the bearing the lamp sits at, clockwise from 12 o'clock.
-   Each side of every cut takes a "faces the lamp" share from it, and the
-   fixed pairs above become mixes by that share:
-
-     outer band   lo <-> hi    a wall facing the lamp falls into shadow
-     inner band   hi <-> lo    the wall climbing back out catches it
-     press cast   cast <-> sunk
-     .raise       the outer pair, flipped
-
-   The gain of 0.7072 is chosen so that at 315deg every share lands on
-   exactly 0% or 100%, which reproduces the fixed chisel pixel for pixel.
-   Anyone who never touches the token sees no change.
-
-   Browsers without CSS trig keep the fixed top-left cut from the rules
-   above, and forced-colors keeps its system colours. */
-
+/* Lamp. Each side gets a 0–100% "faces the lamp" share from --divot-light and
+   every wall pair above becomes a mix by that share. The 0.7072 gain puts
+   315deg exactly at 0% or 100% on every side, so the default renders the
+   fixed cut pixel for pixel. Without CSS trig the fixed cut above stands;
+   forced-colors keeps its system colours. */
 @supports (width: calc(1px * cos(0deg))) {
 @media not (forced-colors: active) {
 
 .divot {
-  --_ft: clamp(0%, calc((0.5 + 0.7072 * cos(var(--divot-light))) * 100%), 100%);
-  --_fr: clamp(0%, calc((0.5 + 0.7072 * sin(var(--divot-light))) * 100%), 100%);
-  --_fb: clamp(0%, calc((0.5 - 0.7072 * cos(var(--divot-light))) * 100%), 100%);
-  --_fl: clamp(0%, calc((0.5 - 0.7072 * sin(var(--divot-light))) * 100%), 100%);
-  --_R: var(--divot-reach);
-  --_S: var(--divot-soft);
+  --_lit-top: clamp(0%, calc((0.5 + 0.7072 * cos(var(--divot-light))) * 100%), 100%);
+  --_lit-right: clamp(0%, calc((0.5 + 0.7072 * sin(var(--divot-light))) * 100%), 100%);
+  --_lit-bottom: clamp(0%, calc((0.5 - 0.7072 * cos(var(--divot-light))) * 100%), 100%);
+  --_lit-left: clamp(0%, calc((0.5 - 0.7072 * sin(var(--divot-light))) * 100%), 100%);
 
   border-color:
-    color-mix(in oklab, var(--_lo) var(--_ft), var(--_hi))
-    color-mix(in oklab, var(--_lo) var(--_fr), var(--_hi))
-    color-mix(in oklab, var(--_lo) var(--_fb), var(--_hi))
-    color-mix(in oklab, var(--_lo) var(--_fl), var(--_hi));
+    color-mix(in oklab, var(--_wall-lo) var(--_lit-top), var(--_wall-hi))
+    color-mix(in oklab, var(--_wall-lo) var(--_lit-right), var(--_wall-hi))
+    color-mix(in oklab, var(--_wall-lo) var(--_lit-bottom), var(--_wall-hi))
+    color-mix(in oklab, var(--_wall-lo) var(--_lit-left), var(--_wall-hi));
   box-shadow:
-    inset 0 var(--_R) var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_ft), var(--_lo-in)),
-    inset var(--_R) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fl), var(--_lo-in)),
-    inset calc(-1 * var(--_R)) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fr), var(--_lo-in)),
-    inset 0 calc(-1 * var(--_R)) var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fb), var(--_lo-in));
+    inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-top), var(--_inner-lo)),
+    inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-left), var(--_inner-lo)),
+    inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-right), var(--_inner-lo)),
+    inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-bottom), var(--_inner-lo));
 }
 
 .divot:active,
@@ -497,19 +328,18 @@ input:focus-visible {
 .divot[aria-pressed="true"],
 .divot[aria-expanded="true"] {
   box-shadow:
-    inset 0 var(--_R) var(--_S) var(--_spread) color-mix(in oklab, var(--_cast) var(--_ft), var(--_sunk)),
-    inset var(--_R) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_cast) var(--_fl), var(--_sunk)),
-    inset calc(-1 * var(--_R)) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_cast) var(--_fr), var(--_sunk)),
-    inset 0 calc(-1 * var(--_R)) var(--_S) var(--_spread) color-mix(in oklab, var(--_cast) var(--_fb), var(--_sunk));
+    inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-top), var(--_floor)),
+    inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-left), var(--_floor)),
+    inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-right), var(--_floor)),
+    inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-bottom), var(--_floor));
 }
 
-/* raised: a face above the plane is lit on the lamp side */
 .divot.raise {
   border-color:
-    color-mix(in oklab, var(--_hi) var(--_ft), var(--_lo))
-    color-mix(in oklab, var(--_hi) var(--_fr), var(--_lo))
-    color-mix(in oklab, var(--_hi) var(--_fb), var(--_lo))
-    color-mix(in oklab, var(--_hi) var(--_fl), var(--_lo));
+    color-mix(in oklab, var(--_wall-hi) var(--_lit-top), var(--_wall-lo))
+    color-mix(in oklab, var(--_wall-hi) var(--_lit-right), var(--_wall-lo))
+    color-mix(in oklab, var(--_wall-hi) var(--_lit-bottom), var(--_wall-lo))
+    color-mix(in oklab, var(--_wall-hi) var(--_lit-left), var(--_wall-lo));
 }
 
 .divot.raise:active,
@@ -517,19 +347,18 @@ input:focus-visible {
 .divot.raise.active,
 .divot.raise[aria-pressed="true"] {
   border-color:
-    color-mix(in oklab, var(--_lo) var(--_ft), var(--_hi))
-    color-mix(in oklab, var(--_lo) var(--_fr), var(--_hi))
-    color-mix(in oklab, var(--_lo) var(--_fb), var(--_hi))
-    color-mix(in oklab, var(--_lo) var(--_fl), var(--_hi));
+    color-mix(in oklab, var(--_wall-lo) var(--_lit-top), var(--_wall-hi))
+    color-mix(in oklab, var(--_wall-lo) var(--_lit-right), var(--_wall-hi))
+    color-mix(in oklab, var(--_wall-lo) var(--_lit-bottom), var(--_wall-hi))
+    color-mix(in oklab, var(--_wall-lo) var(--_lit-left), var(--_wall-hi));
   box-shadow:
-    inset 0 var(--_R) var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_ft), var(--_lo-in)),
-    inset var(--_R) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fl), var(--_lo-in)),
-    inset calc(-1 * var(--_R)) 0 var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fr), var(--_lo-in)),
-    inset 0 calc(-1 * var(--_R)) var(--_S) var(--_spread) color-mix(in oklab, var(--_hi-in) var(--_fb), var(--_lo-in));
+    inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-top), var(--_inner-lo)),
+    inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-left), var(--_inner-lo)),
+    inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-right), var(--_inner-lo)),
+    inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-bottom), var(--_inner-lo));
 }
 
-/* .bare opts out of the walls above; the pressed rule in this section is
-   later in the cascade at the same weight, so it has to opt out again */
+/* .bare has to opt out again: the pressed rule above outranks it by order. */
 .divot.bare,
 .divot.bare:active {
   box-shadow: none;
@@ -537,18 +366,8 @@ input:focus-visible {
 
 }}
 
-/* --- disabled -------------------------------------------------------------
-   Last, so it wins over every strength above it without a specificity
-   fight. The groove goes flat and the ink fades, but the box keeps its
-   size and its label: a control you can see and cannot use is often how an
-   interface explains a capability this machine doesn't have, so it has to
-   stay readable.
-
-   --divot-n: 0 mixes the walls to exactly the ground rather than removing
-   them (the .quiet trick), which is why nothing reflows. The hover bump
-   goes with it — a groove that deepens under a pointer that can't do
-   anything is a promise the button won't keep. */
-
+/* Disabled. Last so it wins without a specificity fight. Walls go flat, ink
+   fades, the box keeps its size and label. */
 .divot:disabled {
   --divot-n: 0;
   color: var(--ink-faint);
@@ -559,13 +378,7 @@ input:focus-visible {
   --divot-bump: 0;
 }
 
-/* --- accessibility --------------------------------------------------------
-   A flush button carries no value contrast against its ground — the cut is
-   doing all the work of saying "target". Where the platform says the user
-   wants more, give it to them globally rather than asking every call site
-   to opt in. The focus ring is the one at the top of this file: it is the
-   one element in the system permitted to break the plane. */
-
+/* Platform preferences. */
 @media (prefers-contrast: more) {
   :root {
     --divot-n: 100;

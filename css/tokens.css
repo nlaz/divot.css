@@ -1,31 +1,10 @@
-/* ==========================================================================
-   divot.css — tokens
-   --------------------------------------------------------------------------
-   The default theme: a warm paper-gray in the light, bister brown once the
-   lights are off. It comes from The Library, where the divot was cut.
+/* divot.css — tokens
+   The default palette: warm paper-gray in the light, bister brown in the
+   dark. core.css reads only the surfaces, the two --edge colours and the ink
+   ramp, so this file can be replaced by any palette that defines those. */
 
-   The primitive itself has no colours of its own — it derives every wall it
-   draws from whatever ground it is sitting on (see core.css). So this file
-   is entirely replaceable: define the same token names against your own
-   palette and the divot follows you, theme flips and all.
-
-   The tokens the primitive actually reads are the surfaces (--bg and
-   friends), the two bezel sources (--edge-hi, --edge-lo) and the ink ramp.
-   There is no accent. A brass wash on the one important button is the
-   kind of thing this system exists to not need: emphasis is a storey on
-   the ladder, not a colour.
-   ========================================================================== */
-
-/* --- §1 type & space -------------------------------------------------------
-   Theme-independent: these do not change between light and dark, so they
-   live on :root alone and the palette blocks below never mention them.
-   The primitive reads none of them; the specimen sheet does.
-
-   No @font-face here on purpose — this package ships no binary assets. The
-   two families stay at the head of their stacks so a project that already
-   loads Instrument Sans or IBM Plex Mono gets them; everyone else lands on
-   the system UI and mono faces, which is a fine place to land. */
-
+/* Type and spacing. Theme-independent; the button reads none of these. No
+   @font-face: projects that load these families get them, others fall back. */
 :root {
   --font-ui: "Instrument Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
@@ -45,51 +24,30 @@
   --sp-6: 32px;
 }
 
-/* --- §2 the light palette --------------------------------------------------
-   One token deliberately does NOT follow the theme, and it is declared
-   here only: --paper, because a page scan is white whatever the hour. The
-   dark block below omits it on purpose — it inherits.
-
-   [data-theme="light"] rides along on the same rule so a light panel can be
-   forced open inside a dark document (the specimen sheet shows both themes
-   side by side that way). */
-
+/* Light. Also applied by [data-theme="light"] so a light panel can sit inside
+   a dark page. --paper is declared here only: it stays white in both themes. */
 :root,
 [data-theme="light"] {
   color-scheme: light;
 
-  /* surfaces */
   --bg: #e8e4d9;
   --surface: #f1eee5;
   --well: #dcd6c7;
   --paper: #fffdf8;
 
-  /* lines & bezels — the two --edge tokens are the divot's light and
-     shadow sources, and the only reason it can draw a cut at all */
   --line: #c9c3b1;
   --line-strong: #8e8977;
-  --edge-hi: #fbf9f2;
-  --edge-lo: #a29c89;
+  --edge-hi: #fbf9f2; /* the highlight the button's lit walls mix toward */
+  --edge-lo: #a29c89; /* the shadow its unlit walls mix toward */
 
-  /* ink */
   --ink: #1e1c16;
-  --ink-dim: #605c4b; /* ≥4.5:1 on --bg, for 11px mono metadata */
+  --ink-dim: #605c4b; /* 4.5:1 on --bg, safe for small text */
   --ink-faint: #97917c;
 }
 
-/* --- §3 the dark palette ---------------------------------------------------
-   The same ramp walked in Lab at fixed lightness and tinted toward bister,
-   so contrast against --bg is identical to the neutral it replaces (ink
-   15.0:1, ink-dim 5.6:1).
-
-   Declared twice, and the two copies must stay identical: once for
-   documents that simply follow the OS, and once for [data-theme="dark"] so
-   a theme can be forced — on the root to beat the OS preference, or on any
-   container to show the two themes on one page. The :not() guard is what
-   lets an explicit light choice win under a dark OS. They are adjacent so
-   the pair can be checked at a glance; there is no way to say this once in
-   plain CSS. */
-
+/* Dark. Declared twice and the two blocks must stay identical: once for pages
+   that follow the OS, once for [data-theme="dark"] on the root or a container.
+   The :not() lets an explicit light choice win under a dark OS. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
@@ -126,16 +84,9 @@
   --ink-faint: #5a5856;
 }
 
-/* --- §4 grounds ------------------------------------------------------------
-   House rule number one: declare the ground on the CONTAINER. A button that
-   has to know where it is has already lost, and a divot cut for --bg and
-   then dropped onto --well stops being flush and starts being a rectangle.
-
-   Each helper writes its background and its --divot-ground from the same
-   variable, so the two cannot drift apart. Use them, or set --divot-ground
-   yourself on whatever surface you already have — they are a convenience,
-   not a requirement. */
-
+/* Grounds. Put one on the container and every button inside is cut into it.
+   Each sets its background and --divot-ground from the same variable so the
+   two cannot drift. Or set --divot-ground yourself on any surface. */
 .ground-bg {
   background: var(--bg);
   --divot-ground: var(--bg);
@@ -151,12 +102,8 @@
   --divot-ground: var(--well);
 }
 
-/* Paper is the instructive one. Nothing is lighter than a white scan, so
-   the light source collapses to the paper itself and the cut becomes
-   shadow-only — which is what a groove in white paper actually looks like.
-   Its shadow source and ink are pinned to the light values rather than
-   taken from the theme, for the same reason --paper is: the sheet is white
-   whatever the hour, and the dark ramp would be invisible on it. */
+/* Paper is white in both themes, so its highlight collapses to the paper
+   itself and its shadow and ink are pinned to the light values. */
 .ground-paper {
   background: var(--paper);
   --divot-ground: var(--paper);
