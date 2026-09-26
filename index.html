@@ -124,15 +124,11 @@ svg.fig { width: 100%; height: auto; display: block; }
 .grounds > div { padding: 24px 12px; display: grid; gap: 12px; justify-items: center; }
 @media (max-width: 560px) { .grounds { grid-template-columns: repeat(2, 1fr); } }
 
-/* elevation: a short row under the reference sheet */
-.elev { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); align-items: center; border: 1px solid var(--line); border-top: 0; margin-top: -24px; }
-.elev > .lab { padding: 0 18px 0 14px; }
-.elev > div { display: flex; align-items: center; gap: 12px; padding: 14px; border-left: 1px solid var(--line); }
-.elev .n { font: 500 var(--fs-mono)/1 var(--font-mono); color: var(--ink-dim); min-width: 2ch; }
-@media (max-width: 640px) { .elev { grid-template-columns: 1fr; } .elev > .lab { padding: 12px 14px 0; } .elev > div { border-left: 0; padding-block: 8px; } }
+/* elevation: the three storeys, as the same cells as the sheet above */
+.elev { display: grid; gap: 14px; margin-top: 16px; }
 
 /* reference sheet captions */
-.sheet .cap, .elev .cap { font-size: var(--fs-mono); color: var(--ink-dim); line-height: 1.4; }
+.sheet .cap { font-size: var(--fs-mono); color: var(--ink-dim); line-height: 1.4; }
 
 /* cheatsheet */
 .cheat { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
@@ -141,8 +137,20 @@ svg.fig { width: 100%; height: auto; display: block; }
 .cheat dt { font-family: var(--font-mono); font-size: var(--fs-mono); white-space: nowrap; }
 .cheat dd { margin: 0; color: var(--ink-dim); }
 @media (max-width: 760px) { .cheat { grid-template-columns: 1fr; } }
-.install { grid-template-columns: repeat(2, 1fr); }
+.install { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.install > div { align-content: start; }
+@media (max-width: 760px) { .install { grid-template-columns: 1fr; } }
 .support { font-size: var(--fs-ui); color: var(--ink-dim); }
+/* install: download row and quiet, tonal syntax colouring for the snippets */
+.dl { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.dl .divot { --divot-pad-y: 8px; --divot-pad-x: 18px; }
+:root { --syn-str: #7a5a24; --syn-attr: #5b6a52; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --syn-str: #c8a570; --syn-attr: #9aab8e; } }
+[data-theme="dark"] { --syn-str: #c8a570; --syn-attr: #9aab8e; }
+pre.hl .p { color: var(--ink-faint); }
+pre.hl .t { color: var(--ink); font-weight: 500; }
+pre.hl .a { color: var(--syn-attr); }
+pre.hl .s { color: var(--syn-str); }
 </style>
 </head>
 <body>
@@ -166,7 +174,7 @@ svg.fig { width: 100%; height: auto; display: block; }
     <p class="sub">A simple skeuomorphic button style, for buttons that feel as good to press as the real thing.</p>
     <div class="row"><a class="divot raise" href="#install" role="button">Download</a><a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a></div>
   </div>
-  <div class="art"><canvas class="ascii" data-press='{"cols":96,"rows":56,"cell":7,"dist":6.6}'></canvas></div>
+  <div class="art"><canvas class="ascii" data-press='{"cols":96,"rows":56,"cell":7,"dist":6.6,"vignette":0.35}'></canvas></div>
 </div></div></div>
 
 <div class="wrap">
@@ -209,10 +217,12 @@ svg.fig { width: 100%; height: auto; display: block; }
       <div><span class="lab">:disabled</span><button class="divot" disabled>Read</button><span class="cap">Groove flat, ink faded, box unchanged.</span></div>
     </div>
     <div class="elev">
-      <span class="lab">elevation</span>
-      <div><span class="n">+1</span><button class="divot raise">Save</button><span class="cap">Raised. The primary action.</span></div>
-      <div><span class="n">0</span><button class="divot">Read</button><span class="cap">Flush. The resting state.</span></div>
-      <div><span class="n">&#8722;1</span><button class="divot" aria-pressed="true">Read</button><span class="cap">Sunk. Where a press lands.</span></div>
+      <p class="eyebrow">elevation</p>
+      <div class="sheet">
+        <div><span class="lab">+1 &#183; .raise</span><button class="divot raise">Save</button><span class="cap">Raised. The primary action.</span></div>
+        <div><span class="lab">0 &#183; .divot</span><button class="divot">Read</button><span class="cap">Flush. The resting state.</span></div>
+        <div><span class="lab">&#8722;1 &#183; pressed</span><button class="divot" aria-pressed="true">Read</button><span class="cap">Sunk. Where a press lands.</span></div>
+      </div>
     </div>
   </section>
 </div></div>
@@ -270,12 +280,13 @@ svg.fig { width: 100%; height: auto; display: block; }
 
   <section id="install">
     <div class="sec-head"><p class="eyebrow">install</p><h2>Link it.</h2></div>
+    <div class="dl"><a class="divot raise" href="https://github.com/nlaz/divot.css/archive/refs/heads/main.zip" target="_blank" rel="noopener">Download .zip</a><span class="support">v0.1.0 &#183; MIT &#183; or grab <code>css/divot.css</code> from <a href="https://github.com/nlaz/divot.css" target="_blank" rel="noopener">GitHub</a></span></div>
     <div class="install">
-      <div><span class="eyebrow">one file</span><pre>&lt;link rel="stylesheet" href="divot.css"&gt;
-&lt;button class="divot"&gt;Read&lt;/button&gt;</pre></div>
-      <div><span class="eyebrow">on a surface that isn't the page</span><pre>&lt;div class="ground-surface"&gt;
-  &lt;button class="divot"&gt;Read&lt;/button&gt;
-&lt;/div&gt;</pre></div>
+      <div><span class="eyebrow">one file</span><pre class="hl"><span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span><span class="p">=</span><span class="s">"stylesheet"</span> <span class="a">href</span><span class="p">=</span><span class="s">"divot.css"</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="t">button</span> <span class="a">class</span><span class="p">=</span><span class="s">"divot"</span><span class="p">&gt;</span>Read<span class="p">&lt;/</span><span class="t">button</span><span class="p">&gt;</span></pre></div>
+      <div><span class="eyebrow">on a surface that isn't the page</span><pre class="hl"><span class="p">&lt;</span><span class="t">div</span> <span class="a">class</span><span class="p">=</span><span class="s">"ground-surface"</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="t">button</span> <span class="a">class</span><span class="p">=</span><span class="s">"divot"</span><span class="p">&gt;</span>Read<span class="p">&lt;/</span><span class="t">button</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="t">div</span><span class="p">&gt;</span></pre></div>
     </div>
     <p class="support">Works in all modern browsers.</p>
   </section>
