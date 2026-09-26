@@ -18,8 +18,8 @@
   var sc = document.getElementById('lScale');
   if (sc && lf) sc.addEventListener('click', function () {
     var one = lf.classList.toggle('x1');
-    sc.textContent = one ? '1\u00d7' : '3\u00d7';
-    sc.setAttribute('aria-label', one ? 'Scale 1\u00d7, switch to 3\u00d7' : 'Scale 3\u00d7, switch to 1\u00d7');
+    sc.textContent = one ? '1\u00d7' : '2\u00d7';
+    sc.setAttribute('aria-label', one ? 'Scale 1\u00d7, switch to 2\u00d7' : 'Scale 2\u00d7, switch to 1\u00d7');
   });
   document.querySelectorAll('canvas.ascii').forEach(function (c) {
     var o = JSON.parse(c.dataset.press || '{}');
