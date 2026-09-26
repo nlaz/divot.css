@@ -123,7 +123,7 @@ window.asciiPress = function(canvas, o){
       var dx = (x/cols - 0.5)*2, dy = (y/rows - 0.5)*2, r = Math.sqrt(dx*dx + dy*dy)/1.4142;
       var f = Math.min(1, Math.max(0, (r - 0.2)/0.8)); f = f*f*(3 - 2*f);
       l *= 1 - VIG*f;
-      l += (BAYER[(y&3)*4 + (x&3)] - 0.5)/n*f;
+      l += (BAYER[(y&3)*4 + (x&3)] - 0.5)/n*f*0.75;
       var k = Math.max(0, Math.min(n-1, Math.floor(l*n)));
       var c = ramp[k]; if (c === ' ') continue;
       ctx.fillStyle = o.tones ? (l>0.66 ? ink : l>0.33 ? dim : faint) : ink;
