@@ -25,13 +25,19 @@
   "style": "css/divot.css",
   "exports": {
     ".": "./css/divot.css",
+    "./divot.css": "./divot.css",
     "./tokens.css": "./css/tokens.css",
     "./core.css": "./css/core.css",
     "./package.json": "./package.json"
   },
   "files": [
     "css",
+    "divot.css",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs --check"
+  }
 }
