@@ -1,6 +1,4 @@
-# divot.css
-
-A simple skeuomorphic button style for a satisfying button experience.
+# divot.css - A simple skeuomorphic button style
 
 v0.2.0 · MIT · **[nlaz.github.io/divot.css](https://nlaz.github.io/divot.css)**
 
