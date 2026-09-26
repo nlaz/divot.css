@@ -134,7 +134,10 @@ svg.fig { width: 100%; height: auto; display: block; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 /* why: a short first-person note, set as running text */
 .why { max-width: 62ch; display: grid; gap: 14px; }
-#why .two { align-items: start; } /* copy starts at the top of the row, level with the diagram */
+/* header and copy share the left column; the diagram is centred against all of it, with a wider gutter */
+#why .two { align-items: center; gap: clamp(48px, 8vw, 112px); }
+#why .why .sec-head { margin-bottom: 10px; }
+#why .why .eyebrow { font-size: var(--fs-meta); line-height: 1; }
 .why p { max-width: none; font-size: var(--fs-title); line-height: 1.6; color: var(--ink-dim); }
 
 /* grounds strip: the same class on four surfaces, no overrides */
@@ -201,11 +204,11 @@ pre.hl .s { color: var(--syn-str); }
 
 <div class="wrap">
   <section id="why">
-    <div class="sec-head"><p class="eyebrow">background</p><h2>Buttons should be satisfying to press.</h2></div>
     <div class="two">
       <div class="why">
-        <p>Real buttons are satisfying to press. So a divot is cut into the page instead of laid on top of it. The face sits flush with the surface, and a 2px groove around it is the only thing that says "press me".</p>
-        <p>Flush at rest, one step up or down, no accent colour. It gives a page a tangible feel that makes you want to click things.</p>
+        <div class="sec-head"><p class="eyebrow">background</p><h2>Buttons should be satisfying to press.</h2></div>
+        <p>Physical buttons are satisfying to press, and I wanted to bring that feeling to the screen. The key feature is a soft divot around the button that keeps its face flush with the surface.</p>
+        <p>It&#8217;s a simple, no-frills skeuomorphic style that mimics light catching the edges of the cut. The result is a page that feels tangible and makes you want to click things.</p>
       </div>
       <div><svg class="fig" viewBox="0 0 420 160" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side"><defs><pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/></pattern></defs>
 <g stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="3 3"><line x1="37" y1="34" x2="64" y2="70"/><line x1="52" y1="8" x2="94" y2="64"/><line x1="82" y1="2" x2="124" y2="58"/></g>
@@ -224,7 +227,7 @@ pre.hl .s { color: var(--syn-str); }
 
 <div class="bleed band-surface"><div class="wrap">
   <section id="reference">
-    <div class="sec-head"><p class="eyebrow">reference</p><h2>Every divot button type.</h2><p class="dim">One class plus a role. None of them change the box; depth is contrast, not size.</p></div>
+    <div class="sec-head"><p class="eyebrow">gallery</p><h2>Every divot button type.</h2><p class="dim">Add one modifier to <code>.divot</code> to change its style. Every variant keeps the same size, so they line up in any layout.</p></div>
     <div class="sheet">
       <div><span class="lab">.divot</span><button class="divot">Edit</button><span class="cap">The default, flush with the page.</span></div>
       <div><span class="lab">.on</span><button class="divot on">Held</button><span class="cap">A toggle held down while on.</span></div>
@@ -290,7 +293,7 @@ pre.hl .s { color: var(--syn-str); }
         <dt>:hover</dt><dd>groove deepens</dd>
         <dt>:active</dt><dd>face sinks, label nudges</dd>
         <dt>[aria-pressed="true"]</dt><dd>stays sunk</dd>
-        <dt>.on .active .sel</dt><dd>same, as classes</dd>
+        <dt>.on .active</dt><dd>same, as classes</dd>
         <dt>:disabled</dt><dd>flat groove, faint ink</dd>
         <dt>:focus-visible</dt><dd>1px outline, keep it</dd>
       </dl></div>
