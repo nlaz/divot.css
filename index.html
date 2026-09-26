@@ -228,7 +228,7 @@ pre.hl .s { color: var(--syn-str); }
     <div class="sec-head"><p class="eyebrow">gallery</p><h2>Every divot button type.</h2><p class="dim">Add one modifier to <code>.divot</code> to change its style. Every variant keeps the same size, so they line up in any layout.</p></div>
     <div class="sheet">
       <div><span class="lab">.divot</span><button class="divot">Edit</button><span class="cap">The default, flush with the page.</span></div>
-      <div><span class="lab">.on</span><button class="divot on">Held</button><span class="cap">A toggle held down while on.</span></div>
+      <div><span class="lab">aria-pressed</span><button class="divot" aria-pressed="true">Held</button><span class="cap">A toggle held down while on.</span></div>
       <div><span class="lab">.raise</span><button class="divot raise">Save</button><span class="cap">The primary action, raised.</span></div>
       <div><span class="lab">.quiet</span><button class="divot quiet">File away</button><span class="cap">Borderless until hovered.</span></div>
       <div><span class="lab">.ghost</span><button class="divot ghost">Cancel</button><span class="cap">A lighter cut, for grouped buttons.</span></div>
@@ -245,7 +245,7 @@ pre.hl .s { color: var(--syn-str); }
       <div class="sheet">
         <div><span class="lab">+1 / .raise</span><button class="divot raise">Save</button><span class="cap">Raised, for the primary action.</span></div>
         <div><span class="lab">0 / .divot</span><button class="divot">Edit</button><span class="cap">Flush, the default resting state.</span></div>
-        <div><span class="lab">&#8722;1 / .on</span><button class="divot on">Bold</button><span class="cap">Pressed in, where every click lands.</span></div>
+        <div><span class="lab">&#8722;1 / pressed</span><button class="divot" aria-pressed="true">Bold</button><span class="cap">Pressed in, where every click lands.</span></div>
       </div>
     </div>
   </section>
@@ -291,7 +291,7 @@ pre.hl .s { color: var(--syn-str); }
         <dt>:hover</dt><dd>groove deepens</dd>
         <dt>:active</dt><dd>face sinks, label nudges</dd>
         <dt>[aria-pressed="true"]</dt><dd>stays sunk</dd>
-        <dt>.on .active</dt><dd>same, as classes</dd>
+        <dt>.active</dt><dd>same, as a class</dd>
         <dt>:disabled</dt><dd>flat groove, faint ink</dd>
         <dt>:focus-visible</dt><dd>1px outline, keep it</dd>
       </dl></div>
