@@ -5,7 +5,9 @@
   var root = document.documentElement;
   function set(t) {
     if (t === 'system') root.removeAttribute('data-theme'); else root.dataset.theme = t;
-    document.querySelectorAll('[data-set-theme]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.setTheme === t ? 'true' : 'false'); });
+    /* no 'auto' button: when following the OS, show whichever theme is in effect as pressed */
+    var eff = t === 'system' ? (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : t;
+    document.querySelectorAll('[data-set-theme]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.setTheme === eff ? 'true' : 'false'); });
     try { localStorage.setItem('divot-theme', t); } catch (e) {}
   }
   document.querySelectorAll('[data-set-theme]').forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.setTheme); }); });
