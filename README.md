@@ -4,8 +4,8 @@ v0.2.0 · MIT · **[nlaz.github.io/divot.css](https://nlaz.github.io/divot.css)*
 
 ![divot.css](https://nlaz.github.io/divot.css/site/og.png)
 
-Physical buttons are so satisfying to press, and I wanted try to bring that feeling
-to the screen. The key feature of this stylesheet is a soft divot around the 
+Physical buttons are so satisfying to press, and I wanted to try to bring that feeling
+to the web. The key feature of this stylesheet is a soft divot around the 
 button that keeps its face flush with the surface. It's a simple, no-frills 
 skeuomorphic style that mimics light catching the edges of the cut. The result is a much
 more tangible look and feel.
