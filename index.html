@@ -104,7 +104,7 @@ svg.fig { width: 100%; height: auto; display: block; }
 /* customize: the same two-column rhythm as the why section. Copy and code on the
    left, the dial in a sunk well panel on the right. */
 .cust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: stretch; }
-.cust .info { display: grid; gap: 24px; align-content: space-between; }
+.cust .info { display: grid; gap: 24px; align-content: start; }
 .cust .info .body { display: grid; gap: 20px; }
 .cust .info .body p { max-width: 62ch; font-size: var(--fs-title); line-height: 1.6; color: var(--ink-dim); }
 .cust .stage { background: var(--well); --divot-ground: var(--well); border: 1px solid var(--line); display: grid; place-items: center; align-content: center; gap: 20px; padding: clamp(24px, 4vw, 40px); }
@@ -251,7 +251,7 @@ pre.hl .s { color: var(--syn-str); }
   <section id="customize">
     <div class="cust">
       <div class="info">
-        <div class="sec-head"><p class="eyebrow">customize</p><h2>Move the lamp.</h2></div>
+        <div class="sec-head"><p class="eyebrow">customize</p><h2>Move the light source.</h2></div>
         <div class="body">
         <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code>: see the cut up close at 8&#215;, or switch to 1&#215; for actual size.</p>
         <div class="lcode"><pre id="lCss">:root { --divot-light: 315deg; }</pre><button class="divot" id="lCopy">Copy</button><button class="divot" id="lReset" disabled>Reset</button></div>
