@@ -1,25 +1,10 @@
-/* ==========================================================================
-   site/ascii-button.js — the landing page's hero render
-   --------------------------------------------------------------------------
-   Page-only. Not part of the divot.css package (package.json "files" ships
-   css/ alone). A three.js scene of a round power button in a recess, seen
-   in three-quarter view, read back as pixels and drawn as text in the
-   page's own ink on the page's own ground, so it follows the theme.
-
-   It is a button: hover depresses it a little, a press pushes it fully in
-   and it LATCHES at half depth; the next press releases it. It takes focus and
-   works from Space or Enter. Every move eases. A completed press calls
-   opts.onPress with the state, whose .latched says which way it went.
-   It only re-renders when something changed, so it idles at no cost.
-
-   Needs window.THREE (r128) loaded first. Call asciiPress(canvas, opts);
-   the defaults below are the chosen composition.
-   ========================================================================== */
+/* site/ascii-button.js: the hero render, page-only. A three.js power button
+   drawn as text in the page's own ink. Needs window.THREE (r128) first. */
 window.asciiPress = function(canvas, o){
   if (!window.THREE) return null;
   o = o || {};
   var cols = o.cols || 96, rows = o.rows || 48, ramp = o.ramp || ' .:-=+*#%@';
-  // one shared WebGL renderer for every button on the page; each draw resizes it to its own grid
+  // one shared renderer for every button on the page
   var ren = window.__asciiRen;
   if (!ren) { try { ren = new THREE.WebGLRenderer({antialias:false, preserveDrawingBuffer:true}); } catch(e) { return null; }
     ren.setPixelRatio(1); ren.shadowMap.enabled = true; ren.shadowMap.type = THREE.PCFSoftShadowMap; window.__asciiRen = ren; }
@@ -30,7 +15,7 @@ window.asciiPress = function(canvas, o){
   var la = o.look || [0, 0, 0]; cam.position.copy(dir.multiplyScalar(dist)); cam.lookAt(la[0], la[1], la[2]);
   var cp = [cam.position.x, cam.position.y, cam.position.z];
 
-  // lighting: a hard overhead key that casts into the recess and off the glyph.
+  // lighting
   function keyLight(pos, intensity, radius, amb, fillI, fillPos){
     var key = new THREE.DirectionalLight(0xffffff, intensity); key.position.set(pos[0], pos[1], pos[2]);
     key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.radius = radius; key.shadow.bias = -0.0008;
@@ -98,7 +83,7 @@ window.asciiPress = function(canvas, o){
   canvas.addEventListener('keydown', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (!down) { down = true; retarget(); } ev.preventDefault(); } });
   canvas.addEventListener('keyup', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (down) { down = false; retarget(); fire(); } ev.preventDefault(); } });
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // a theme change crossfades the last frame into the new one instead of cutting
+  // theme change: crossfade instead of cut
   var fade = null, FADE_MS = o.fadeMs != null ? o.fadeMs : 600;
   function themeChanged(){ if (reduce) { dirty = true; return; } var snap = document.createElement('canvas'); snap.width = canvas.width; snap.height = canvas.height; snap.getContext('2d').drawImage(canvas, 0, 0); fade = { img: snap, t0: performance.now() }; dirty = true; }
   try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeChanged); } catch(e){}
@@ -117,10 +102,7 @@ window.asciiPress = function(canvas, o){
     for (var y=0; y<rows; y++) for (var x=0; x<cols; x++) {
       var i = ((rows-1-y)*cols + x)*4;
       var l = (px[i]*0.3 + px[i+1]*0.59 + px[i+2]*0.11)/255;
-      // lens vignette: a smooth radial falloff that begins just outside the button's well
-      // and wraps all four edges, not just the corners. Where it acts, an ordered dither
-      // spreads the step between ramp characters so the fade reads as a gradient, not a
-      // contour line. Inside the well f is 0: the button and its edge render untouched.
+      // vignette: radial falloff outside the well, dithered between ramp characters
       var dx = (x/cols - 0.5)*2, dy = (y/rows - 0.5)*2, r = Math.sqrt(dx*dx + dy*dy);
       var f = Math.min(1, Math.max(0, (r - VIG_IN)/(1.4142 - VIG_IN))); f = f*f*(3 - 2*f);
       l *= 1 - VIG*f;

@@ -1,6 +1,4 @@
-// Builds the single-file bundle at the repo root: divot.css = banner + tokens + core.
-// No dependencies. `node scripts/build.mjs` writes it; `--check` only compares and
-// exits 1 when the committed bundle is stale.
+// Writes the root bundle: divot.css = banner + tokens + core. `--check` exits 1 if stale.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
