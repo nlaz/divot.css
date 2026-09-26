@@ -2,7 +2,7 @@
   "name": "divot.css",
   "version": "0.2.0",
   "description": "A button whose face is the plane it sits in, made legible by a groove cut around it. The walls are mixed from the ground, never hardcoded.",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "author": "Niko Lazaris",
   "homepage": "https://github.com/nlaz/divot.css",
   "repository": {

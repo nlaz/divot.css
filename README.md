@@ -189,4 +189,4 @@ or on a container to show both themes on one page.
 
 ## License
 
-Apache-2.0
+MIT
