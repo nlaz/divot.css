@@ -103,7 +103,7 @@ svg.fig { width: 100%; height: auto; display: block; }
    copy, the 1x row and the code are pinned top, middle and bottom. */
 .cust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--line); }
 .cust .stage { background: var(--well); --divot-ground: var(--well); display: grid; place-items: center; padding: clamp(24px, 4vw, 48px); border-right: 1px solid var(--line); }
-.cust .stage .lframe { max-width: 340px; }
+.cust .stage .lframe { max-width: 260px; }
 .cust .info { padding: clamp(20px, 3vw, 36px); display: grid; grid-template-rows: auto 1fr auto; gap: 24px; }
 .cust .info .top { display: grid; gap: 12px; }
 .cust .info .mid { align-self: center; }
@@ -197,15 +197,17 @@ pre.hl .s { color: var(--syn-str); }
         <p>Real buttons are satisfying to press. So a divot is cut into the page instead of laid on top of it. The face sits flush with the surface, and a 2px groove around it is the only thing that says "press me".</p>
         <p>Flush at rest, one step up or down, no accent colour. It gives a page a tangible feel that makes you want to click things.</p>
       </div>
-      <div><svg class="fig" viewBox="0 0 420 170" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side"><defs><pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/></pattern></defs><g stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="3 3"><line x1="22" y1="14" x2="64" y2="70"/><line x1="52" y1="8" x2="94" y2="64"/><line x1="82" y1="2" x2="124" y2="58"/></g>
-<circle cx="14" cy="10" r="4" fill="var(--ink)"/><text x="24" y="12" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">light</text><path d="M0 80 H60 V96 H80 V80 H340 V96 H360 V80 H420 V170 H0 Z" fill="url(#hrest)"/>
+      <div><svg class="fig" viewBox="0 0 420 160" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side"><defs><pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/></pattern></defs>
+<g stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="3 3"><line x1="37" y1="34" x2="64" y2="70"/><line x1="52" y1="8" x2="94" y2="64"/><line x1="82" y1="2" x2="124" y2="58"/></g>
+<circle cx="12" cy="10" r="4" fill="var(--ink)"/><text x="3" y="30" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">light</text>
+<path d="M0 80 H60 V96 H80 V80 H340 V96 H360 V80 H420 V112 H0 Z" fill="url(#hrest)"/>
 <path d="M0 80 H60 M80 80 H340 M360 80 H420" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
 <path d="M60 80 V96 H80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
 <path d="M80 96 V80" stroke="var(--edge-hi)" stroke-width="2.5"/>
 <path d="M340 80 V96" stroke="var(--edge-hi)" stroke-width="2.5"/>
 <path d="M340 96 H360 V80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
-<g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)"><text x="0" y="122">ground</text><text x="56" y="122">lo</text><text x="80" y="122">hi</text><text x="210" y="122" text-anchor="middle">face &#183; flush</text><text x="328" y="122">hi</text><text x="356" y="122">lo</text></g>
-<g stroke="var(--ink-dim)" stroke-width="1"><line x1="60" y1="146" x2="80" y2="146"/><line x1="60" y1="142" x2="60" y2="150"/><line x1="80" y1="142" x2="80" y2="150"/></g><text x="70" y="162" text-anchor="middle" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">2px</text></svg></div>
+<g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)"><text x="0" y="130">ground</text><text x="57" y="130" text-anchor="end">lo</text><text x="83" y="130">hi</text><text x="210" y="130" text-anchor="middle">face &#183; flush</text><text x="337" y="130" text-anchor="end">hi</text><text x="363" y="130">lo</text></g>
+<g stroke="var(--ink-dim)" stroke-width="1"><line x1="60" y1="142" x2="80" y2="142"/><line x1="60" y1="138" x2="60" y2="146"/><line x1="80" y1="138" x2="80" y2="146"/></g><text x="70" y="158" text-anchor="middle" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">2px</text></svg></div>
     </div>
   </section>
 </div>
@@ -246,7 +248,7 @@ pre.hl .s { color: var(--syn-str); }
           <i class="ring" aria-hidden="true"></i>
           <i class="ray" aria-hidden="true"></i>
           <button class="divot mag" tabindex="-1" aria-hidden="true">Edit</button>
-          <span class="zoom" aria-hidden="true">8&#215; &#183; press it</span>
+          <span class="zoom" aria-hidden="true">press it</span>
           <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
         </div>
       </div>
