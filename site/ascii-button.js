@@ -91,7 +91,7 @@ window.asciiPress = function(canvas, o){
   function fire(){ latched = !latched; state.latched = latched; retarget(); if (o.onPress) { try { o.onPress(state); } catch(e){} } }
   function up(ev){ if (!down) return; down = false; if (ev && ev.clientX != null) over = hit(ev); retarget(); if (over || ev.clientX == null) fire(); }
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
-  canvas.tabIndex = 0; canvas.setAttribute('role', 'button'); canvas.setAttribute('aria-label', o.label || 'Power button. Press to latch it in, press again to release.');
+  canvas.tabIndex = 0; canvas.setAttribute('role', 'button'); canvas.setAttribute('aria-pressed', 'false'); canvas.setAttribute('aria-label', o.label || 'Power button. Press to latch it in, press again to release.');
   canvas.addEventListener('focus', function(){ focused = true; retarget(); });
   canvas.addEventListener('blur', function(){ focused = false; down = false; retarget(); });
   canvas.addEventListener('keydown', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { if (!down) { down = true; retarget(); } ev.preventDefault(); } });

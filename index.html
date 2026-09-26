@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>divot.css</title>
 <meta name="description" content="A simple skeuomorphic button style system. One class, cut into the page.">
+<link rel="canonical" href="https://nlaz.github.io/divot.css/">
+<link rel="icon" href="site/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="divot.css">
+<meta property="og:description" content="A simple skeuomorphic button style system. One class, cut into the page.">
+<meta property="og:url" content="https://nlaz.github.io/divot.css/">
+<meta property="og:image" content="https://nlaz.github.io/divot.css/site/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="divot.css">
+<meta name="twitter:description" content="A simple skeuomorphic button style system. One class, cut into the page.">
+<meta name="twitter:image" content="https://nlaz.github.io/divot.css/site/og.png">
 
 <!-- The real tokens and the real primitive, LINKED rather than copied, so
      this page cannot drift from what the package ships. If it looks wrong,
@@ -15,10 +28,11 @@
 <link rel="stylesheet" href="site/light.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 
-<!-- the hero render: three.js, then the page-only scene in site/ -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="site/ascii-button.js"></script>
-<script src="site/light.js"></script>
+<!-- all deferred, in order: three.js, the hero scene, the lamp dial, then the page script that starts them -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script defer src="site/ascii-button.js"></script>
+<script defer src="site/light.js"></script>
+<script defer src="site/page.js"></script>
 
 <style>
 /* --- page-only -----------------------------------------------------------
@@ -78,35 +92,55 @@ svg.fig { width: 100%; height: auto; display: block; }
 .foot { padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font: var(--fs-mono)/1.5 var(--font-mono); color: var(--ink-dim); }
 .foot nav { display: flex; gap: 16px; }
 /* customize: drag the lamp. The frame is square so the lamp can orbit it;
-   the button in the middle is a real .divot with 12px walls, so it shows
-   the same cut the page uses, twelve times over. */
-.cust { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+   the button in the middle is a real .divot with 8px walls, so it shows
+   the same cut the page uses, eight times over. Everything inside the
+   frame is sized in cqw so it scales with the dial. */
+.cust { display: grid; grid-template-columns: minmax(0, 290px) minmax(0, 440px); gap: clamp(24px, 4vw, 56px); align-items: center; }
 @media (max-width: 760px) { .cust { grid-template-columns: 1fr; } }
-.lframe { position: relative; width: 100%; max-width: 580px; aspect-ratio: 1; container-type: inline-size; justify-self: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.lframe { position: relative; width: 100%; max-width: 290px; aspect-ratio: 1; container-type: inline-size; justify-self: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
 .lframe.grab { cursor: grabbing; }
 .lframe .ring { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed var(--line-strong); }
-.lframe .brg { position: absolute; font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); color: var(--ink-faint); background: var(--bg); padding: 2px 4px; }
-.lframe .brg.n { top: 0; left: 50%; transform: translate(-50%, -4px); }
-.lframe .brg.e { right: 0; top: 50%; transform: translate(4px, -50%); }
-.lframe .brg.s { bottom: 0; left: 50%; transform: translate(-50%, 4px); }
-.lframe .brg.w { left: 0; top: 50%; transform: translate(-4px, -50%); }
 .lframe .ray { position: absolute; left: 50%; top: 50%; width: 0; height: 46cqw; border-left: 1px dashed var(--ink-dim); transform-origin: 0 0; transform: rotate(calc(var(--divot-light) + 180deg)); }
-.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; font: 500 clamp(40px, 11cqw, 68px)/1 var(--font-ui); letter-spacing: -0.02em; border-width: 12px; --divot-reach: 12px; --divot-nudge: 3px; --divot-pad-y: clamp(14px, 4cqw, 26px); --divot-pad-x: clamp(28px, 8cqw, 48px); }
-.lframe .zoom { position: absolute; left: 50%; top: calc(50% + clamp(56px, 13cqw, 84px)); transform: translateX(-50%); font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
+.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; font: 500 11cqw/1 var(--font-ui); letter-spacing: -0.02em; border-width: 8px; --divot-reach: 8px; --divot-nudge: 2px; --divot-pad-y: 4cqw; --divot-pad-x: 8cqw; }
+.lframe .zoom { position: absolute; left: 50%; top: calc(50% + 19cqw); transform: translateX(-50%); font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
 .lframe .lamp { position: absolute; left: 50%; top: 50%; z-index: 2; width: 22px; height: 22px; margin: -11px; border-radius: 50%; border: 1px solid var(--ink); background: var(--bg); display: grid; place-items: center;
   transform: rotate(var(--divot-light)) translateY(-46cqw) rotate(calc(-1 * var(--divot-light))); }
 .lframe .lamp::before { content: ""; position: absolute; inset: -14px; border-radius: 50%; }
 .lframe .lamp::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
 .lframe .lamp:hover, .lframe.grab .lamp { box-shadow: 0 0 0 5px var(--line); }
 .lframe .lamp:focus-visible { outline: 1px solid var(--ink); outline-offset: 5px; }
-.cust-side { display: grid; gap: 18px; align-content: center; }
-.lread { display: flex; gap: 12px; align-items: baseline; }
-.lread b { font: 500 clamp(32px, 4vw, 44px)/1 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.sides { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-.sides > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 8px 10px; display: grid; gap: 6px; }
-.sides dd { margin: 0; font: 500 var(--fs-mono)/1 var(--font-mono); font-variant-numeric: tabular-nums; }
-.snippet { background: var(--surface); border: 1px solid var(--line); padding: 10px 12px; }
+.cust-side { display: grid; gap: 20px; align-content: center; }
+.lcode { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
+.lcode pre { flex: 1 1 auto; background: var(--surface); border: 1px solid var(--line); padding: 6px 12px; line-height: 1.5; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* why: a short first-person note, set as running text */
+.why { max-width: 62ch; display: grid; gap: 14px; }
+.why p { max-width: none; font-size: var(--fs-title); line-height: 1.6; }
+
+/* grounds strip: the same class on four surfaces, no overrides */
+.grounds { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); }
+.grounds > div { padding: 24px 12px; display: grid; gap: 12px; justify-items: center; }
+@media (max-width: 560px) { .grounds { grid-template-columns: repeat(2, 1fr); } }
+
+/* levels: three storeys */
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.levels > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 22px 18px; display: grid; gap: 12px; align-content: start; justify-items: start; }
+.levels .n { font: 500 clamp(22px, 3vw, 30px)/1 var(--font-mono); letter-spacing: -0.02em; }
+.levels p { font-size: var(--fs-ui); color: var(--ink-dim); }
+@media (max-width: 640px) { .levels { grid-template-columns: 1fr; } }
+
+/* reference sheet captions */
+.sheet .cap { font-size: var(--fs-mono); color: var(--ink-dim); line-height: 1.4; }
+
+/* cheatsheet */
+.cheat { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.cheat > div { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
+.cheat dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: var(--fs-ui); }
+.cheat dt { font-family: var(--font-mono); font-size: var(--fs-mono); white-space: nowrap; }
+.cheat dd { margin: 0; color: var(--ink-dim); }
+@media (max-width: 760px) { .cheat { grid-template-columns: 1fr; } }
+.install { grid-template-columns: repeat(2, 1fr); }
+.support { font-size: var(--fs-ui); color: var(--ink-dim); }
 </style>
 </head>
 <body>
@@ -114,7 +148,7 @@ svg.fig { width: 100%; height: auto; display: block; }
   <header class="mast">
     <span class="word">divot.css</span>
     <nav>
-      <a href="#concept">concept</a><a href="#reference">reference</a><a href="#customize">customize</a><a href="#install">install</a><a href="https://github.com/nlaz/divot.css">github</a>
+      <a href="#why">why</a><a href="#concept">concept</a><a href="#reference">reference</a><a href="#customize">customize</a><a href="#install">install</a><a href="https://github.com/nlaz/divot.css">github</a>
       <span class="row theme">
         <button class="divot quiet" data-set-theme="light">light</button>
         <button class="divot quiet" data-set-theme="system">auto</button>
@@ -126,7 +160,6 @@ svg.fig { width: 100%; height: auto; display: block; }
 
 <div class="bleed hero-band"><div class="wrap"><div class="hero">
   <div class="t">
-    <p class="eyebrow">a button primitive &#183; one class &#183; 0.2.0</p>
     <h1>divot.css</h1>
     <p class="sub">A simple skeuomorphic button style system. One class, cut into the page.</p>
     <div class="row"><a class="divot raise" href="#install" role="button">Get started</a><a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a></div>
@@ -135,8 +168,19 @@ svg.fig { width: 100%; height: auto; display: block; }
 </div></div></div>
 
 <div class="wrap">
+  <section id="why">
+    <div class="sec-head"><p class="eyebrow">why</p><h2>I got tired of making the same button.</h2></div>
+    <div class="why">
+      <p>I've been building software for years, and every project ends at the same control: a rectangle, some padding, a border, a fill. Then the same rectangle again in another colour for the next state. It works, and it stopped being interesting a long time ago. This stylesheet started as a way out of that rut.</p>
+      <p>Real buttons are satisfying to press. There's travel, a face that goes down and comes back, a click you can feel. I wanted a page to have some of that: not a picture of a button, but something with a position. So a divot is cut into the page rather than laid on top of it. The face sits flush with the surface, and a soft groove around it is the only thing that says "press me".</p>
+      <p>What makes it different from other bevelled buttons is that flush is the resting state, and a button can move one step either way. There's a raised version that stands one band above the surface, and a sunk version, which is where every press lands. Three positions, one material, no accent colour. It gives a page a tangible feel that makes me want to click things, and that's the whole reason for it.</p>
+    </div>
+  </section>
+</div>
+
+<div class="bleed band-surface"><div class="wrap">
   <section id="concept">
-    <div class="sec-head"><p class="eyebrow">01 &#183; the concept</p><h2>A groove, not a box.</h2></div>
+    <div class="sec-head"><p class="eyebrow">the concept</p><h2>A groove, not a box.</h2></div>
     <div class="two">
       <p>A divot is a button cut into the page instead of laid on top of it. The face is the same colour as whatever is behind it. A 2px groove around the edge is the only thing that says "button": one wall down, one wall back up, light from the top-left. Both wall colours are mixed from the background with <code>color-mix()</code>, so one class works on every surface and in both themes.</p>
       <div><svg class="fig" viewBox="0 0 420 170" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side"><defs><pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/></pattern></defs><g stroke="var(--ink-dim)" stroke-width="1" stroke-dasharray="3 3"><line x1="22" y1="14" x2="64" y2="70"/><line x1="52" y1="8" x2="94" y2="64"/><line x1="82" y1="2" x2="124" y2="58"/></g>
@@ -149,90 +193,113 @@ svg.fig { width: 100%; height: auto; display: block; }
 <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)"><text x="0" y="122">ground</text><text x="56" y="122">lo</text><text x="80" y="122">hi</text><text x="210" y="122" text-anchor="middle">face &#183; flush</text><text x="328" y="122">hi</text><text x="356" y="122">lo</text></g>
 <g stroke="var(--ink-dim)" stroke-width="1"><line x1="60" y1="146" x2="80" y2="146"/><line x1="60" y1="142" x2="60" y2="150"/><line x1="80" y1="142" x2="80" y2="150"/></g><text x="70" y="162" text-anchor="middle" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">2px</text></svg></div>
     </div>
+    <div class="sec-head"><p class="dim">The same class on four surfaces. Nothing is overridden; the walls re-mix from whatever is behind them.</p></div>
+    <div class="grounds">
+      <div class="ground-bg"><span class="lab">--bg</span><button class="divot">Read</button></div>
+      <div class="ground-surface"><span class="lab">--surface</span><button class="divot">Read</button></div>
+      <div class="ground-well"><span class="lab">--well</span><button class="divot">Read</button></div>
+      <div class="ground-paper"><span class="lab">--paper</span><button class="divot">Read</button></div>
+    </div>
+  </section>
+</div></div>
+
+<div class="wrap">
+  <section id="levels">
+    <div class="sec-head"><p class="eyebrow">levels</p><h2>Three positions, one step apart.</h2>
+    <p class="dim">Flush is the resting state. Every press travels exactly one step down: a raised button lands flush, a flush button lands sunk.</p></div>
+    <div class="levels">
+      <div><span class="n">+1</span><button class="divot raise">Save</button><p><b>Raised.</b> Stands one band above the surface. The one button on a screen that should be pressed first: save, send, confirm. There is no accent colour; this is how a button gets emphasis.</p><code>.divot.raise</code></div>
+      <div><span class="n">0</span><button class="divot">Read</button><p><b>Flush.</b> The default. The face is the page. Use it for everything that isn't the primary action, which is most buttons.</p><code>.divot</code></div>
+      <div><span class="n">&#8722;1</span><button class="divot" aria-pressed="true">Read</button><p><b>Sunk.</b> Where a press lands, and where a toggle stays while it's on. Filters, switches, a tab that is selected.</p><code>.divot[aria-pressed="true"]</code></div>
+    </div>
   </section>
 </div>
 
 <div class="bleed band-surface"><div class="wrap">
   <section id="reference">
-    <div class="sec-head"><p class="eyebrow">02 &#183; reference</p><h2>One class. Every role.</h2></div>
+    <div class="sec-head"><p class="eyebrow">reference</p><h2>Every role.</h2><p class="dim">One class plus a role. None of them change the box; depth is contrast, not size.</p></div>
     <div class="sheet">
-      <div><span class="lab">.divot</span><button class="divot ">Read</button></div>
-      <div><span class="lab">held</span><button class="divot" aria-pressed="true">held</button></div>
-      <div><span class="lab">.raise</span><button class="divot raise">Add to collection</button></div>
-      <div><span class="lab">.quiet</span><button class="divot quiet">file away</button></div>
-      <div><span class="lab">.ghost</span><button class="divot ghost">Read</button></div>
-      <div><span class="lab">.firm</span><button class="divot firm">Read</button></div>
-      <div><span class="lab">.bare</span><button class="divot bare">row item</button></div>
-      <div><span class="lab">.icon</span><button class="divot icon" aria-pressed="true">&#9790;</button></div>
-      <div><span class="lab">.eased</span><button class="divot eased">Read</button></div>
-      <div><span class="lab">.pill</span><button class="divot pill">filter</button></div>
-      <div><span class="lab">.pill held</span><button class="divot pill" aria-pressed="true">filter</button></div>
-      <div><span class="lab">.danger (hover)</span><button class="divot danger">Delete</button></div>
-      <div><span class="lab">:disabled</span><button class="divot " disabled">Read</button></div>
+      <div><span class="lab">.divot</span><button class="divot ">Read</button><span class="cap">The default. Flush with the page.</span></div>
+      <div><span class="lab">held</span><button class="divot" aria-pressed="true">held</button><span class="cap">A toggle that is on. Also <code>.on</code>.</span></div>
+      <div><span class="lab">.raise</span><button class="divot raise">Save</button><span class="cap">One band up. The primary action.</span></div>
+      <div><span class="lab">.quiet</span><button class="divot quiet">file away</button><span class="cap">No walls until hovered. Toolbars.</span></div>
+      <div><span class="lab">.ghost</span><button class="divot ghost">Read</button><span class="cap">Lighter cut. Inside a framed group.</span></div>
+      <div><span class="lab">.firm</span><button class="divot firm">Read</button><span class="cap">Heavier cut. Over busy grounds.</span></div>
+      <div><span class="lab">.bare</span><button class="divot bare">row item</button><span class="cap">No walls at all. List and rail rows.</span></div>
+      <div><span class="lab">.icon</span><button class="divot icon" aria-pressed="true">&#9790;</button><span class="cap">Squares the box around a glyph.</span></div>
+      <div><span class="lab">.eased</span><button class="divot eased">Read</button><span class="cap">3px corners.</span></div>
+      <div><span class="lab">.pill</span><button class="divot pill">filter</button><span class="cap">Full-round. Chips and filters.</span></div>
+      <div><span class="lab">.danger</span><button class="divot danger">Delete</button><span class="cap">Inverts on hover. Severity, not emphasis.</span></div>
+      <div><span class="lab">:disabled</span><button class="divot" disabled>Read</button><span class="cap">Groove flat, ink faded, box unchanged.</span></div>
     </div>
   </section>
 </div></div>
 
 <div class="wrap">
   <section id="customize">
-    <div class="sec-head"><p class="eyebrow">03 &#183; customize</p><h2>Move the lamp.</h2></div>
+    <div class="sec-head"><p class="eyebrow">customize</p><h2>Move the lamp.</h2></div>
     <div class="cust">
       <div class="lframe" id="lframe">
         <i class="ring" aria-hidden="true"></i>
-        <span aria-hidden="true"><span class="brg n">0&#176;</span><span class="brg e">90&#176;</span><span class="brg s">180&#176;</span><span class="brg w">270&#176;</span></span>
         <i class="ray" aria-hidden="true"></i>
         <button class="divot mag" tabindex="-1" aria-hidden="true">Read</button>
-        <span class="zoom" aria-hidden="true">walls at 12&#215; &#183; press it</span>
+        <span class="zoom" aria-hidden="true">8&#215; &#183; press it</span>
         <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
       </div>
       <div class="cust-side">
-        <p>The groove assumes a lamp at the top-left. Drag the lamp around the ring and every wall on this page re-mixes from one value: a wall facing the lamp drops into shadow, and a wall turned away catches the light. The button in the middle is a real <code>.divot</code> with its walls drawn twelve times wider. Press it.</p>
-        <div class="lread"><b id="lDeg">315&#176;</b><span class="dim" id="lDir">top-left</span></div>
-        <dl class="sides" aria-label="Shade on each outer wall">
-          <div><dt class="lab">top</dt><dd id="lSt">100%</dd></div>
-          <div><dt class="lab">right</dt><dd id="lSr">0%</dd></div>
-          <div><dt class="lab">bottom</dt><dd id="lSb">0%</dd></div>
-          <div><dt class="lab">left</dt><dd id="lSl">100%</dd></div>
-        </dl>
-        <pre class="snippet" id="lCss">:root { --divot-light: 315deg; }</pre>
-        <div class="row"><button class="divot" id="lReset" disabled>Reset</button><button class="divot quiet" id="lCopy">Copy CSS</button></div>
-        <div class="row"><span class="lab">at 1&#215;</span><button class="divot">Read</button><button class="divot" aria-pressed="true">held</button><button class="divot raise">Add to collection</button></div>
-        <p class="lab">drag anywhere in the ring &#183; shift snaps to 15&#176; &#183; arrow keys when the lamp is focused</p>
+        <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code> at eight times scale, so you can press it.</p>
+        <div class="lcode"><pre id="lCss">:root { --divot-light: 315deg; }</pre><button class="divot" id="lCopy">Copy</button><button class="divot" id="lReset" disabled>Reset</button></div>
+        <div class="row"><span class="lab">at 1&#215;</span><button class="divot">Read</button><button class="divot" aria-pressed="true">held</button><button class="divot raise">Save</button></div>
       </div>
+    </div>
+  </section>
+
+  <section id="cheatsheet">
+    <div class="sec-head"><p class="eyebrow">cheatsheet</p><h2>Everything you can set.</h2></div>
+    <div class="cheat">
+      <div><span class="lab">classes</span><dl>
+        <dt>.divot</dt><dd>the button</dd>
+        <dt>.raise</dt><dd>one band up, the primary</dd>
+        <dt>.quiet .ghost .firm</dt><dd>strength 0 / 25 / 70</dd>
+        <dt>.bare</dt><dd>no walls</dd>
+        <dt>.icon</dt><dd>square box for a glyph</dd>
+        <dt>.eased .pill</dt><dd>3px / full-round corners</dd>
+        <dt>.danger</dt><dd>inverts on hover</dd>
+      </dl></div>
+      <div><span class="lab">states</span><dl>
+        <dt>:hover</dt><dd>groove deepens</dd>
+        <dt>:active</dt><dd>face sinks, label nudges</dd>
+        <dt>[aria-pressed="true"]</dt><dd>stays sunk</dd>
+        <dt>.on .active .sel</dt><dd>same, as classes</dd>
+        <dt>:disabled</dt><dd>flat groove, faint ink</dd>
+        <dt>:focus-visible</dt><dd>1px outline, keep it</dd>
+      </dl></div>
+      <div><span class="lab">tokens &#183; set on a container</span><dl>
+        <dt>--divot-ground</dt><dd>the surface it's cut into</dd>
+        <dt>.ground-bg &#8230; -paper</dt><dd>helpers that set it for you</dd>
+        <dt>--divot-n</dt><dd>strength, 0&#8211;100</dd>
+        <dt>--divot-r</dt><dd>corner radius, 0 by default</dd>
+        <dt>--divot-pad-y / -x</dt><dd>the box; not <code>padding</code></dd>
+        <dt>--raise-n</dt><dd>how far .raise lifts</dd>
+        <dt>--divot-light</dt><dd>lamp bearing (proposed)</dd>
+      </dl></div>
     </div>
   </section>
 
   <section id="install">
-    <div class="sec-head"><p class="eyebrow">04 &#183; install</p><h2>Link it, or install it.</h2></div>
+    <div class="sec-head"><p class="eyebrow">install</p><h2>Link it.</h2></div>
     <div class="install">
-      <div><span class="eyebrow">link it</span><pre>&lt;link rel="stylesheet" href="divot.css"&gt;
+      <div><span class="eyebrow">one file</span><pre>&lt;link rel="stylesheet" href="divot.css"&gt;
 &lt;button class="divot"&gt;Read&lt;/button&gt;</pre></div>
-      <div><span class="eyebrow">or install it</span><pre>npm install divot.css
-@import "divot.css";</pre></div>
-      <div><span class="eyebrow">put it on a surface</span><pre>&lt;div class="ground-surface"&gt;
+      <div><span class="eyebrow">on a surface that isn't the page</span><pre>&lt;div class="ground-surface"&gt;
   &lt;button class="divot"&gt;Read&lt;/button&gt;
 &lt;/div&gt;</pre></div>
     </div>
+    <p class="support">Needs <code>color-mix()</code>: Safari 16.2, Chrome 111, Firefox 113 and later. Follows the system theme; force one with <code>data-theme="light"</code> or <code>"dark"</code> on any element.</p>
   </section>
 
-  <footer class="foot"><span>divot.css &#183; Apache-2.0</span><nav><a href="https://github.com/nlaz/divot.css">GitHub</a><a href="https://www.npmjs.com/package/divot.css">npm</a><a href="https://instagram.com/">Instagram</a></nav></footer>
+  <footer class="foot"><span>divot.css &#183; Apache-2.0</span><nav><a href="https://github.com/nlaz/divot.css">GitHub</a><a href="https://www.instagram.com/nikolazaris">Instagram</a></nav></footer>
 </div>
 
-<script>
-(function(){
-  var root = document.documentElement;
-  function set(t){ if (t === 'system') root.removeAttribute('data-theme'); else root.dataset.theme = t;
-    document.querySelectorAll('[data-set-theme]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.setTheme === t ? 'true' : 'false'); });
-    try { localStorage.setItem('divot-theme', t); } catch(e){} }
-  document.querySelectorAll('[data-set-theme]').forEach(function(b){ b.addEventListener('click', function(){ set(b.dataset.setTheme); }); });
-  var saved = null; try { saved = localStorage.getItem('divot-theme'); } catch(e){}
-  set(saved || root.dataset.theme || 'system');
-  var lf = document.getElementById('lframe'); if (lf && window.divotLight) window.divotLight(lf);
-  document.querySelectorAll('canvas.ascii').forEach(function(c){
-    var o = JSON.parse(c.dataset.press || '{}');
-    try { window.asciiPress(c, o); } catch(e) {}
-  });
-})();
-</script>
 </body>
 </html>

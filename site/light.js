@@ -14,8 +14,6 @@ window.divotLight = function (frame) {
   function norm(x) { return ((x % 360) + 360) % 360; }
   /* shortest signed turn, so the value never jumps a whole revolution */
   function wrap(x) { return ((x % 360) + 540) % 360 - 180; }
-  /* the same share the CSS computes, for the readout */
-  function share(t) { return Math.max(0, Math.min(1, 0.5 + 0.7072 * t)); }
 
   function render() {
     root.style.setProperty('--divot-light', v + 'deg');
@@ -23,13 +21,8 @@ window.divotLight = function (frame) {
     var dir = DIRS[Math.round(norm(v) / 45) % 8];
     lamp.setAttribute('aria-valuenow', n);
     lamp.setAttribute('aria-valuetext', n + ' degrees, light from the ' + dir);
-    $('#lDeg').textContent = n + '°';
-    $('#lDir').textContent = dir;
     $('#lCss').textContent = ':root { --divot-light: ' + n + 'deg; }';
     $('#lReset').disabled = n === DEFAULT;
-    var r = v * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
-    var sh = { t: share(c), r: share(s), b: share(-c), l: share(-s) };
-    Object.keys(sh).forEach(function (k) { $('#lS' + k).textContent = Math.round(sh[k] * 100) + '%'; });
   }
   function set(x) { v = x; render(); }
 
@@ -76,7 +69,7 @@ window.divotLight = function (frame) {
 
   $('#lCopy').addEventListener('click', function () {
     var btn = this, pre = $('#lCss');
-    function done(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy CSS'; }, 1400); }
+    function done(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy'; }, 1400); }
     function select() {
       var range = document.createRange(); range.selectNodeContents(pre);
       var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
