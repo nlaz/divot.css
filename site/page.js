@@ -14,6 +14,13 @@
   var saved = null; try { saved = localStorage.getItem('divot-theme'); } catch (e) {}
   set(saved || root.dataset.theme || 'system');
   var lf = document.getElementById('lframe'); if (lf && window.divotLight) window.divotLight(lf);
+  /* one button on the dial panel flips the magnified button between 8x and 1x */
+  var sc = document.getElementById('lScale');
+  if (sc && lf) sc.addEventListener('click', function () {
+    var one = lf.classList.toggle('x1');
+    sc.textContent = one ? '1\u00d7' : '8\u00d7';
+    sc.setAttribute('aria-label', one ? 'Scale 1\u00d7, switch to 8\u00d7' : 'Scale 8\u00d7, switch to 1\u00d7');
+  });
   document.querySelectorAll('canvas.ascii').forEach(function (c) {
     var o = JSON.parse(c.dataset.press || '{}');
     if (window.asciiPress) { try { window.asciiPress(c, o); } catch (e) {} }
