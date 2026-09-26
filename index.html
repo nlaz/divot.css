@@ -61,7 +61,9 @@ a.divot { text-decoration: none; display: inline-block; }
 .mast nav { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .mast nav a { text-decoration: none; font: var(--fs-ui)/1 var(--font-ui); color: var(--ink-dim); padding: 6px 8px; }
 .mast nav a:hover { color: var(--ink); }
-.mast .theme { margin-left: 8px; }
+.mast .theme { margin-left: 8px; gap: 4px; }
+.mast .theme .divot { --divot-pad-y: 6px; --divot-pad-x: 7px; }
+.mast .theme svg { display: block; }
 
 /* full-bleed band: escapes the body gutter, then re-applies it inside */
 .bleed { margin-inline: calc(50% - 50vw); padding-inline: max(16px, calc(50vw - 540px)); }
@@ -71,7 +73,7 @@ a.divot { text-decoration: none; display: inline-block; }
 .hero { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center; padding-block: clamp(32px, 5vw, 64px); }
 .hero .t { display: grid; gap: 20px; align-content: center; }
 .hero h1 { font-size: clamp(48px, 8.5vw, 120px); line-height: 0.92; letter-spacing: -0.035em; margin-left: -0.045em; /* optical: pull the d's side bearing back onto the text edge */ }
-.hero .ver { margin-bottom: -6px; text-transform: none; } /* sits closer to the title than the 20px stack gap */
+.hero .ver { margin-bottom: -6px; text-transform: none; font-size: var(--fs-ui); } /* sits closer to the title than the 20px stack gap */
 .hero .row .divot { --divot-pad-y: 8px; --divot-pad-x: 18px; } /* CTAs: roomier box, via the tokens so the press nudge still works */
 .hero .sub { font-size: clamp(15px, 1.6vw, 19px); line-height: 1.45; color: var(--ink-dim); max-width: 44ch; text-wrap: balance; }
 .hero .art { border: 1px solid var(--line-strong); background: var(--surface); position: relative; }
@@ -97,8 +99,15 @@ svg.fig { width: 100%; height: auto; display: block; }
    the button in the middle is a real .divot with 8px walls, so it shows
    the same cut the page uses, eight times over. Everything inside the
    frame is sized in cqw so it scales with the dial. */
-.cust { display: grid; grid-template-columns: minmax(0, 290px) minmax(0, 440px); gap: clamp(24px, 4vw, 56px); align-items: center; }
-@media (max-width: 760px) { .cust { grid-template-columns: 1fr; } }
+/* specimen card: one frame, two equal halves. The dial sits in a sunk well;
+   copy, the 1x row and the code are pinned top, middle and bottom. */
+.cust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--line); }
+.cust .stage { background: var(--well); --divot-ground: var(--well); display: grid; place-items: center; padding: clamp(24px, 4vw, 48px); border-right: 1px solid var(--line); }
+.cust .stage .lframe { max-width: 340px; }
+.cust .info { padding: clamp(20px, 3vw, 36px); display: grid; grid-template-rows: auto 1fr auto; gap: 24px; }
+.cust .info .top { display: grid; gap: 12px; }
+.cust .info .mid { align-self: center; }
+@media (max-width: 760px) { .cust { grid-template-columns: 1fr; } .cust .stage { border-right: 0; border-bottom: 1px solid var(--line); } }
 .lframe { position: relative; width: 100%; max-width: 290px; aspect-ratio: 1; container-type: inline-size; justify-self: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
 .lframe.grab { cursor: grabbing; }
 .lframe .ring { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed var(--line-strong); }
@@ -111,13 +120,12 @@ svg.fig { width: 100%; height: auto; display: block; }
 .lframe .lamp::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
 .lframe .lamp:hover, .lframe.grab .lamp { box-shadow: 0 0 0 5px var(--line); }
 .lframe .lamp:focus-visible { outline: 1px solid var(--ink); outline-offset: 5px; }
-.cust-side { display: grid; gap: 20px; align-content: center; }
 .lcode { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
 .lcode pre { flex: 1 1 auto; background: var(--surface); border: 1px solid var(--line); padding: 6px 12px; line-height: 1.5; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 /* why: a short first-person note, set as running text */
 .why { max-width: 62ch; display: grid; gap: 14px; }
-.why p { max-width: none; font-size: var(--fs-title); line-height: 1.6; }
+.why p { max-width: none; font-size: var(--fs-title); line-height: 1.6; color: var(--ink-dim); }
 
 /* grounds strip: the same class on four surfaces, no overrides */
 .grounds { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); }
@@ -145,8 +153,8 @@ svg.fig { width: 100%; height: auto; display: block; }
 @media (max-width: 760px) { .install { grid-template-columns: 1fr; } }
 .support { font-size: var(--fs-ui); color: var(--ink-dim); }
 /* install: download row and quiet, tonal syntax colouring for the snippets */
-.dl { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
-.dl .divot { --divot-pad-y: 8px; --divot-pad-x: 18px; }
+.inst-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; }
+.inst-head .divot { --divot-pad-y: 8px; --divot-pad-x: 18px; }
 :root { --syn-str: #7a5a24; --syn-attr: #5b6a52; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --syn-str: #c8a570; --syn-attr: #9aab8e; } }
 [data-theme="dark"] { --syn-str: #c8a570; --syn-attr: #9aab8e; }
@@ -163,8 +171,8 @@ pre.hl .s { color: var(--syn-str); }
     <nav>
       <a href="#install">Install</a><a href="https://github.com/nlaz/divot.css">GitHub</a>
       <span class="row theme">
-        <button class="divot quiet" data-set-theme="light">Light</button>
-        <button class="divot quiet" data-set-theme="dark">Dark</button>
+        <button class="divot quiet icon" data-set-theme="light" aria-label="Light theme" title="Light"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg></button>
+        <button class="divot quiet icon" data-set-theme="dark" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M13.5 9.6A5.5 5.5 0 0 1 6.4 2.5a5.5 5.5 0 1 0 7.1 7.1z"/></svg></button>
       </span>
     </nav>
   </header>
@@ -177,7 +185,7 @@ pre.hl .s { color: var(--syn-str); }
     <p class="sub">A simple skeuomorphic button style, for buttons that feel as good to press as the real thing.</p>
     <div class="row"><a class="divot raise" href="#install" role="button">Download</a><a class="divot" href="https://github.com/nlaz/divot.css" role="button">GitHub</a></div>
   </div>
-  <div class="art"><canvas class="ascii" data-press='{"cols":96,"rows":56,"cell":7,"dist":6.6,"vignette":0.35}'></canvas></div>
+  <div class="art"><canvas class="ascii" data-press='{"cols":96,"rows":56,"cell":7,"dist":6.6,"vignette":0.16}'></canvas></div>
 </div></div></div>
 
 <div class="wrap">
@@ -232,19 +240,23 @@ pre.hl .s { color: var(--syn-str); }
 
 <div class="wrap">
   <section id="customize">
-    <div class="sec-head"><p class="eyebrow">customize</p><h2>Move the lamp.</h2></div>
     <div class="cust">
-      <div class="lframe" id="lframe">
-        <i class="ring" aria-hidden="true"></i>
-        <i class="ray" aria-hidden="true"></i>
-        <button class="divot mag" tabindex="-1" aria-hidden="true">Edit</button>
-        <span class="zoom" aria-hidden="true">8&#215; &#183; press it</span>
-        <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
+      <div class="stage">
+        <div class="lframe" id="lframe">
+          <i class="ring" aria-hidden="true"></i>
+          <i class="ray" aria-hidden="true"></i>
+          <button class="divot mag" tabindex="-1" aria-hidden="true">Edit</button>
+          <span class="zoom" aria-hidden="true">8&#215; &#183; press it</span>
+          <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
+        </div>
       </div>
-      <div class="cust-side">
-        <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code> at eight times scale, so you can press it.</p>
+      <div class="info">
+        <div class="top">
+          <div class="sec-head"><p class="eyebrow">customize</p><h2>Move the lamp.</h2></div>
+          <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code> at eight times scale, so you can press it.</p>
+        </div>
+        <div class="row mid"><span class="lab">at 1&#215;</span><button class="divot">Edit</button><button class="divot" aria-pressed="true">Held</button><button class="divot raise">Save</button></div>
         <div class="lcode"><pre id="lCss">:root { --divot-light: 315deg; }</pre><button class="divot" id="lCopy">Copy</button><button class="divot" id="lReset" disabled>Reset</button></div>
-        <div class="row"><span class="lab">at 1&#215;</span><button class="divot">Edit</button><button class="divot" aria-pressed="true">Held</button><button class="divot raise">Save</button></div>
       </div>
     </div>
   </section>
@@ -282,8 +294,10 @@ pre.hl .s { color: var(--syn-str); }
   </section>
 
   <section id="install">
-    <div class="sec-head"><p class="eyebrow">install</p><h2>Link it.</h2></div>
-    <div class="dl"><a class="divot raise" href="https://github.com/nlaz/divot.css/archive/refs/heads/main.zip" target="_blank" rel="noopener">Download .zip</a><span class="support">v0.2.0 &#183; Apache-2.0 &#183; or grab <code>css/divot.css</code> from <a href="https://github.com/nlaz/divot.css" target="_blank" rel="noopener">GitHub</a></span></div>
+    <div class="inst-head">
+      <div class="sec-head"><p class="eyebrow">install</p><h2>Link it.</h2></div>
+      <a class="divot raise" href="https://github.com/nlaz/divot.css/archive/refs/heads/main.zip" target="_blank" rel="noopener">Download</a>
+    </div>
     <div class="install">
       <div><span class="eyebrow">one file</span><pre class="hl"><span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span><span class="p">=</span><span class="s">"stylesheet"</span> <span class="a">href</span><span class="p">=</span><span class="s">"divot.css"</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="t">button</span> <span class="a">class</span><span class="p">=</span><span class="s">"divot"</span><span class="p">&gt;</span>Edit<span class="p">&lt;/</span><span class="t">button</span><span class="p">&gt;</span></pre></div>
@@ -291,7 +305,6 @@ pre.hl .s { color: var(--syn-str); }
   <span class="p">&lt;</span><span class="t">button</span> <span class="a">class</span><span class="p">=</span><span class="s">"divot"</span><span class="p">&gt;</span>Edit<span class="p">&lt;/</span><span class="t">button</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="t">div</span><span class="p">&gt;</span></pre></div>
     </div>
-    <p class="support">Works in all modern browsers.</p>
   </section>
 
   <footer class="foot"><span>divot.css &#183; Apache-2.0</span><nav><a href="https://github.com/nlaz/divot.css">GitHub</a><a href="https://www.instagram.com/nikolazaris">Instagram</a></nav></footer>
