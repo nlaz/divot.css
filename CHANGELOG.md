@@ -17,8 +17,8 @@ The chisel release, and the first one with a site: https://nlaz.github.io/divot.
 - Fixed: `.danger:hover` mixes both wall sources from the ink itself, so the
   cut reads as a cut on an ink ground in both themes and a press still sinks
   darker.
-- Removed: the `.sel` state alias. Use `.on`, `.active` or
-  `[aria-pressed="true"]`.
+- Removed: the `.sel` and `.on` state aliases. Use `[aria-pressed="true"]`,
+  `[aria-expanded="true"]` or `.active`.
 - Removed: the build-out. The package is the button and nothing else.
 - Single-file bundle `divot.css` at the repo root, regenerated with
   `npm run build`.

@@ -18,7 +18,7 @@ Add one modifier to `.divot`. Every variant keeps the same size.
 | Class | |
 |---|---|
 | `.divot` | The default, flush with the page. |
-| `.divot.on` | A toggle held down while on. |
+| `.divot[aria-pressed="true"]` | A toggle held down while on. |
 | `.divot.raise` | The primary action, raised. |
 | `.divot.quiet` | Borderless until hovered. |
 | `.divot.ghost` | A lighter cut, for grouped buttons. |

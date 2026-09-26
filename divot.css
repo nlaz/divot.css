@@ -204,7 +204,6 @@ input:focus-visible {
    nudge toward the shadow. Every selector is compound so a loose
    [aria-pressed] elsewhere on the page is not restyled. */
 .divot:active,
-.divot.on,
 .divot.active,
 .divot[aria-pressed="true"],
 .divot[aria-expanded="true"] {
@@ -238,7 +237,6 @@ input:focus-visible {
 }
 
 /* A latched quiet button needs its walls back to read as "on". */
-.divot.quiet.on,
 .divot.quiet.active,
 .divot.quiet[aria-pressed="true"] {
   --divot-n: 45;
@@ -276,7 +274,6 @@ input:focus-visible {
 }
 
 .divot.raise:active,
-.divot.raise.on,
 .divot.raise.active,
 .divot.raise[aria-pressed="true"] {
   background-color: var(--divot-ground);
@@ -323,7 +320,6 @@ input:focus-visible {
 }
 
 .divot:active,
-.divot.on,
 .divot.active,
 .divot[aria-pressed="true"],
 .divot[aria-expanded="true"] {
@@ -343,7 +339,6 @@ input:focus-visible {
 }
 
 .divot.raise:active,
-.divot.raise.on,
 .divot.raise.active,
 .divot.raise[aria-pressed="true"] {
   border-color:
