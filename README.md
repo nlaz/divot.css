@@ -2,7 +2,7 @@
 
 A simple skeuomorphic button style for a satisfying button experience.
 
-v0.2.0 · MIT · **[nlaz.github.io/divot.css](https://nlaz.github.io/divot.css/)**
+v0.2.0 · MIT · **[nlaz.github.io/divot.css](https://nlaz.github.io/divot.css)**
 
 ![divot.css](https://nlaz.github.io/divot.css/site/og.png)
 
