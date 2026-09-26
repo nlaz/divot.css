@@ -102,17 +102,17 @@ svg.fig { width: 100%; height: auto; display: block; }
 /* specimen card: one frame, two equal halves. The dial sits in a sunk well;
    copy, the 1x row and the code are pinned top, middle and bottom. */
 .cust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--line); }
-.cust .stage { background: var(--well); --divot-ground: var(--well); display: grid; place-items: center; padding: clamp(24px, 4vw, 48px); border-right: 1px solid var(--line); }
+.cust .stage { background: var(--well); --divot-ground: var(--well); display: grid; place-items: center; align-content: center; gap: 20px; padding: clamp(24px, 4vw, 48px); border-right: 1px solid var(--line); }
 .cust .stage .lframe { max-width: 260px; }
-.cust .info { padding: clamp(20px, 3vw, 36px); display: grid; grid-template-rows: auto 1fr auto; gap: 24px; }
+.cust .info { padding: clamp(20px, 3vw, 36px); display: grid; align-content: space-between; gap: 24px; }
 .cust .info .top { display: grid; gap: 12px; }
-.cust .info .mid { align-self: center; }
+.cust .stage .mid { justify-content: center; }
 @media (max-width: 760px) { .cust { grid-template-columns: 1fr; } .cust .stage { border-right: 0; border-bottom: 1px solid var(--line); } }
 .lframe { position: relative; width: 100%; max-width: 290px; aspect-ratio: 1; container-type: inline-size; justify-self: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
 .lframe.grab { cursor: grabbing; }
 .lframe .ring { position: absolute; inset: 4%; border-radius: 50%; border: 1px dashed var(--line-strong); }
 .lframe .ray { position: absolute; left: 50%; top: 50%; width: 0; height: 46cqw; border-left: 1px dashed var(--ink-dim); transform-origin: 0 0; transform: rotate(calc(var(--divot-light) + 180deg)); }
-.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; font: 500 8cqw/1 var(--font-ui); letter-spacing: -0.01em; border-width: 8px; --divot-reach: 8px; --divot-nudge: 2px; --divot-pad-y: 4cqw; --divot-pad-x: 8cqw; }
+.lframe .mag { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1; font: 500 8cqw/1 var(--font-ui); letter-spacing: -0.01em; border-width: 6px; --divot-reach: 6px; --divot-nudge: 1.5px; --divot-pad-y: 4cqw; --divot-pad-x: 8cqw; }
 .lframe .zoom { position: absolute; left: 50%; top: calc(50% + 19cqw); transform: translateX(-50%); font: var(--fs-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
 .lframe .lamp { position: absolute; left: 50%; top: 50%; z-index: 2; width: 22px; height: 22px; margin: -11px; border-radius: 50%; border: 1px solid var(--ink); background: var(--bg); display: grid; place-items: center;
   transform: rotate(var(--divot-light)) translateY(-46cqw) rotate(calc(-1 * var(--divot-light))); }
@@ -248,16 +248,16 @@ pre.hl .s { color: var(--syn-str); }
           <i class="ring" aria-hidden="true"></i>
           <i class="ray" aria-hidden="true"></i>
           <button class="divot mag" tabindex="-1" aria-hidden="true">Edit</button>
-          <span class="zoom" aria-hidden="true">press it</span>
+          <span class="zoom" aria-hidden="true">drag it</span>
           <div class="lamp" role="slider" tabindex="0" aria-label="Light angle" aria-valuemin="0" aria-valuemax="359"></div>
         </div>
+        <div class="row mid"><span class="lab">at 1&#215;</span><button class="divot">Edit</button><button class="divot" aria-pressed="true">Held</button><button class="divot raise">Save</button></div>
       </div>
       <div class="info">
         <div class="top">
           <div class="sec-head"><p class="eyebrow">customize</p><h2>Move the lamp.</h2></div>
           <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code> at eight times scale, so you can press it.</p>
         </div>
-        <div class="row mid"><span class="lab">at 1&#215;</span><button class="divot">Edit</button><button class="divot" aria-pressed="true">Held</button><button class="divot raise">Save</button></div>
         <div class="lcode"><pre id="lCss">:root { --divot-light: 315deg; }</pre><button class="divot" id="lCopy">Copy</button><button class="divot" id="lReset" disabled>Reset</button></div>
       </div>
     </div>

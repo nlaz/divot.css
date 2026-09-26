@@ -62,6 +62,7 @@ window.asciiPress = function(canvas, o){
   scene.add(button);
 
   var px = new Uint8Array(cols*rows*4);
+  var BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(function(v){ return (v + 0.5)/16; });
   var ctx = canvas.getContext('2d');
   var cw = o.cell || 8, ch = Math.round(cw*1.7);
   canvas.width = cols*cw; canvas.height = rows*ch;
@@ -116,9 +117,14 @@ window.asciiPress = function(canvas, o){
     for (var y=0; y<rows; y++) for (var x=0; x<cols; x++) {
       var i = ((rows-1-y)*cols + x)*4;
       var l = (px[i]*0.3 + px[i+1]*0.59 + px[i+2]*0.11)/255;
-      var dx = (x/cols - 0.5)*2, dy = (y/rows - 0.5)*2, r2 = dx*dx + dy*dy;
-      l *= 1 - VIG*Math.min(1, r2*0.5);
-      var k = Math.min(n-1, Math.floor(l*n));
+      // lens vignette: a smooth radial falloff (cos^4-like) that starts near the centre and
+      // wraps all four edges, not just the corners. Where it acts, an ordered dither spreads
+      // the step between ramp characters so the fade reads as a gradient, not a contour line.
+      var dx = (x/cols - 0.5)*2, dy = (y/rows - 0.5)*2, r = Math.sqrt(dx*dx + dy*dy)/1.4142;
+      var f = Math.min(1, Math.max(0, (r - 0.2)/0.8)); f = f*f*(3 - 2*f);
+      l *= 1 - VIG*f;
+      l += (BAYER[(y&3)*4 + (x&3)] - 0.5)/n*f;
+      var k = Math.max(0, Math.min(n-1, Math.floor(l*n)));
       var c = ramp[k]; if (c === ' ') continue;
       ctx.fillStyle = o.tones ? (l>0.66 ? ink : l>0.33 ? dim : faint) : ink;
       ctx.fillText(c, x*cw, y*ch);
