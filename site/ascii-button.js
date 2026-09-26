@@ -42,7 +42,7 @@ window.asciiPress = function(canvas, o){
 
   var mGround = new THREE.MeshLambertMaterial({color: 0x4e4e4e});
   var mWell = new THREE.MeshLambertMaterial({color: 0x0a0a0a});
-  var mFace = new THREE.MeshLambertMaterial({color: 0x565656}); // a hair lighter than the ground: the face separates without reading as a fill
+  var mFace = new THREE.MeshLambertMaterial({color: 0x626262}); // a step lighter than the ground: the face reads as its own surface
   var mMark = new THREE.MeshLambertMaterial({color: 0x888888}); // a step lighter than the face: inks darker, but softly
   var BR = o.radius || 1.2, G = 0.14*BR/1.35;
   var slab = new THREE.Shape(); slab.moveTo(-60, -60); slab.lineTo(60, -60); slab.lineTo(60, 60); slab.lineTo(-60, 60); slab.closePath();
