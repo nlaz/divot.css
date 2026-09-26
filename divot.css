@@ -299,67 +299,66 @@ input:focus-visible {
    fixed cut pixel for pixel. Without CSS trig the fixed cut above stands;
    forced-colors keeps its system colours. */
 @supports (width: calc(1px * cos(0deg))) {
-@media not (forced-colors: active) {
+  @media not (forced-colors: active) {
+    .divot {
+      --_lit-top: clamp(0%, calc((0.5 + 0.7072 * cos(var(--divot-light))) * 100%), 100%);
+      --_lit-right: clamp(0%, calc((0.5 + 0.7072 * sin(var(--divot-light))) * 100%), 100%);
+      --_lit-bottom: clamp(0%, calc((0.5 - 0.7072 * cos(var(--divot-light))) * 100%), 100%);
+      --_lit-left: clamp(0%, calc((0.5 - 0.7072 * sin(var(--divot-light))) * 100%), 100%);
 
-.divot {
-  --_lit-top: clamp(0%, calc((0.5 + 0.7072 * cos(var(--divot-light))) * 100%), 100%);
-  --_lit-right: clamp(0%, calc((0.5 + 0.7072 * sin(var(--divot-light))) * 100%), 100%);
-  --_lit-bottom: clamp(0%, calc((0.5 - 0.7072 * cos(var(--divot-light))) * 100%), 100%);
-  --_lit-left: clamp(0%, calc((0.5 - 0.7072 * sin(var(--divot-light))) * 100%), 100%);
+      border-color:
+        color-mix(in oklab, var(--_wall-lo) var(--_lit-top), var(--_wall-hi))
+        color-mix(in oklab, var(--_wall-lo) var(--_lit-right), var(--_wall-hi))
+        color-mix(in oklab, var(--_wall-lo) var(--_lit-bottom), var(--_wall-hi))
+        color-mix(in oklab, var(--_wall-lo) var(--_lit-left), var(--_wall-hi));
+      box-shadow:
+        inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-top), var(--_inner-lo)),
+        inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-left), var(--_inner-lo)),
+        inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-right), var(--_inner-lo)),
+        inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-bottom), var(--_inner-lo));
+    }
 
-  border-color:
-    color-mix(in oklab, var(--_wall-lo) var(--_lit-top), var(--_wall-hi))
-    color-mix(in oklab, var(--_wall-lo) var(--_lit-right), var(--_wall-hi))
-    color-mix(in oklab, var(--_wall-lo) var(--_lit-bottom), var(--_wall-hi))
-    color-mix(in oklab, var(--_wall-lo) var(--_lit-left), var(--_wall-hi));
-  box-shadow:
-    inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-top), var(--_inner-lo)),
-    inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-left), var(--_inner-lo)),
-    inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-right), var(--_inner-lo)),
-    inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-bottom), var(--_inner-lo));
+    .divot:active,
+    .divot.active,
+    .divot[aria-pressed="true"],
+    .divot[aria-expanded="true"] {
+      box-shadow:
+        inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-top), var(--_floor)),
+        inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-left), var(--_floor)),
+        inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-right), var(--_floor)),
+        inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-bottom), var(--_floor));
+    }
+
+    .divot.raise {
+      border-color:
+        color-mix(in oklab, var(--_wall-hi) var(--_lit-top), var(--_wall-lo))
+        color-mix(in oklab, var(--_wall-hi) var(--_lit-right), var(--_wall-lo))
+        color-mix(in oklab, var(--_wall-hi) var(--_lit-bottom), var(--_wall-lo))
+        color-mix(in oklab, var(--_wall-hi) var(--_lit-left), var(--_wall-lo));
+    }
+
+    .divot.raise:active,
+    .divot.raise.active,
+    .divot.raise[aria-pressed="true"] {
+      border-color:
+        color-mix(in oklab, var(--_wall-lo) var(--_lit-top), var(--_wall-hi))
+        color-mix(in oklab, var(--_wall-lo) var(--_lit-right), var(--_wall-hi))
+        color-mix(in oklab, var(--_wall-lo) var(--_lit-bottom), var(--_wall-hi))
+        color-mix(in oklab, var(--_wall-lo) var(--_lit-left), var(--_wall-hi));
+      box-shadow:
+        inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-top), var(--_inner-lo)),
+        inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-left), var(--_inner-lo)),
+        inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-right), var(--_inner-lo)),
+        inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-bottom), var(--_inner-lo));
+    }
+
+    /* .bare has to opt out again: the pressed rule above outranks it by order. */
+    .divot.bare,
+    .divot.bare:active {
+      box-shadow: none;
+    }
+  }
 }
-
-.divot:active,
-.divot.active,
-.divot[aria-pressed="true"],
-.divot[aria-expanded="true"] {
-  box-shadow:
-    inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-top), var(--_floor)),
-    inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-left), var(--_floor)),
-    inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-right), var(--_floor)),
-    inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_floor-shadow) var(--_lit-bottom), var(--_floor));
-}
-
-.divot.raise {
-  border-color:
-    color-mix(in oklab, var(--_wall-hi) var(--_lit-top), var(--_wall-lo))
-    color-mix(in oklab, var(--_wall-hi) var(--_lit-right), var(--_wall-lo))
-    color-mix(in oklab, var(--_wall-hi) var(--_lit-bottom), var(--_wall-lo))
-    color-mix(in oklab, var(--_wall-hi) var(--_lit-left), var(--_wall-lo));
-}
-
-.divot.raise:active,
-.divot.raise.active,
-.divot.raise[aria-pressed="true"] {
-  border-color:
-    color-mix(in oklab, var(--_wall-lo) var(--_lit-top), var(--_wall-hi))
-    color-mix(in oklab, var(--_wall-lo) var(--_lit-right), var(--_wall-hi))
-    color-mix(in oklab, var(--_wall-lo) var(--_lit-bottom), var(--_wall-hi))
-    color-mix(in oklab, var(--_wall-lo) var(--_lit-left), var(--_wall-hi));
-  box-shadow:
-    inset 0 var(--divot-reach) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-top), var(--_inner-lo)),
-    inset var(--divot-reach) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-left), var(--_inner-lo)),
-    inset calc(-1 * var(--divot-reach)) 0 var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-right), var(--_inner-lo)),
-    inset 0 calc(-1 * var(--divot-reach)) var(--divot-soft) var(--_spread) color-mix(in oklab, var(--_inner-hi) var(--_lit-bottom), var(--_inner-lo));
-}
-
-/* .bare has to opt out again: the pressed rule above outranks it by order. */
-.divot.bare,
-.divot.bare:active {
-  box-shadow: none;
-}
-
-}}
 
 /* Disabled. Last so it wins without a specificity fight. Walls go flat, ink
    fades, the box keeps its size and label. */

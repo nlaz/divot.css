@@ -1,16 +1,6 @@
-/* ==========================================================================
-   divot.css — the button, and nothing else
-   --------------------------------------------------------------------------
-   The default entry point. Tokens plus the core primitive: a button whose
-   face is the plane it sits in, made legible by a groove cut around it.
-
-       <link rel="stylesheet" href="css/divot.css">
-       <button class="divot">Read</button>
-
-   Bringing your own palette? Skip this file, link core.css alone, and
-   define the tokens it reads: --divot-ground (or --bg), --edge-hi,
-   --edge-lo, --ink, --ink-dim and --ink-faint.
-   ========================================================================== */
+/* divot.css — the default entry point: tokens plus the core primitive.
+   Bringing your own palette? Link core.css alone and define --bg, --edge-hi,
+   --edge-lo, --ink, --ink-dim and --ink-faint. */
 
 @import url("./tokens.css");
 @import url("./core.css");
