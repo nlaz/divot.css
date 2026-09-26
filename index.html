@@ -107,7 +107,7 @@ svg.fig { width: 100%; height: auto; display: block; }
 .cust .info { display: grid; gap: 24px; align-content: start; }
 .cust .info .body { display: grid; gap: 20px; }
 .cust .info .body p { margin-bottom: 36px; max-width: 62ch; font-size: var(--fs-title); line-height: 1.6; color: var(--ink-dim); }
-.cust .stage { background: var(--well); --divot-ground: var(--well); border: 1px solid var(--line); display: grid; place-items: center; align-content: center; gap: 20px; padding: clamp(24px, 3vw, 32px); }
+.cust .stage { border: 1px solid var(--line); display: grid; place-items: center; align-content: center; gap: 20px; padding: clamp(24px, 3vw, 32px); }
 .cust .stage .lframe { max-width: 240px; }
 .cust .stage { position: relative; }
 .cust .tools { position: absolute; top: 10px; right: 10px; gap: 6px; }
@@ -225,31 +225,29 @@ pre.hl .s { color: var(--syn-str); }
   <section id="reference">
     <div class="sec-head"><p class="eyebrow">reference</p><h2>Every role.</h2><p class="dim">One class plus a role. None of them change the box; depth is contrast, not size.</p></div>
     <div class="sheet">
-      <div><span class="lab">.divot</span><button class="divot">Edit</button><span class="cap">The default. Flush with the page.</span></div>
-      <div><span class="lab">.on</span><button class="divot on">Held</button><span class="cap">A toggle that stays sunk while on.</span></div>
-      <div><span class="lab">.raise</span><button class="divot raise">Save</button><span class="cap">A primary action. Raised one level up.</span></div>
-      <div><span class="lab">.quiet</span><button class="divot quiet">File away</button><span class="cap">No borders until hovered.</span></div>
-      <div><span class="lab">.ghost</span><button class="divot ghost">Cancel</button><span class="cap">Lighter cut. Inside a framed group.</span></div>
-      <div><span class="lab">.firm</span><button class="divot firm">Export</button><span class="cap">Heavier cut. Over busy grounds.</span></div>
-      <div><span class="lab">.bare</span><button class="divot bare">Row item</button><span class="cap">No walls at all. List and rail rows.</span></div>
-      <div><span class="lab">.icon</span><button class="divot icon" aria-pressed="true">&#9790;</button><span class="cap">Squares the box around a glyph.</span></div>
-      <div><span class="lab">.eased</span><button class="divot eased">Share</button><span class="cap">3px corners.</span></div>
-      <div><span class="lab">.pill</span><button class="divot pill">Filter</button><span class="cap">Full-round. Chips and filters.</span></div>
-      <div><span class="lab">.danger</span><button class="divot danger">Delete</button><span class="cap">Inverts on hover. Severity, not emphasis.</span></div>
-      <div><span class="lab">:disabled</span><button class="divot" disabled>Undo</button><span class="cap">Groove flat, ink faded, box unchanged.</span></div>
+      <div><span class="lab">.divot</span><button class="divot">Edit</button><span class="cap">The default button, cut flush into the page.</span></div>
+      <div><span class="lab">.on</span><button class="divot on">Held</button><span class="cap">Holds a toggle pressed in while it’s switched on.</span></div>
+      <div><span class="lab">.raise</span><button class="divot raise">Save</button><span class="cap">The primary action, raised one level above the page.</span></div>
+      <div><span class="lab">.quiet</span><button class="divot quiet">File away</button><span class="cap">Stays borderless until you hover over it.</span></div>
+      <div><span class="lab">.ghost</span><button class="divot ghost">Cancel</button><span class="cap">A lighter cut, for buttons inside a bordered group.</span></div>
+      <div><span class="lab">.firm</span><button class="divot firm">Export</button><span class="cap">A deeper cut that stays visible on busy backgrounds.</span></div>
+      <div><span class="lab">.bare</span><button class="divot bare">Row item</button><span class="cap">No border at all, for rows in lists and menus.</span></div>
+      <div><span class="lab">.icon</span><button class="divot icon" aria-label="Dark mode">&#9790;</button><span class="cap">A square button sized to fit a single icon.</span></div>
+      <div><span class="lab">.eased</span><button class="divot eased">Share</button><span class="cap">Slightly rounded, 3px corners.</span></div>
+      <div><span class="lab">.pill</span><button class="divot pill">Filter</button><span class="cap">Fully rounded ends, for chips and filters.</span></div>
+      <div><span class="lab">.danger</span><button class="divot danger">Delete</button><span class="cap">Turns solid on hover to flag a destructive action.</span></div>
+      <div><span class="lab">:disabled</span><button class="divot" disabled>Undo</button><span class="cap">Flattened and faded, but keeps its size and label.</span></div>
     </div>
     <div class="elev">
       <p class="eyebrow">elevation</p>
       <div class="sheet">
-        <div><span class="lab">+1 / .raise</span><button class="divot raise">Save</button><span class="cap">Raised. The primary action.</span></div>
-        <div><span class="lab">0 / .divot</span><button class="divot">Edit</button><span class="cap">Flush. The resting state.</span></div>
-        <div><span class="lab">&#8722;1 / .on</span><button class="divot" aria-pressed="true">Bold</button><span class="cap">Sunk. Where a press lands.</span></div>
+        <div><span class="lab">+1 / .raise</span><button class="divot raise">Save</button><span class="cap">Raised above the page, for the primary action.</span></div>
+        <div><span class="lab">0 / .divot</span><button class="divot">Edit</button><span class="cap">Flush with the page, the default resting state.</span></div>
+        <div><span class="lab">&#8722;1 / .on</span><button class="divot on">Bold</button><span class="cap">Pressed into the page, where every click lands.</span></div>
       </div>
     </div>
   </section>
-</div></div>
 
-<div class="wrap">
   <section id="customize">
     <div class="cust">
       <div class="info">
@@ -271,6 +269,9 @@ pre.hl .s { color: var(--syn-str); }
       </div>
     </div>
   </section>
+</div></div>
+
+<div class="wrap">
 
   <section id="cheatsheet">
     <div class="sec-head"><p class="eyebrow">cheatsheet</p><h2>Everything you can set.</h2></div>
