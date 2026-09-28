@@ -1,6 +1,0 @@
-/* divot.css — the default entry point: tokens plus the core primitive.
-   Bringing your own palette? Link core.css alone and define --bg, --edge-hi,
-   --edge-lo, --ink, --ink-dim and --ink-faint. */
-
-@import url("./tokens.css");
-@import url("./core.css");

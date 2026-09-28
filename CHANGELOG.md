@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- Removed: the MIT licence. The repository no longer carries a licence.
+- Changed: the library source moved from `css/` to `src/`, so it is kept apart
+  from the landing page in `site/`. The bundled `divot.css` stays at the root.
+- Removed: the type and spacing tokens (`--font-ui`, `--font-mono`, `--fs-*`,
+  `--track-label`, `--sp-*`) and `--line` / `--line-strong` are no longer in
+  the tokens. The button never read them; they were for the landing page.
+- Renamed tokens for readability:
+  `--edge-hi` / `--edge-lo` → `--edge-high` / `--edge-low`,
+  `--divot-src-hi` / `--divot-src-lo` → `--divot-highlight` / `--divot-shadow`,
+  `--divot-n` → `--divot-strength`, `--divot-bump` → `--divot-hover-boost`,
+  `--divot-r` → `--divot-radius`, `--divot-pad-y` / `-x` → `--divot-padding-y` / `-x`,
+  `--divot-reach` → `--divot-inner-width`, `--divot-soft` → `--divot-inner-blur`,
+  `--divot-inner` → `--divot-inner-strength`, `--divot-light` → `--divot-light-angle`,
+  `--divot-nudge` → `--divot-press-offset`, `--raise-n` → `--divot-raise-strength`,
+  `--bg` → `--background`.
 - Fixed: the tokens no longer set `color-scheme` on `:root`. Following the OS
   into dark mode used to switch the host page's default text, link and form
   colours to their dark versions, which left pale text on any page that

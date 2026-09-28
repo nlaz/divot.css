@@ -7,14 +7,14 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(resolve(root, p), 'utf8');
 const pkg = JSON.parse(read('package.json'));
 
-const banner = `/*! ${pkg.name} v${pkg.version} | ${pkg.license} | ${pkg.homepage}
+const banner = `/*! ${pkg.name} v${pkg.version} | ${pkg.homepage}
    A simple skeuomorphic button style. Tokens + the core primitive in one file:
      <link rel="stylesheet" href="divot.css">
      <button class="divot">Edit</button>
 */
 `;
 
-const out = banner + '\n' + read('css/tokens.css') + '\n' + read('css/core.css');
+const out = banner + '\n' + read('src/tokens.css') + '\n' + read('src/core.css');
 const target = resolve(root, 'divot.css');
 
 if (process.argv.includes('--check')) {

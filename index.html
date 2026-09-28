@@ -21,8 +21,7 @@
   <meta name="twitter:image" content="https://nlaz.github.io/divot.css/site/og.png">
 
   <!-- the package itself, linked rather than copied, then the page's own layout -->
-  <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/core.css">
+  <link rel="stylesheet" href="divot.css">
   <link rel="stylesheet" href="site/site.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 
@@ -91,7 +90,7 @@
         <svg class="fig" viewBox="0 0 420 160" role="img" aria-label="fig. 1 &#8212; the divot at rest, seen from the side">
           <defs>
             <pattern id="hrest" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-strong)" stroke-width="1"/>
+              <line x1="0" y1="0" x2="0" y2="6" stroke="var(--border-strong)" stroke-width="1"/>
             </pattern>
           </defs>
           <!-- light rays -->
@@ -105,10 +104,10 @@
           <!-- the ground, with the groove cut into it -->
           <path d="M0 80 H60 V96 H80 V80 H340 V96 H360 V80 H420 V112 H0 Z" fill="url(#hrest)"/>
           <path d="M0 80 H60 M80 80 H340 M360 80 H420" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
-          <path d="M60 80 V96 H80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
-          <path d="M80 96 V80" stroke="var(--edge-hi)" stroke-width="2.5"/>
-          <path d="M340 80 V96" stroke="var(--edge-hi)" stroke-width="2.5"/>
-          <path d="M340 96 H360 V80" stroke="var(--edge-lo)" stroke-width="2.5" fill="none"/>
+          <path d="M60 80 V96 H80" stroke="var(--edge-low)" stroke-width="2.5" fill="none"/>
+          <path d="M80 96 V80" stroke="var(--edge-high)" stroke-width="2.5"/>
+          <path d="M340 80 V96" stroke="var(--edge-high)" stroke-width="2.5"/>
+          <path d="M340 96 H360 V80" stroke="var(--edge-low)" stroke-width="2.5" fill="none"/>
           <!-- labels -->
           <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="9" letter-spacing="0.08em" fill="var(--ink-dim)">
             <text x="0" y="130">ground</text>
@@ -232,7 +231,7 @@
           <div class="body">
             <p>Every wall on the page takes its light from one value. Drag the lamp around the ring to move it. The button inside is a real <code>.divot</code>: see the cut up close at 2&#215;, or switch to 1&#215; for actual size.</p>
             <div class="lcode">
-              <pre id="lCss" class="hl"><span class="t">:root</span> <span class="p">{</span> <span class="a">--divot-light</span><span class="p">:</span> <span class="s">315deg</span><span class="p">; }</span></pre>
+              <pre id="lCss" class="hl"><span class="t">:root</span> <span class="p">{</span> <span class="a">--divot-light-angle</span><span class="p">:</span> <span class="s">315deg</span><span class="p">; }</span></pre>
               <button class="divot" id="lCopy">Copy</button>
             </div>
           </div>
@@ -289,11 +288,11 @@
         <span class="lab">tokens &#183; set on a container</span>
         <dl>
           <dt>--divot-ground</dt><dd>the surface it's cut into</dd>
-          <dt>--divot-n</dt><dd>strength, 0&#8211;100</dd>
-          <dt>--divot-r</dt><dd>corner radius, 0 by default</dd>
-          <dt>--divot-pad-y / -x</dt><dd>the box; not <code>padding</code></dd>
-          <dt>--raise-n</dt><dd>how far .raise lifts</dd>
-          <dt>--divot-light</dt><dd>lamp angle, 315deg by default</dd>
+          <dt>--divot-strength</dt><dd>0&#8211;100</dd>
+          <dt>--divot-radius</dt><dd>0 by default</dd>
+          <dt>--divot-padding-y / -x</dt><dd>the box; not <code>padding</code></dd>
+          <dt>--divot-raise-strength</dt><dd>how far .raise lifts</dd>
+          <dt>--divot-light-angle</dt><dd>315deg by default</dd>
         </dl>
       </div>
     </div>
@@ -323,7 +322,7 @@
   </section>
 
   <footer class="foot">
-    <span>divot.css &#183; MIT</span>
+    <span>divot.css</span>
     <nav>
       <a href="https://github.com/nlaz/divot.css">GitHub</a>
       <a href="https://www.instagram.com/nikolazaris">Instagram</a>
