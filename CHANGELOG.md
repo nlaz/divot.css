@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Fixed: the tokens no longer set `color-scheme` on `:root`. Following the OS
+  into dark mode used to switch the host page's default text, link and form
+  colours to their dark versions, which left pale text on any page that
+  paints its own light background. `color-scheme` is now set only by
+  `[data-theme="light"]` and `[data-theme="dark"]`; a page that wants the
+  browser to follow the OS sets `color-scheme: light dark` itself.
+
 ## 0.2.0
 
 The chisel release, and the first one with a site: https://nlaz.github.io/divot.css/
