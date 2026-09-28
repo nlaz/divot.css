@@ -2,7 +2,6 @@
   "name": "divot.css",
   "version": "0.2.0",
   "description": "A simple skeuomorphic button style for a satisfying button experience.",
-  "license": "MIT",
   "author": "Niko Lazaris",
   "homepage": "https://github.com/nlaz/divot.css",
   "repository": {
@@ -10,7 +9,7 @@
     "url": "git+https://github.com/nlaz/divot.css.git"
   },
   "keywords": [
-    "css",
+    "src",
     "button",
     "color-mix",
     "skeuomorphism",
@@ -21,20 +20,19 @@
   "sideEffects": [
     "*.css"
   ],
-  "main": "css/divot.css",
-  "style": "css/divot.css",
+  "main": "src/divot.css",
+  "style": "src/divot.css",
   "exports": {
-    ".": "./css/divot.css",
+    ".": "./src/divot.css",
     "./divot.css": "./divot.css",
-    "./tokens.css": "./css/tokens.css",
-    "./core.css": "./css/core.css",
+    "./tokens.css": "./src/tokens.css",
+    "./core.css": "./src/core.css",
     "./package.json": "./package.json"
   },
   "files": [
-    "css",
+    "src",
     "divot.css",
-    "README.md",
-    "LICENSE"
+    "README.md"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",

@@ -1,0 +1,82 @@
+/* divot.css — tokens. The default palette; swap it for any that defines
+   --background, --edge-high, --edge-low and the --ink ramp. */
+
+/* Never set color-scheme on :root: it restyles the host page's own text and
+   controls. --paper is light-only: it stays white in both themes. */
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root,
+[data-theme="light"] {
+  --background: #e8e4d9;
+  --surface: #f1eee5;
+  --well: #dcd6c7;
+  --paper: #fffdf8;
+
+  --edge-high: #fbf9f2; /* the highlight the button's lit walls mix toward */
+  --edge-low: #a29c89; /* the shadow its unlit walls mix toward */
+
+  --ink: #1e1c16;
+  --ink-dim: #605c4b; /* 4.5:1 on --background, safe for small text */
+  --ink-faint: #97917c;
+}
+
+/* Dark is declared twice (OS and [data-theme]); keep the blocks identical. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #110e0a;
+    --surface: #191613;
+    --well: #0c0906;
+
+    --edge-high: #322c28;
+    --edge-low: #000000;
+
+    --ink: #e7e2de;
+    --ink-dim: #8d8a87;
+    --ink-faint: #5a5856;
+  }
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: #110e0a;
+  --surface: #191613;
+  --well: #0c0906;
+
+  --edge-high: #322c28;
+  --edge-low: #000000;
+
+  --ink: #e7e2de;
+  --ink-dim: #8d8a87;
+  --ink-faint: #5a5856;
+}
+
+/* Each ground sets background and --divot-ground together so they can't drift. */
+.ground-bg {
+  background: var(--background);
+  --divot-ground: var(--background);
+}
+
+.ground-surface {
+  background: var(--surface);
+  --divot-ground: var(--surface);
+}
+
+.ground-well {
+  background: var(--well);
+  --divot-ground: var(--well);
+}
+
+/* White in both themes, so shadow and ink are pinned to the light values. */
+.ground-paper {
+  background: var(--paper);
+  --divot-ground: var(--paper);
+  --divot-highlight: var(--paper);
+  --divot-shadow: #8e8977;
+  --ink: #1e1c16;
+  --ink-dim: #605c4b;
+  --ink-faint: #97917c;
+  color: var(--ink);
+}

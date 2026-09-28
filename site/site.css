@@ -1,5 +1,39 @@
-/* site/site.css: layout for the landing page. Page-only.
-   Colours and type come from css/tokens.css; the buttons from css/core.css. */
+/* site/site.css: the landing page. Page-only, never shipped.
+   It sits on top of the library bundle (../divot.css), which supplies the
+   palette and the buttons. Everything below is for this page alone. */
+
+/* --- page tokens ------------------------------------------------------ */
+/* Type, and the hairlines the page draws. The button reads none of these. */
+:root {
+  --font-ui: "Instrument Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-size-micro: 10px;
+  --font-size-meta: 11px;
+  --font-size-mono: 12px;
+  --font-size-ui: 13px;
+  --font-size-body: 14px;
+  --font-size-title: 15px;
+  --label-tracking: 0.12em;
+}
+
+/* Same three theme selectors as the library palette, so they stay in step. */
+:root,
+[data-theme="light"] {
+  --border: #c9c3b1;
+  --border-strong: #8e8977;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --border: #2a2521;
+    --border-strong: #4c443d;
+  }
+}
+
+[data-theme="dark"] {
+  --border: #2a2521;
+  --border-strong: #4c443d;
+}
 
 /* --- base ------------------------------------------------------------- */
 /* The tokens leave color-scheme alone on :root, so the page opts in itself:
@@ -16,9 +50,9 @@ body {
   margin: 0;
   padding-inline: 16px;
   padding-block: 0 72px;
-  background: var(--bg);
+  background: var(--background);
   color: var(--ink);
-  font: var(--fs-body)/1.55 var(--font-ui);
+  font: var(--font-size-body)/1.55 var(--font-ui);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -43,7 +77,7 @@ p {
 
 a {
   color: inherit;
-  text-decoration-color: var(--line-strong);
+  text-decoration-color: var(--border-strong);
   text-underline-offset: 2px;
 }
 
@@ -58,13 +92,13 @@ code {
 
 pre {
   margin: 0;
-  font: var(--fs-mono)/1.6 var(--font-mono);
+  font: var(--font-size-mono)/1.6 var(--font-mono);
   white-space: pre;
   overflow-x: auto;
 }
 
 .divot {
-  font: var(--fs-ui)/1.3 var(--font-ui);
+  font: var(--font-size-ui)/1.3 var(--font-ui);
 }
 
 a.divot {
@@ -97,15 +131,15 @@ a.divot {
 }
 
 .eyebrow {
-  font: 500 var(--fs-meta)/1 var(--font-mono);
-  letter-spacing: var(--track-label);
+  font: 500 var(--font-size-meta)/1 var(--font-mono);
+  letter-spacing: var(--label-tracking);
   text-transform: uppercase;
   color: var(--ink-dim);
 }
 
 .lab {
-  font: var(--fs-micro)/1.3 var(--font-mono);
-  letter-spacing: var(--track-label);
+  font: var(--font-size-micro)/1.3 var(--font-mono);
+  letter-spacing: var(--label-tracking);
   text-transform: uppercase;
   color: var(--ink-dim);
 }
@@ -136,8 +170,8 @@ section {
 .sheet {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
 }
 
 .sheet > div {
@@ -147,38 +181,38 @@ section {
   align-content: start;
   min-height: 80px;
   padding: 18px 14px;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .sheet .cap {
-  font-size: var(--fs-mono);
+  font-size: var(--font-size-mono);
   line-height: 1.4;
   color: var(--ink-dim);
 }
 
 /* --- syntax colouring for the snippets -------------------------------- */
 :root {
-  --syn-str: #7a5a24;
-  --syn-attr: #5b6a52;
+  --syntax-string: #7a5a24;
+  --syntax-attribute: #5b6a52;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --syn-str: #c8a570;
-    --syn-attr: #9aab8e;
+    --syntax-string: #c8a570;
+    --syntax-attribute: #9aab8e;
   }
 }
 
 [data-theme="dark"] {
-  --syn-str: #c8a570;
-  --syn-attr: #9aab8e;
+  --syntax-string: #c8a570;
+  --syntax-attribute: #9aab8e;
 }
 
 pre.hl .p { color: var(--ink-faint); }
 pre.hl .t { color: var(--ink); font-weight: 500; }
-pre.hl .a { color: var(--syn-attr); }
-pre.hl .s { color: var(--syn-str); }
+pre.hl .a { color: var(--syntax-attribute); }
+pre.hl .s { color: var(--syntax-string); }
 
 /* --- masthead --------------------------------------------------------- */
 .mast {
@@ -191,7 +225,7 @@ pre.hl .s { color: var(--syn-str); }
 }
 
 .mast .word {
-  font: 500 var(--fs-title)/1 var(--font-ui);
+  font: 500 var(--font-size-title)/1 var(--font-ui);
 }
 
 .mast nav {
@@ -203,7 +237,7 @@ pre.hl .s { color: var(--syn-str); }
 
 .mast nav a {
   padding: 6px 8px;
-  font: var(--fs-ui)/1 var(--font-ui);
+  font: var(--font-size-ui)/1 var(--font-ui);
   color: var(--ink-dim);
   text-decoration: none;
 }
@@ -218,8 +252,8 @@ pre.hl .s { color: var(--syn-str); }
 }
 
 .mast .theme .divot {
-  --divot-pad-y: 6px;
-  --divot-pad-x: 7px;
+  --divot-padding-y: 6px;
+  --divot-padding-x: 7px;
 }
 
 .mast .theme svg {
@@ -230,8 +264,8 @@ pre.hl .s { color: var(--syn-str); }
 .hero-band {
   background: var(--surface);
   --divot-ground: var(--surface);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .hero {
@@ -257,7 +291,7 @@ pre.hl .s { color: var(--syn-str); }
 
 .hero .ver {
   margin-bottom: -6px;
-  font-size: var(--fs-ui);
+  font-size: var(--font-size-ui);
   text-transform: none;
 }
 
@@ -270,13 +304,13 @@ pre.hl .s { color: var(--syn-str); }
 }
 
 .hero .row .divot {
-  --divot-pad-y: 8px;
-  --divot-pad-x: 18px;
+  --divot-padding-y: 8px;
+  --divot-padding-x: 18px;
 }
 
 .hero .art {
   position: relative;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--border-strong);
   background: var(--surface);
 }
 
@@ -308,13 +342,13 @@ canvas.ascii:focus-visible {
 }
 
 .why .eyebrow {
-  font-size: var(--fs-meta);
+  font-size: var(--font-size-meta);
   line-height: 1;
 }
 
 .why p {
   max-width: none;
-  font-size: var(--fs-title);
+  font-size: var(--font-size-title);
   line-height: 1.6;
   color: var(--ink-dim);
 }
@@ -337,7 +371,7 @@ svg.fig {
 }
 
 .elev .sheet > div {
-  box-shadow: -1px -1px 0 var(--line);
+  box-shadow: -1px -1px 0 var(--border);
 }
 
 /* --- customize -------------------------------------------------------- */
@@ -346,9 +380,9 @@ svg.fig {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
   align-items: stretch;
-  border: 1px solid var(--line);
-  background: var(--bg);
-  --divot-ground: var(--bg);
+  border: 1px solid var(--border);
+  background: var(--background);
+  --divot-ground: var(--background);
 }
 
 .cust .info {
@@ -366,7 +400,7 @@ svg.fig {
 .cust .info .body p {
   margin-bottom: 20px;
   max-width: 62ch;
-  font-size: var(--fs-title);
+  font-size: var(--font-size-title);
   line-height: 1.6;
   color: var(--ink-dim);
 }
@@ -378,7 +412,7 @@ svg.fig {
   align-content: center;
   gap: 20px;
   padding: clamp(40px, 5vw, 56px) clamp(24px, 3vw, 32px);
-  border-left: 1px solid var(--line);
+  border-left: 1px solid var(--border);
 }
 
 .cust .stage .lframe {
@@ -393,9 +427,9 @@ svg.fig {
 }
 
 .cust .tool {
-  --divot-pad-y: 3px;
-  --divot-pad-x: 8px;
-  font: var(--fs-mono)/1.3 var(--font-mono);
+  --divot-padding-y: 3px;
+  --divot-padding-x: 8px;
+  font: var(--font-size-mono)/1.3 var(--font-mono);
 }
 
 .cust .scale {
@@ -413,7 +447,7 @@ svg.fig {
   flex: 1 1 auto;
   padding: 6px 12px;
   line-height: 1.5;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   background: var(--surface);
 }
 
@@ -438,7 +472,7 @@ svg.fig {
 .lframe .ring {
   position: absolute;
   inset: 4%;
-  border: 1px dashed var(--line-strong);
+  border: 1px dashed var(--border-strong);
   border-radius: 50%;
 }
 
@@ -450,7 +484,7 @@ svg.fig {
   height: 46cqw;
   border-left: 1px dashed var(--ink-dim);
   transform-origin: 0 0;
-  transform: rotate(calc(var(--divot-light) + 180deg));
+  transform: rotate(calc(var(--divot-light-angle) + 180deg));
 }
 
 /* The button in the middle: a stock .divot with every dimension doubled. */
@@ -460,13 +494,13 @@ svg.fig {
   top: 50%;
   z-index: 1;
   transform: translate(-50%, -50%);
-  font: calc(var(--fs-ui) * 2)/1.3 var(--font-ui);
+  font: calc(var(--font-size-ui) * 2)/1.3 var(--font-ui);
   letter-spacing: normal;
   border-width: 2px;
-  --divot-reach: 2px;
-  --divot-nudge: 0.5px;
-  --divot-pad-y: 10px;
-  --divot-pad-x: 24px;
+  --divot-inner-width: 2px;
+  --divot-press-offset: 0.5px;
+  --divot-padding-y: 10px;
+  --divot-padding-x: 24px;
 }
 
 .lframe .zoom {
@@ -474,8 +508,8 @@ svg.fig {
   left: 50%;
   top: calc(50% + 20cqw);
   transform: translateX(-50%);
-  font: var(--fs-micro)/1 var(--font-mono);
-  letter-spacing: var(--track-label);
+  font: var(--font-size-micro)/1 var(--font-mono);
+  letter-spacing: var(--label-tracking);
   text-transform: uppercase;
   color: var(--ink-faint);
   white-space: nowrap;
@@ -483,13 +517,13 @@ svg.fig {
 
 /* At 1× the button renders at actual size. */
 .lframe.x1 .mag {
-  font: var(--fs-ui)/1.3 var(--font-ui);
+  font: var(--font-size-ui)/1.3 var(--font-ui);
   letter-spacing: normal;
   border-width: 1px;
-  --divot-reach: 1px;
-  --divot-nudge: 0.25px;
-  --divot-pad-y: 5px;
-  --divot-pad-x: 12px;
+  --divot-inner-width: 1px;
+  --divot-press-offset: 0.25px;
+  --divot-padding-y: 5px;
+  --divot-padding-x: 12px;
 }
 
 .lframe.x1 .zoom {
@@ -508,8 +542,8 @@ svg.fig {
   margin: -11px;
   border: 1px solid var(--ink);
   border-radius: 50%;
-  background: var(--bg);
-  transform: rotate(var(--divot-light)) translateY(-46cqw) rotate(calc(-1 * var(--divot-light)));
+  background: var(--background);
+  transform: rotate(var(--divot-light-angle)) translateY(-46cqw) rotate(calc(-1 * var(--divot-light-angle)));
 }
 
 .lframe .lamp::before {
@@ -529,7 +563,7 @@ svg.fig {
 
 .lframe .lamp:hover,
 .lframe.grab .lamp {
-  box-shadow: 0 0 0 5px var(--line);
+  box-shadow: 0 0 0 5px var(--border);
 }
 
 .lframe .lamp:focus-visible {
@@ -541,8 +575,8 @@ svg.fig {
 .cheat {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
 }
 
 .cheat > div {
@@ -550,8 +584,8 @@ svg.fig {
   gap: 10px;
   align-content: start;
   padding: 16px 18px;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .cheat dl {
@@ -559,12 +593,12 @@ svg.fig {
   grid-template-columns: auto 1fr;
   gap: 6px 14px;
   margin: 0;
-  font-size: var(--fs-ui);
+  font-size: var(--font-size-ui);
 }
 
 .cheat dt {
   font-family: var(--font-mono);
-  font-size: var(--fs-mono);
+  font-size: var(--font-size-mono);
   white-space: nowrap;
 }
 
@@ -587,15 +621,15 @@ svg.fig {
 }
 
 .inst-head .divot {
-  --divot-pad-y: 8px;
-  --divot-pad-x: 18px;
+  --divot-padding-y: 8px;
+  --divot-padding-x: 18px;
 }
 
 .install {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
 }
 
 .install > div {
@@ -603,8 +637,8 @@ svg.fig {
   gap: 8px;
   align-content: start;
   padding: 14px 16px;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
 
@@ -615,8 +649,8 @@ svg.fig {
   justify-content: space-between;
   gap: 12px;
   padding-top: 24px;
-  border-top: 1px solid var(--line);
-  font: var(--fs-mono)/1.5 var(--font-mono);
+  border-top: 1px solid var(--border);
+  font: var(--font-size-mono)/1.5 var(--font-mono);
   color: var(--ink-dim);
 }
 
@@ -637,7 +671,7 @@ svg.fig {
 
   .cust .stage {
     border-left: 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--border);
   }
 }
 

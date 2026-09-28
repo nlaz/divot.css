@@ -19,7 +19,7 @@
     vignette: 0.14,        // how much the edges darken
     vignetteStart: 0.7,    // radius (0–1.41) where the darkening begins
     fadeMs: 600,           // theme crossfade
-    bgVar: '--bg',
+    bgVar: '--background',
     inkVar: '--ink',
     tones: false,          // colour glyphs by brightness with the ink ramp
     label: 'Power button. Press to latch it in, press again to release.',

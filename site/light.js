@@ -1,5 +1,5 @@
 /* site/light.js: the lamp dial. Page-only.
-   Dragging inside the frame sets --divot-light on :root. The pin is a slider
+   Dragging inside the frame sets --divot-light-angle on :root. The pin is a slider
    for keyboards and screen readers. */
 window.divotLight = (frame) => {
   const DEFAULT = 315;
@@ -36,14 +36,14 @@ window.divotLight = (frame) => {
   // --- state -------------------------------------------------------------
   const highlight = (deg) =>
     `<span class="t">:root</span> <span class="p">{</span> ` +
-    `<span class="a">--divot-light</span><span class="p">:</span> ` +
+    `<span class="a">--divot-light-angle</span><span class="p">:</span> ` +
     `<span class="s">${deg}deg</span><span class="p">; }</span>`;
 
   const render = () => {
     const deg = Math.round(normalize(angle)) % 360;
     const direction = DIRECTIONS[Math.round(normalize(angle) / 45) % 8];
 
-    root.style.setProperty('--divot-light', `${angle}deg`);
+    root.style.setProperty('--divot-light-angle', `${angle}deg`);
     pin.setAttribute('aria-valuenow', deg);
     pin.setAttribute('aria-valuetext', `${deg} degrees, light from the ${direction}`);
     code.innerHTML = highlight(deg);
