@@ -31,11 +31,15 @@
 }
 
 /* Light. Also applied by [data-theme="light"] so a light panel can sit inside
-   a dark page. --paper is declared here only: it stays white in both themes. */
-:root,
+   a dark page. --paper is declared here only: it stays white in both themes.
+   color-scheme is set only where a theme is asked for by name, never on :root:
+   it restyles the host page's own text, links and form controls. */
 [data-theme="light"] {
   color-scheme: light;
+}
 
+:root,
+[data-theme="light"] {
   --bg: #e8e4d9;
   --surface: #f1eee5;
   --well: #dcd6c7;
@@ -51,13 +55,12 @@
   --ink-faint: #97917c;
 }
 
-/* Dark. Declared twice and the two blocks must stay identical: once for pages
-   that follow the OS, once for [data-theme="dark"] on the root or a container.
-   The :not() lets an explicit light choice win under a dark OS. */
+/* Dark. Declared twice and the two blocks must stay identical, apart from
+   color-scheme: once for pages that follow the OS, once for [data-theme="dark"]
+   on the root or a container. The :not() lets an explicit light choice win
+   under a dark OS. Only the explicit block sets color-scheme (see Light). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    color-scheme: dark;
-
     --bg: #110e0a;
     --surface: #191613;
     --well: #0c0906;
