@@ -4,15 +4,13 @@ v0.2.0 · MIT · **[nlaz.github.io/divot.css](https://nlaz.github.io/divot.css)*
 
 ![divot.css](https://nlaz.github.io/divot.css/site/og.png)
 
-Physical buttons are so satisfying to press, and I wanted to try to bring that feeling
-to the web. The key feature of this stylesheet is a soft divot around the 
-button that keeps its face flush with the surface. It's a simple, no-frills 
-skeuomorphic style that mimics light catching the edges of the cut. The result is a much
-more tangible look and feel.
+Real buttons are so satisfying to press, and I wanted to try to bring that feeling to the web. The key feature of this stylesheet is a soft divot around the button that keeps its face flush with the surface.
 
-## Every divot button type
+It’s a simple, no-frills skeuomorphic style that mimics light catching the edges of the cut. The result is a page that feels tangible and makes you want to click things.
 
-Add one modifier to `.divot`. Every variant keeps the same size.
+## How to use it
+
+To use this style, just add the `divot` class name plus any modifier class.
 
 | Class | |
 |---|---|
@@ -29,23 +27,23 @@ Add one modifier to `.divot`. Every variant keeps the same size.
 | `.divot.danger` | Inverts on hover, for deletes. |
 | `.divot:disabled` | Faded, but keeps its size. |
 
-## Change your light source
+## Customize your light source
 
-`--divot-light` is the light source bearing, clockwise from 12 o'clock. The default,
-`315deg`, is the top-left. Set it on `:root` for the page or on a container
-for a region.
+`--divot-light` is the light source variable. The default,
+`315deg`, is the top-left. You can set it on `:root` to customize
+the light for thepage.
 
 ```css
 :root { --divot-light: 135deg; }
 ```
 
-## Tokens
+## Other tokens
 
 | Token | Default | |
 |---|---|---|
 | `--divot-n` | `45` | Strength, 0–100. The only knob you should normally touch. |
-| `--divot-ground` | `var(--bg)` | The plane being cut. Must match what is behind the button. |
-| `--divot-light` | `315deg` | Lamp bearing, clockwise from 12. |
+| `--divot-ground` | `var(--bg)` | The plane being cut. Should match what is behind the button. |
+| `--divot-light` | `315deg` | Light source variable, clockwise from 12. |
 | `--divot-r` | `0px` | Corner radius. Square at rest. |
 | `--divot-pad-y` / `--divot-pad-x` | `5px` / `12px` | The box. Override these, not `padding`, so the press nudge keeps working. |
 | `--raise-n` | `20` | How far `.raise` lifts off the plane. |
