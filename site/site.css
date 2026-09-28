@@ -2,6 +2,12 @@
    Colours and type come from css/tokens.css; the buttons from css/core.css. */
 
 /* --- base ------------------------------------------------------------- */
+/* The tokens leave color-scheme alone on :root, so the page opts in itself:
+   follow the OS until the theme toggle sets [data-theme]. */
+:root:not([data-theme]) {
+  color-scheme: light dark;
+}
+
 * {
   box-sizing: border-box;
 }
